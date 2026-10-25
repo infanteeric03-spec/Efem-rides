@@ -28,7 +28,7 @@
     var p = run.here ? A.byId[run.here] : null;
     setText("dReg", p ? C.regName(p.reg) : (run.region ? C.regName(run.region) : "En ruta"));
     setText("dName", p ? p.n : (run.lastFix ? "En ruta" : "Buscando GPS…"));
-    /* Próximo lugar dentro de la señal; la distancia ocupa la columna derecha en grande. */
+    /* Próximo lugar dentro de la señal, con la distancia en grande a la derecha. */
     if (run.next) {
       var dk = C.fmtKm(run.next.d).split(" ");
       setText("dNextName", "Próximo: " + run.next.p.n);

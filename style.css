@@ -381,17 +381,11 @@ body.driving .drive.fact-open .d-btn { font-size: clamp(15px, min(6vw, 2.8vh), 2
 .r-country select { flex: 1 1 auto; max-width: 70%; min-height: 44px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); padding: 0 8px; color: var(--fg); }
 .r-hint { font-size: 14px; color: var(--muted); }
 
-/* Señal de conducción en dos columnas: lugar y próximo a la izquierda (60 %), distancia a la derecha (40 %). */
-.d-sign-in { display: flex; align-items: stretch; gap: 0; }
-.d-sign-main { flex: 1 1 60%; min-width: 0; display: flex; flex-direction: column; gap: 2px; justify-content: center; }
+/* Señal de conducción: a la izquierda región, lugar y "Próximo: X"; a la derecha la distancia,
+   número y unidad a la misma altura, centrada en vertical y del orden del 40 % del alto de la señal. Sin separadores. */
+.sign-in.d-sign-in { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 14px; align-items: center; }
+.d-sign-main { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .d-sign-next { font: 600 clamp(15px, min(4.6vw, 2.4vh), 21px)/1.2 var(--font-display); letter-spacing: .02em; opacity: .92; margin-top: 4px; overflow-wrap: break-word; }
-.d-sign-dist {
-  flex: 0 0 40%; max-width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  border-left: 3px solid var(--sign-ink); margin-left: 12px; padding-left: 10px; text-align: center;
-}
-.d-sign-dist b { font: 700 clamp(44px, min(17vw, 10vh), 104px)/.9 var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; letter-spacing: -.01em; }
-.d-sign-dist small { font: 700 clamp(16px, min(5vw, 2.6vh), 24px)/1 var(--font-display); letter-spacing: .12em; text-transform: uppercase; margin-top: 2px; }
-body.driving .d-sign-main .sign-name { font-size: clamp(24px, min(10vw, 6.4vh), 60px); }
-.d-sign-in:has(.d-sign-dist[hidden]) .d-sign-main .sign-name { font-size: clamp(26px, min(11.5vw, 7.2vh), 68px); }
-.sign-in.d-sign-in { flex-direction: row; align-items: stretch; }
-body.driving .d-sign-main .sign-name { font-size: clamp(24px, min(8.6vw, 6vh), 56px); hyphens: manual; }
+.d-sign-dist { white-space: nowrap; text-align: right; font: 700 clamp(40px, min(15vw, 7.6vh), 88px)/.9 var(--font-display); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+body.driving .d-sign .sign-name { font-size: clamp(24px, min(9.6vw, 6.6vh), 64px); hyphens: manual; overflow-wrap: break-word; }
+.d-sign-in:has(.d-sign-dist[hidden]) .sign-name { font-size: clamp(26px, min(11.5vw, 7.2vh), 68px) !important; }
