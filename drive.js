@@ -28,7 +28,16 @@
     var p = run.here ? A.byId[run.here] : null;
     setText("dReg", p ? C.regName(p.reg) : (run.region ? C.regName(run.region) : "En ruta"));
     setText("dName", p ? p.n : (run.lastFix ? "En ruta" : "Buscando GPS…"));
-    setText("dNext", run.next ? "Próximo: " + run.next.p.n + "\u00a0·\u00a0" + C.fmtKm(run.next.d).replace(" ", "\u00a0") : (run.lastFix ? "Sin lugares catalogados cerca" : "Esperando la señal del GPS"));
+    /* Próximo lugar dentro de la señal; la distancia ocupa la columna derecha en grande. */
+    if (run.next) {
+      var dk = C.fmtKm(run.next.d).split(" ");
+      setText("dNextName", "Próximo: " + run.next.p.n);
+      setText("dDist", dk[0]); setText("dDistU", dk[1] || "km");
+      $("dNextName").hidden = false; $("dDistBox").hidden = false; $("dNext").hidden = true;
+    } else {
+      $("dNextName").hidden = true; $("dDistBox").hidden = true; $("dNext").hidden = false;
+      setText("dNext", run.lastFix ? "Sin lugares catalogados cerca" : "Esperando la señal del GPS");
+    }
 
     var T = A.trip(), st = T && T.pts.length > 1 ? C.stats(T.pts) : { km: 0, ms: 0 };
     var mins = Math.floor(st.ms / 60000);
