@@ -42,7 +42,7 @@ En Ajustes, bajo **Probar sin salir de casa**, hay cuatro rutas simuladas (por e
 
 Para viajar fuera de los lugares que trae la app (por ejemplo, Oviedo–León):
 
-1. En la pestaña **Ruta**, en **Viaje a un destino nuevo**, escribe el destino (y el origen si no sales de donde estás) y pulsa **Preparar viaje**. Hazlo con cobertura, mejor con wifi.
+1. En la pestaña **Lugares**, debajo del buscador, pulsa **+ Viaje a un nuevo destino**, escribe el destino (y el origen si no sales de donde estás) y pulsa **Preparar viaje**. Hazlo con cobertura, mejor con wifi.
 2. La app calcula la ruta con OSRM (sobre OpenStreetMap), busca en Wikipedia los pueblos y lugares a menos de unos 4 km de la carretera, se queda con los más relevantes (uno cada 3 km como mucho) y guarda su resumen en el móvil. En el coche funciona sin conexión.
 3. Para probarla antes de salir: **Ajustes, Probar sin salir de casa**, elige **Ruta preparada**.
 

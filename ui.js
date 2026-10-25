@@ -153,6 +153,7 @@
     if (!box.firstChild) box.appendChild(el("p", "empty", "No hay ningún lugar con ese nombre."));
   }
   $("q").addEventListener("input", renderPlaces);
+  A.on("places", function () { if (current === "lugares") renderPlaces(); });
 
   /* ---------- Viaje ---------- */
   function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }

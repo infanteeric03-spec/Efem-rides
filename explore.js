@@ -254,7 +254,7 @@
       var places = pick(cands, builtIn(), 3, Math.ceil(route.km / 3) + 5);
       fillRegions(places, String(dest.full).split(",")[1] ? String(dest.full).split(",")[1].trim() : dest.name);
       R = { from: origin.name, to: dest.name, km: route.km, min: route.min, created: Date.now(), pts: thin(route.pts, 0.3), places: places, live: (R && R.live) || [] };
-      install(); persist();
+      install(); persist(); A.emit("places");
       progress(1);
       status("");
       renderPrep();
@@ -293,7 +293,7 @@
       fillRegions(add, run.region);
       if (!R) R = { live: [] };
       R.live = (R.live || []).concat(add).slice(-300);
-      install(); persist();
+      install(); persist(); A.emit("places");
     }).catch(function () { /* sin cobertura: se intentará más adelante */ }).then(function () { busyQ = false; });
   });
 
@@ -309,12 +309,23 @@
         (R.live && R.live.length ? " (+" + R.live.length + " encontrados por el camino)" : "") +
         ". Preparado el " + d.toLocaleDateString("es-ES", { day: "numeric", month: "long" }) + ".";
     }
+    var mini = $("pMini");
+    mini.hidden = !has;
+    if (has) mini.textContent = "Ruta preparada: " + R.from + " → " + R.to + " · " + R.places.length + " lugares";
     var sel = $("s_sim"), opt = sel.querySelector('option[value="ruta"]');
     if (has && !opt) { opt = document.createElement("option"); opt.value = "ruta"; sel.insertBefore(opt, sel.firstChild); }
     if (opt) { if (has) opt.textContent = "Ruta preparada: " + R.from + " → " + R.to; else opt.remove(); }
     if (S.sim === "ruta") sel.value = has ? "ruta" : "0";
   }
   A.on("trip", function () { $("prep").hidden = run.on; });
+  function setOpen(open) {
+    $("pPanel").hidden = !open;
+    $("pToggle").setAttribute("aria-expanded", open ? "true" : "false");
+    $("pToggle").querySelector(".prep-plus").textContent = open ? "−" : "+";
+    $("pMini").classList.toggle("off", open);
+    if (open) setTimeout(function () { $("pTo").focus(); }, 50);
+  }
+  $("pToggle").addEventListener("click", function () { setOpen($("pPanel").hidden); });
   $("pGo").addEventListener("click", function () { prepare($("pFrom").value.trim(), $("pTo").value.trim()); });
   $("pTo").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); $("pGo").click(); } });
   var armT;
@@ -322,7 +333,7 @@
     var b = $("pClear");
     if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Pulsa otra vez para borrar"; armT = setTimeout(function () { delete b.dataset.armed; b.textContent = "Borrar ruta"; }, 3500); return; }
     clearTimeout(armT); delete b.dataset.armed; b.textContent = "Borrar ruta";
-    R = null; install(); persist(); renderPrep(); A.emit("toast", "Ruta borrada.");
+    R = null; install(); persist(); A.emit("places"); renderPrep(); A.emit("toast", "Ruta borrada.");
   });
   var sl = $("s_live"); sl.checked = !!S.live;
   sl.addEventListener("change", function () { A.setS("live", sl.checked); });

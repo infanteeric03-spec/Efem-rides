@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 <header class="top">
@@ -62,24 +62,6 @@
       </div>
     </div>
 
-    <div class="prep" id="prep">
-      <h2 class="sec">Viaje a un destino nuevo</h2>
-      <div class="prep-card">
-        <p class="note">Para lugares que la app no conoce. Prepáralo con cobertura antes de salir: calculo la ruta y guardo en el móvil los pueblos que vas a cruzar, con su resumen de Wikipedia.</p>
-        <div class="prep-fields">
-          <label for="pFrom">Desde</label><input class="search" id="pFrom" type="text" placeholder="Tu ubicación actual" autocomplete="off">
-          <label for="pTo">Hasta</label><input class="search" id="pTo" type="text" placeholder="Por ejemplo, León" autocomplete="off">
-        </div>
-        <button class="btn" id="pGo" type="button">Preparar viaje</button>
-        <div class="prog" id="pProg" hidden><div id="pBar"></div></div>
-        <p class="note" id="pStatus" aria-live="polite" hidden></p>
-        <div class="prep-done" id="pDone" hidden>
-          <p class="prep-sum" id="pSum"></p>
-          <button class="btn ghost small" id="pClear" type="button">Borrar ruta</button>
-        </div>
-      </div>
-    </div>
-
     <div class="metrics">
       <div><span id="mSpeed">0</span><small>km/h</small></div>
       <div><span id="mKm">0,0</span><small>km</small></div>
@@ -112,6 +94,25 @@
 
   <section class="tab" id="tab-lugares" role="tabpanel" aria-labelledby="t-lugares" hidden>
     <input class="search" id="q" type="search" placeholder="Buscar un lugar" autocomplete="off" aria-label="Buscar un lugar">
+    <div class="prep" id="prep">
+      <button class="prep-toggle" id="pToggle" type="button" aria-expanded="false" aria-controls="pPanel"><span class="prep-plus" aria-hidden="true">+</span> Viaje a un nuevo destino</button>
+      <p class="prep-mini" id="pMini" hidden></p>
+      <div class="prep-card" id="pPanel" hidden>
+        <p class="note">Para lugares que la app no conoce. Prepáralo con cobertura antes de salir: calculo la ruta y guardo en el móvil los pueblos que vas a cruzar, con su resumen de Wikipedia.</p>
+        <div class="prep-fields">
+          <label for="pFrom">Desde</label><input class="search" id="pFrom" type="text" placeholder="Tu ubicación actual" autocomplete="off">
+          <label for="pTo">Hasta</label><input class="search" id="pTo" type="text" placeholder="Por ejemplo, León" autocomplete="off">
+        </div>
+        <button class="btn" id="pGo" type="button">Preparar viaje</button>
+        <div class="prog" id="pProg" hidden><div id="pBar"></div></div>
+        <p class="note" id="pStatus" aria-live="polite" hidden></p>
+        <div class="prep-done" id="pDone" hidden>
+          <p class="prep-sum" id="pSum"></p>
+          <button class="btn ghost small" id="pClear" type="button">Borrar ruta</button>
+        </div>
+      </div>
+    </div>
+
     <div id="placesList" class="tab"></div>
   </section>
 
@@ -204,7 +205,7 @@
       <div class="line"><span class="lbl">La prueba no se guarda en tu viaje</span><button class="btn small" id="btnSim" type="button" style="flex:0 0 auto">Simular</button></div>
     </div>
 
-    <p class="note">Versión 10. Los datos están guardados en la propia aplicación, así que funciona sin cobertura una vez instalada. Las fechas y cifras proceden de fuentes generales; si vas a citar alguna, compruébala antes.</p>
+    <p class="note">Versión 11. Los datos están guardados en la propia aplicación, así que funciona sin cobertura una vez instalada. Las fechas y cifras proceden de fuentes generales; si vas a citar alguna, compruébala antes.</p>
   </section>
 </main>
 
@@ -223,14 +224,14 @@
 <div id="toast" role="status" aria-live="polite" hidden></div>
 <div id="dimmer" hidden></div>
 
-<script src="data-asturias.js?v=10"></script>
-<script src="data-cantabria.js?v=10"></script>
-<script src="data-dias.js?v=10"></script>
-<script src="core.js?v=10"></script>
-<script src="engine.js?v=10"></script>
-<script src="ui.js?v=10"></script>
-<script src="radio.js?v=10"></script>
-<script src="explore.js?v=10"></script>
-<script src="drive.js?v=10"></script>
+<script src="data-asturias.js?v=11"></script>
+<script src="data-cantabria.js?v=11"></script>
+<script src="data-dias.js?v=11"></script>
+<script src="core.js?v=11"></script>
+<script src="engine.js?v=11"></script>
+<script src="ui.js?v=11"></script>
+<script src="radio.js?v=11"></script>
+<script src="explore.js?v=11"></script>
+<script src="drive.js?v=11"></script>
 </body>
 </html>
