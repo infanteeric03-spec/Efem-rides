@@ -306,3 +306,16 @@ body.driving main, body.driving .dock { display: none !important; }
 .d-btn { min-height: 74px; }
 .d-wide { min-height: 84px; }
 #dRadio[aria-pressed="true"] { border-color: var(--ok); color: var(--ok); }
+
+/* Preparar viaje */
+.prep { display: flex; flex-direction: column; gap: 8px; }
+.prep-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.prep-fields { display: grid; grid-template-columns: auto 1fr; gap: 8px 10px; align-items: center; }
+.prep-fields label { font: 600 13px/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.prep-fields .search { min-width: 0; }
+.prep-card .btn:not(.small) { min-height: 52px; }
+.prep-done { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; border-top: 1px solid var(--line); padding-top: 10px; }
+.prep-sum { font-size: 16px; }
+.prog { height: 8px; border-radius: 4px; background: var(--panel-2); overflow: hidden; }
+.prog > div { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.src-link { color: var(--muted); font-size: 14px; }

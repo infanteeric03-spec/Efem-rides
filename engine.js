@@ -195,7 +195,7 @@
       if (run.regN >= 3) {
         var first = run.region === null;
         run.region = reg;
-        if (!first) speak("Entrando en " + C.REGIONES[reg] + ".", false);
+        if (!first) speak("Entrando en " + C.regName(reg) + ".", false);
         emit("region", reg);
       }
     } else if (reg) { run.regCand = null; run.regN = 0; }
@@ -282,7 +282,8 @@
   App.startSim = function () {
     if (run.on) App.stop();
     var route = App.SIMS[+S.sim] || App.SIMS[0], factor = +S.simSpeed || 10;
-    run.simPath = C.simPath(route.ids, L, 0.025 * factor);
+    run.simPath = S.sim === "ruta" && App.routePath ? App.routePath(0.025 * factor) : C.simPath(route.ids, L, 0.025 * factor);
+    if (!run.simPath || run.simPath.length < 2) run.simPath = C.simPath(App.SIMS[0].ids, L, 0.025 * factor);
     run.simI = 0; run.simT0 = Date.now();
     begin(true);
     run.timer = setInterval(function () {

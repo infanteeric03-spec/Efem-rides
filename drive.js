@@ -26,7 +26,7 @@
   function render() {
     if (!shown) return;
     var p = run.here ? A.byId[run.here] : null;
-    setText("dReg", p ? C.REGIONES[p.reg] : (run.region ? C.REGIONES[run.region] : "En ruta"));
+    setText("dReg", p ? C.regName(p.reg) : (run.region ? C.regName(run.region) : "En ruta"));
     setText("dName", p ? p.n : (run.lastFix ? "En ruta" : "Buscando GPS…"));
     setText("dNext", run.next ? "Próximo: " + run.next.p.n + "\u00a0·\u00a0" + C.fmtKm(run.next.d).replace(" ", "\u00a0") : (run.lastFix ? "Sin lugares catalogados cerca" : "Esperando la señal del GPS"));
 

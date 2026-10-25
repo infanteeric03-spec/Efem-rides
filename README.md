@@ -38,6 +38,18 @@ En Ajustes, bajo **Probar sin salir de casa**, hay cuatro rutas simuladas (por e
 - Modo ahorro en Ajustes: atiende una posición cada 3 o 5 segundos (por defecto, todas, que suele ser una por segundo). Reduce el trabajo del móvil, pero el GPS sigue encendido, así que la batería mejora poco. Lo que más gasta es la pantalla.
 - Guarda el recorrido, calcula distancia y velocidades, y lo exporta como GPX.
 
+## Destinos nuevos
+
+Para viajar fuera de los lugares que trae la app (por ejemplo, Oviedo–León):
+
+1. En la pestaña **Ruta**, en **Viaje a un destino nuevo**, escribe el destino (y el origen si no sales de donde estás) y pulsa **Preparar viaje**. Hazlo con cobertura, mejor con wifi.
+2. La app calcula la ruta con OSRM (sobre OpenStreetMap), busca en Wikipedia los pueblos y lugares a menos de unos 4 km de la carretera, se queda con los más relevantes (uno cada 3 km como mucho) y guarda su resumen en el móvil. En el coche funciona sin conexión.
+3. Para probarla antes de salir: **Ajustes, Probar sin salir de casa**, elige **Ruta preparada**.
+
+Además, con **Buscar lugares sobre la marcha** activado y cobertura, la app consulta Wikipedia unos 7 km por delante cuando no tiene lugares guardados en esa dirección.
+
+Los lugares propios de Asturias y Cantabria tienen prioridad: no se añade ningún pueblo de Wikipedia a menos de 3 km de uno de ellos. Los textos de Wikipedia se publican con licencia CC BY-SA; cada lugar enlaza a su artículo en la pestaña Lugares.
+
 ## Radio
 
 La pestaña **Radio** reproduce emisoras por internet. Vienen como favoritas Europa FM, COPE, Cadena SER, LOS40 y LOS40 Classic, y con el buscador se puede añadir cualquier otra. Las emisoras se buscan en [Radio Browser](https://www.radio-browser.info), un directorio público y gratuito, así que la app usa siempre el enlace vigente de cada una.

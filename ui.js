@@ -41,9 +41,9 @@
       sub = T && T.log.length ? "Tienes un viaje guardado. Al empezar, continuará donde lo dejaste." : "Deja el móvil en el soporte, conectado al coche, y pulsa Empezar viaje.";
     } else if (run.here) {
       var p = A.byId[run.here];
-      reg = C.REGIONES[p.reg]; name = p.n; sub = "Estás aquí";
+      reg = C.regName(p.reg); name = p.n; sub = "Estás aquí";
     } else {
-      reg = run.region ? C.REGIONES[run.region] : "En ruta"; name = "En ruta";
+      reg = run.region ? C.regName(run.region) : "En ruta"; name = "En ruta";
       sub = run.next ? "Próximo: " + run.next.p.n + ", a " + C.fmtKm(run.next.d) : (run.lastFix ? "Buscando el siguiente lugar con historia…" : "Esperando la señal del GPS…");
     }
     $("signReg").textContent = reg; $("signName").textContent = name; $("signSub").textContent = sub;
@@ -53,7 +53,7 @@
     if (!run.on) { $("nextName").textContent = "—"; $("nextDist").textContent = "Empieza el viaje para ver el siguiente."; return; }
     if (run.next) {
       $("nextName").textContent = run.next.p.n;
-      $("nextDist").textContent = "a " + C.fmtKm(run.next.d) + " · " + C.REGIONES[run.next.p.reg];
+      $("nextDist").textContent = "a " + C.fmtKm(run.next.d) + " · " + C.regName(run.next.p.reg);
     } else {
       $("nextName").textContent = "—";
       $("nextDist").textContent = run.lastFix ? "No hay lugares catalogados por delante." : "Esperando la señal del GPS…";
@@ -87,7 +87,7 @@
   }
 
   A.on("fact", function (e) {
-    $("factMeta").textContent = e.p.n + " · dato " + (e.f.i + 1) + " de " + e.f.n;
+    $("factMeta").textContent = e.p.n + " · dato " + (e.f.i + 1) + " de " + e.f.n + (e.p.src ? " · Wikipedia" : "");
     $("factText").textContent = e.f.text;
     renderSign(); renderButtons(); if (current === "viaje") renderViaje();
   });
@@ -118,12 +118,14 @@
   function renderPlaces() {
     var q = norm($("q").value.trim()), box = $("placesList"), T = A.trip();
     box.textContent = "";
-    ["AST", "CAN"].forEach(function (reg) {
-      var items = L.filter(function (p) { return p.reg === reg && (!q || norm(p.n).indexOf(q) >= 0); });
+    var groups = [];
+    L.forEach(function (p) { var g = p.src ? "ruta" : p.reg; if (groups.indexOf(g) < 0) groups.push(g); });
+    groups.forEach(function (reg) {
+      var items = L.filter(function (p) { return (p.src ? "ruta" : p.reg) === reg && (!q || norm(p.n).indexOf(q) >= 0); });
       if (!items.length) return;
       if (run.cur) items.sort(function (a, b) { return C.dist(run.cur.lat, run.cur.lon, a.lat, a.lon) - C.dist(run.cur.lat, run.cur.lon, b.lat, b.lon); });
       else items.sort(function (a, b) { return a.n.localeCompare(b.n, "es"); });
-      box.appendChild(el("h2", "group", C.REGIONES[reg]));
+      box.appendChild(el("h2", "group", reg === "ruta" ? (A.routeLabel ? A.routeLabel() : "Ruta preparada") : C.regName(reg)));
       items.forEach(function (p) {
         var card = el("div", "place"), head = el("button", "head");
         head.type = "button";
@@ -139,6 +141,7 @@
         var play = el("button", "btn small", "Escuchar"); play.type = "button";
         play.addEventListener("click", function () { A.speakPlace(p); });
         body.appendChild(play);
+        if (p.url) { var src = el("a", "src-link", "Texto de Wikipedia (CC BY-SA)"); src.href = p.url; src.target = "_blank"; src.rel = "noopener"; body.appendChild(src); }
         card.appendChild(body);
         head.addEventListener("click", function () {
           open[p.id] = !open[p.id]; body.hidden = !open[p.id];

@@ -158,6 +158,7 @@
     dist: dist, inside: inside, nearest: nearest, regionAt: regionAt, pickFact: pickFact,
     today: today, dateEs: dateEs, shouldRecord: shouldRecord, stats: stats, gpx: gpx,
     simPath: simPath, chunks: chunks, fmtKm: fmtKm, fmtDur: fmtDur,
-    MESES: MESES, REGIONES: REGIONES
+    MESES: MESES, REGIONES: REGIONES,
+    regName: function (r) { return REGIONES[r] || r || ""; }
   };
 });
