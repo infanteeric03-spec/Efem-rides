@@ -52,4 +52,4 @@ Las efemérides con fecha están en `data-dias.js`. Escribe las cifras en letra 
 
 ## Aviso sobre los datos
 
-Los datos son una selección propia, hecha a partir de conocimiento general y sin conexión a Wikipedia, y no se han contrastado con fuentes primarias. Hay fechas que la tradición discute (por ejemplo, la batalla de Covadonga). Antes de citar alguna cifra o fecha en público, compruébala.
+Los datos son una selección propia. En octubre de 2026 se revisaron las fechas y cifras con más riesgo de error contrastándolas con fuentes web (Turismo de Asturias y de Cantabria, Wikipedia, RAE, prensa regional) y se corrigieron las que no cuadraban. Hay fechas que la tradición discute, como la batalla de Covadonga (718 o 722) o el lugar de nacimiento de Juan de la Cosa, y así se indica en la propia app. Antes de citar alguna cifra en público, compruébala.

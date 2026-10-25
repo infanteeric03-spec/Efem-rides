@@ -43,7 +43,7 @@
 
   add("torrelavega", "Torrelavega", 43.3490, -4.0480, 5, [
     "Torrelavega, la segunda ciudad de Cantabria y un gran nudo industrial entre los ríos Besaya y Saja.",
-    "La fábrica de Solvay empezó a producir en Barreda en 1908, y desde entonces la industria química marcó la vida de la ciudad.",
+    "La fábrica de Solvay, en Barreda, funciona desde 1908, y desde entonces la industria química marcó la vida de la ciudad.",
     "Torrelavega alberga el Mercado Nacional de Ganados, uno de los mayores de España, un reflejo de la tradición ganadera de Cantabria."
   ]);
 
@@ -58,7 +58,7 @@
     "Comillas, un pueblo de indianos y de nobleza del siglo diecinueve, con tres joyas arquitectónicas.",
     "El Capricho de Gaudí, construido entre 1883 y 1885, es una de las tres obras de Gaudí fuera de Cataluña.",
     "El Palacio de Sobrellano, de estilo neogótico, lo mandó construir Antonio López, el primer marqués de Comillas, naviero y fundador de la Compañía Transatlántica.",
-    "Según la tradición, Comillas fue una de las primeras poblaciones de España con alumbrado eléctrico, estrenado en 1881 con motivo de una visita de Alfonso Doce.",
+    "Comillas fue de los primeros lugares de España con bombillas eléctricas de Edison, hacia 1880. Y el 6 de agosto de 1881, durante la estancia de Alfonso Doce, fue capital de España por un día.",
     "En el cementerio, sobre las ruinas de una antigua iglesia, se alza el Ángel Exterminador, una escultura de Josep Llimona."
   ]);
 
@@ -76,8 +76,8 @@
   ]);
 
   add("fuente-de", "Fuente Dé", 43.1520, -4.8100, 4, [
-    "Fuente Dé, el final del valle, donde un teleférico salva 753 metros de desnivel hasta el Mirador del Cable, a 1.823 metros de altitud.",
-    "Desde aquí se accede al macizo central de los Picos de Europa, donde está Torre Cerredo, de 2.650 metros, la cumbre más alta de todo el parque."
+    "Fuente Dé, el final del valle de Camaleño, donde un teleférico salva 753 metros de desnivel hasta el Mirador del Cable, a 1.823 metros de altitud.",
+    "Desde aquí se accede al macizo central de los Picos de Europa. En él está Torre Cerredo, de 2.650 metros, la cumbre más alta de la cordillera, entre Asturias y León."
   ]);
 
   add("reinosa", "Reinosa", 43.0000, -4.1367, 4, [
@@ -93,8 +93,8 @@
   ]);
 
   add("santoña", "Santoña", 43.4442, -3.4586, 3.5, [
-    "Santoña, una villa pesquera famosa por sus anchoas, que cuentan con indicación geográfica protegida.",
-    "En Santoña nació hacia 1460 Juan de la Cosa, cartógrafo y propietario de la Santa María, la nao de Colón en 1492. Su mapamundi de 1500 es uno de los primeros que representa América.",
+    "Santoña, una villa pesquera famosa por sus anchoas en salazón y en aceite, una industria que impulsaron conserveros italianos a finales del siglo diecinueve.",
+    "Según la tesis más extendida, en Santoña nació hacia 1450 o 1460 Juan de la Cosa, cartógrafo y propietario de la Santa María, la nao de Colón en 1492. Su mapamundi de 1500 es uno de los primeros que representa América.",
     "Las Marismas de Santoña, Victoria y Joyel son Parque Natural y humedal Ramsar, un lugar clave para las aves migratorias."
   ]);
 
@@ -119,7 +119,7 @@
   ]);
 
   add("carmona", "Carmona", 43.2000, -4.3050, 3, [
-    "Carmona, un pueblo de casonas montañesas con balcones de madera y escudos, en el valle de Cabuérniga, junto al Parque Natural Saja-Besaya.",
-    "En invierno, en este valle salen los zamarrones, figuras cubiertas de pieles y cencerros que recorren los pueblos."
+    "Carmona, un pueblo de casonas montañesas de los siglos diecisiete y dieciocho, con balcones de madera, en el valle de Cabuérniga y dentro del Parque Natural Saja-Besaya.",
+    "A Carmona la llaman la flor de los albarqueros, por sus albarcas, el calzado tradicional de madera. El último sábado de septiembre celebra La Pasá, la bajada del ganado tudanco de los puertos."
   ]);
 })(typeof window !== "undefined" ? window : globalThis);

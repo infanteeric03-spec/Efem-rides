@@ -9,7 +9,6 @@
     { m: 7, d: 28, t: "El 28 de julio es el Día de las Instituciones de Cantabria." },
     { m: 8, d: 5, t: "El 5 de agosto de 1904, Pedro Pidal y Gregorio Pérez, el Cainejo, hicieron la primera ascensión al Naranjo de Bulnes." },
     { m: 9, d: 8, t: "El 8 de septiembre es el Día de Asturias, dedicado a la Virgen de Covadonga." },
-    { m: 9, d: 17, t: "El 17 de septiembre de 1968 se descubrió la cueva de Tito Bustillo, en Ribadesella." },
     { m: 9, d: 19, t: "El 19 de septiembre de 1517 desembarcó Carlos Primero en Tazones, en la costa de Villaviciosa." },
     { m: 9, d: 24, t: "El 24 de septiembre de 1905 nació en Luarca Severo Ochoa, Premio Nobel de Medicina en 1959." },
     { m: 9, d: 28, t: "El 28 de septiembre de 1556 desembarcó en Laredo el emperador Carlos Quinto, camino del monasterio de Yuste." },

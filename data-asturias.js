@@ -18,7 +18,7 @@
     "Gijón, la ciudad más poblada de Asturias, se abre a la bahía de San Lorenzo. Su barrio viejo, Cimadevilla, ocupa una pequeña península que ya habitaron los romanos.",
     "En Cimadevilla están las termas romanas de Campo Valdés. En lo alto del cerro de Santa Catalina se alza Elogio del Horizonte, la escultura de Eduardo Chillida inaugurada en 1990.",
     "Gaspar Melchor de Jovellanos, escritor, jurista y político de la Ilustración, nació en Gijón en 1744.",
-    "La Laboral, levantada entre 1946 y 1956 como Universidad Laboral para huérfanos de mineros, es hoy la Ciudad de la Cultura, con una torre de más de cien metros.",
+    "La Laboral, cuyas obras empezaron en 1946, nació como un centro para los huérfanos de mineros. Su torre mide 117 metros, y desde 2007 es la Laboral Ciudad de la Cultura.",
     "El Real Sporting se fundó en 1905 y juega en El Molinón, un estadio que se inauguró en 1908."
   ]);
 
@@ -30,7 +30,7 @@
   ]);
 
   add("peñas", "Cabo de Peñas", 43.6556, -5.8480, 3, [
-    "Cabo de Peñas, el punto más septentrional de Asturias, con un faro de mediados del siglo diecinueve sobre acantilados que caen al Cantábrico.",
+    "Cabo de Peñas, el punto más septentrional de Asturias. Su faro se encendió por primera vez en 1852, sobre acantilados que caen al Cantábrico.",
     "Es un lugar muy conocido para observar aves marinas durante sus migraciones, y también por sus temporales, que han hundido barcos a lo largo de la historia."
   ]);
 
@@ -42,7 +42,7 @@
   add("luarca", "Luarca", 43.5420, -6.5350, 3, [
     "Luarca, la Villa Blanca de la Costa Verde, con casas escalonadas a ambos lados del río Negro, justo antes de que desemboque en el mar.",
     "En Luarca nació en 1905 Severo Ochoa, Premio Nobel de Medicina en 1959.",
-    "El cementerio de Luarca está sobre un acantilado, junto a la ermita de la Blanca, con vistas abiertas al Cantábrico. Es uno de los rincones más fotografiados de la villa."
+    "El cementerio de Luarca está sobre un acantilado, junto al faro y la ermita de la Blanca, en la Atalaya, con vistas abiertas al Cantábrico. Es uno de los rincones más fotografiados de la villa."
   ]);
 
   add("pravia", "Pravia", 43.4833, -6.1167, 3, [
@@ -62,21 +62,21 @@
   ]);
 
   add("covadonga", "Covadonga", 43.3086, -4.9863, 4, [
-    "Covadonga. Según la tradición, aquí venció Pelayo hacia el año 722, un hecho considerado el inicio simbólico del reino de Asturias y de la Reconquista.",
-    "La Santa Cueva guarda la imagen de la Santina, la Virgen de Covadonga, y los sepulcros del rey Pelayo y de su esposa Gaudiosa.",
+    "Covadonga. Según la tradición, aquí venció Pelayo en el año 718, aunque muchos historiadores lo sitúan hacia el 722, un hecho considerado el inicio simbólico del reino de Asturias y de la Reconquista.",
+    "La Santa Cueva guarda la imagen de la Santina, la Virgen de Covadonga, y el panteón real con los restos atribuidos a Pelayo, su esposa Gaudiosa, Alfonso Primero y Ermesinda.",
     "La basílica neorrománica se levantó a finales del siglo diecinueve. El Parque Nacional de la Montaña de Covadonga, declarado en 1918, es el primero de España.",
     "En la montaña, a unos doce kilómetros, están los lagos de Enol y de la Ercina. El ocho de septiembre es el Día de Asturias, dedicado a la Virgen de Covadonga."
   ]);
 
   add("arriondas", "Arriondas", 43.3833, -5.2000, 3, [
     "Arriondas, a orillas del Sella, es el punto de salida del Descenso del Sella, la fiesta de las piraguas que baja hasta Ribadesella.",
-    "El Descenso del Sella se celebra desde 1930, en agosto, y es Fiesta de Interés Turístico Internacional.",
+    "El Descenso del Sella se celebra desde 1930, el primer fin de semana de agosto, y es Fiesta de Interés Turístico Internacional. Lo impulsó Dionisio de la Huerta.",
     "Cerca, el mirador del Fito ofrece vistas a la costa y a los Picos de Europa."
   ]);
 
   add("ribadesella", "Ribadesella", 43.4636, -5.0586, 3.5, [
     "Ribadesella, en la desembocadura del Sella, es la meta del Descenso de las piraguas.",
-    "La cueva de Tito Bustillo, con arte rupestre de hace más de veinte mil años, se descubrió el 17 de septiembre de 1968 y es Patrimonio Mundial desde 2008."
+    "La cueva de Tito Bustillo la descubrió en 1968 un grupo de jóvenes espeleólogos. Lleva el nombre de uno de ellos, Celestino Fernández Bustillo, Tito, que murió pocas semanas después. Algunas de sus pinturas tienen más de treinta mil años, y es Patrimonio Mundial desde 2008."
   ]);
 
   add("lastres", "Lastres", 43.5148, -5.2689, 3, [
@@ -93,7 +93,7 @@
 
   add("llanes", "Llanes", 43.4200, -4.7550, 4, [
     "Llanes, con restos de murallas medievales, un puerto pesquero y el paseo de San Pedro sobre el mar.",
-    "En el rompeolas del puerto están los Cubos de la Memoria, una obra de Agustín Ibarrola de 2001, hecha con bloques de hormigón pintados.",
+    "En el rompeolas del puerto están los Cubos de la Memoria, bloques de hormigón que Agustín Ibarrola empezó a pintar en 2001.",
     "En agosto, Llanes celebra las fiestas de San Roque, con ramos, gaiteros y mucha sidra."
   ]);
 
