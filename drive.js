@@ -11,6 +11,24 @@
   var shown = false, closedThisTrip = false, lastFactKey = "", lastName = "", lastNext = "";
   var POP_SECONDS = 30, popTimer = null, popLeft = 0;
 
+  /* Iconos de los botones pequeños (trazo con el color del botón). */
+  var ICONS = {
+    repeat: '<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4 4.5v5h5"/>',
+    sound: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke-linejoin="round"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/>',
+    muted: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke-linejoin="round"/><path d="M15.5 9.5l5 5"/><path d="M20.5 9.5l-5 5"/>',
+    radio: '<rect x="3" y="8.5" width="18" height="11.5" rx="2"/><path d="M7 8.5l10-4.5"/><circle cx="15.5" cy="14.25" r="2.75"/><path d="M6.5 12.5h4M6.5 16h4"/>',
+    radioOn: '<rect x="3" y="8.5" width="18" height="11.5" rx="2" fill="currentColor" fill-opacity=".18"/><path d="M7 8.5l10-4.5"/><circle cx="15.5" cy="14.25" r="2.75" fill="currentColor"/><path d="M6.5 12.5h4M6.5 16h4"/>',
+    next: '<path d="M6 6l9 6-9 6z" fill="currentColor" stroke-linejoin="round"/><path d="M18 6v12"/>'
+  };
+  function setIcon(id, icon, label) {
+    var b = $(id);
+    if (b.dataset.icon !== icon) {
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">' + ICONS[icon] + '</svg>';
+      b.dataset.icon = icon;
+    }
+    b.setAttribute("aria-label", label); b.title = label;
+  }
+
   function setText(id, t) { var e = $(id); if (e.textContent !== t) e.textContent = t; }
   function setVisible(el, on) { el.style.visibility = on ? "visible" : "hidden"; }
 
@@ -127,7 +145,7 @@
     $("dMore").disabled = !(run.here || run.lastFact);
     $("dRepeat").disabled = !run.lastFact;
     $("dMute").setAttribute("aria-pressed", run.mute ? "true" : "false");
-    setText("dMute", run.mute ? "Voz silenciada" : "Silenciar");
+    setIcon("dMute", run.mute ? "muted" : "sound", run.mute ? "Voz silenciada: toca para activarla" : "Silenciar la voz");
     if (!armed.dStop) setText("dStop", run.sim ? "Parar prueba" : "Parar viaje");
   }
 
@@ -148,7 +166,7 @@
   $("dRadio").addEventListener("click", function () { if (A.radio) A.radio.toggle(); });
   $("dStation").addEventListener("click", function () { if (A.radio) A.radio.next(); });
   A.on("radio", function (r) {
-    setText("dRadio", r.playing ? "Parar radio" : "Radio");
+    setIcon("dRadio", r.playing ? "radioOn" : "radio", r.playing ? "Parar la radio" : "Encender la radio");
     $("dRadio").setAttribute("aria-pressed", r.playing ? "true" : "false");
     var info = $("dRadioInfo");
     setText("dRadioInfo", r.text || "");
@@ -165,6 +183,10 @@
   st2.checked = !!S.driveText;
   st2.addEventListener("change", function () { A.setS("driveText", st2.checked); $("drive").classList.toggle("no-text", !S.driveText); });
 
+  setIcon("dRepeat", "repeat", "Repetir el último dato");
+  setIcon("dStation", "next", "Otra emisora");
+  setIcon("dMute", "sound", "Silenciar la voz");
+  setIcon("dRadio", "radio", "Encender la radio");
   setVisible($("dRadioInfo"), false);
   show(false);
 })();
