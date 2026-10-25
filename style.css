@@ -469,3 +469,8 @@ body.driving .d-sign-dist #dDistU { font-size: 1em; margin: 0; letter-spacing: .
 .d-icon { display: flex; align-items: center; justify-content: center; padding: 0; }
 .d-icon svg { height: min(60%, 58px); width: auto; aspect-ratio: 1; display: block; }
 #dMute[aria-pressed="true"] { border-color: var(--warn); color: var(--warn); }
+
+/* Letra más grande en los botones principales: Otro dato, Parar viaje y Empezar/Parar viaje. */
+body.driving .d-btn.d-wide { font-size: clamp(24px, min(9vw, 4.8vh), 42px); letter-spacing: .05em; }
+.startbar .btn.big { font-size: clamp(26px, 8vw, 36px); }
+.startrow.two .btn.big { font-size: clamp(20px, 6vw, 28px); }
