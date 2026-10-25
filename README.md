@@ -59,6 +59,7 @@ La pestaña **Radio** reproduce emisoras por internet. Vienen como favoritas Eur
 - Si se corta por falta de cobertura, reconecta sola cuando vuelve la señal.
 - En la vista de conducción hay dos botones: **Radio** (encender o apagar) y **Otra radio**.
 - Al pulsar **Parar viaje** se para también la radio.
+- El buscador permite elegir país: España, República Dominicana o todos. Sin escribir nada, muestra las emisoras más escuchadas del país elegido.
 - Gasta unos 60 MB de datos por hora.
 
 ## Añadir o corregir lugares

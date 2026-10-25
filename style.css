@@ -376,3 +376,7 @@ body.driving .drive.fact-open .d-stats { display: none; }
 body.driving .drive.fact-open .d-fact.open .d-fact-text { max-height: 24vh; }
 body.driving .drive.fact-open .d-grid { grid-template-rows: minmax(42px, 1.1fr) repeat(2, minmax(40px, 1fr)) minmax(42px, 1.1fr); }
 body.driving .drive.fact-open .d-btn { font-size: clamp(15px, min(6vw, 2.8vh), 24px); }
+
+.r-country { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; font-size: 15px; color: var(--muted); }
+.r-country select { flex: 1 1 auto; max-width: 70%; min-height: 44px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); padding: 0 8px; color: var(--fg); }
+.r-hint { font-size: 14px; color: var(--muted); }

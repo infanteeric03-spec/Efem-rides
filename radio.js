@@ -55,7 +55,7 @@
   }
   function httpsOf(u) { return !u ? null : /^https:/i.test(u) ? u : /^http:/i.test(u) ? u.replace(/^http:/i, "https:") : null; }
   function searchStations(q, country) {
-    var p = "/json/stations/search?hidebroken=true&order=clickcount&reverse=true&limit=40&name=" + encodeURIComponent(q) + (country ? "&countrycode=" + country : "");
+    var p = "/json/stations/search?hidebroken=true&order=clickcount&reverse=true&limit=40" + (q ? "&name=" + encodeURIComponent(q) : "") + (country ? "&countrycode=" + country : "");
     return api(p).then(function (list) {
       return (list || []).filter(function (s) { return s && (s.url_resolved || s.url); }).map(function (s) {
         return { n: (s.name || "").trim(), uuid: s.stationuuid, url: s.url_resolved || s.url, favicon: s.favicon || "", tags: s.tags || "", state: s.state || "", clicks: s.clickcount || 0, codec: s.codec || "", bitrate: s.bitrate || 0 };
@@ -255,11 +255,14 @@
     var reset = $("rReset"); reset.hidden = st.favs.length >= PRESETS.length && PRESETS.every(function (p) { return st.favs.some(function (f) { return f.preset === p.n; }); });
   }
   function doSearch() {
-    var q = $("rQ").value.trim(), box = $("rResults");
-    if (q.length < 2) { box.textContent = ""; return; }
+    var q = $("rQ").value.trim(), box = $("rResults"), country = $("rCountry").value;
+    /* Sin nombre se muestran las más escuchadas del país elegido. */
+    if (q.length < 2 && !country) { box.textContent = ""; box.appendChild(el("p", "empty", "Escribe el nombre de una emisora o elige un país.")); return; }
+    if (q.length < 2) q = "";
     box.textContent = ""; box.appendChild(el("p", "empty", "Buscando…"));
-    searchStations(q, $("rSpain").checked ? "ES" : "").then(function (list) {
+    searchStations(q, country).then(function (list) {
       box.textContent = "";
+      if (!q && list.length) box.appendChild(el("p", "r-hint", "Las más escuchadas en " + $("rCountry").selectedOptions[0].textContent + ":"));
       var seen = {};
       list = list.filter(function (s) { var k = norm(s.n) + "|" + s.url; if (seen[k]) return false; seen[k] = 1; return true; }).slice(0, 25);
       if (!list.length) { box.appendChild(el("p", "empty", "No he encontrado emisoras con ese nombre.")); return; }
@@ -297,6 +300,9 @@
     PRESETS.forEach(function (p) { if (!st.favs.some(function (f) { return f.preset === p.n; })) st.favs.push({ n: p.n, preset: p.n, uuid: null, url: null, favicon: "" }); });
     persist(); renderFavs();
   });
+  var rc = $("rCountry");
+  if (st.country != null) rc.value = st.country;
+  rc.addEventListener("change", function () { st.country = rc.value; persist(); doSearch(); });
   var vol = $("rVol"); vol.value = st.vol;
   vol.addEventListener("input", function () { st.vol = +vol.value; if (!ducked) audio.volume = st.vol; persist(); });
   var duck = $("rDuck"); duck.value = st.duck;
