@@ -1,8 +1,8 @@
 /* Service worker: guarda la app para que abra sin cobertura. */
-var CACHE = "ruta-historia-v4";
+var CACHE = "ruta-historia-v6";
 var ARCHIVOS = [
-  "./", "./index.html", "./style.css", "./engine.js", "./ui.js", "./core.js",
-  "./data-asturias.js", "./data-cantabria.js", "./data-dias.js",
+  "./", "./index.html", "./style.css?v=6", "./engine.js?v=6", "./ui.js?v=6", "./core.js?v=6",
+  "./data-asturias.js?v=6", "./data-cantabria.js?v=6", "./data-dias.js?v=6",
   "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"
 ];
 
@@ -25,7 +25,7 @@ self.addEventListener("fetch", function (e) {
   if (!propio && !fuentes) return;
   // Primero la red para los archivos propios (así las actualizaciones llegan), y la caché si no hay cobertura.
   if (propio) {
-    e.respondWith(fetch(req).then(function (r) {
+    e.respondWith(fetch(req, { cache: "no-cache" }).then(function (r) {
       var copia = r.clone();
       caches.open(CACHE).then(function (c) { c.put(req, copia); });
       return r;

@@ -10,6 +10,8 @@
   var toastTimer;
   function toast(msg) {
     var t = $("toast");
+    var dock = $("dock");
+    if (dock) document.documentElement.style.setProperty("--dock-h", dock.offsetHeight + "px");
     t.textContent = msg; t.hidden = false;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { t.hidden = true; }, 4500);
@@ -161,11 +163,13 @@
     if (pts.length > 1) {
       la0 = 90; la1 = -90; lo0 = 180; lo1 = -180;
       pts.forEach(function (p) { la0 = Math.min(la0, p[0]); la1 = Math.max(la1, p[0]); lo0 = Math.min(lo0, p[1]); lo1 = Math.max(lo1, p[1]); });
-      var pad = 0.04;
-      la0 -= pad; la1 += pad; lo0 -= pad; lo1 += pad;
+      L.forEach(function (p) { if (vis[p.id]) { la0 = Math.min(la0, p.lat); la1 = Math.max(la1, p.lat); lo0 = Math.min(lo0, p.lon); lo1 = Math.max(lo1, p.lon); } });
+      var cLa = (la0 + la1) / 2, cLo = (lo0 + lo1) / 2;
+      var hLa = Math.max((la1 - la0) / 2 * 1.15, 0.05), hLo = Math.max((lo1 - lo0) / 2 * 1.15, 0.07);
+      la0 = cLa - hLa; la1 = cLa + hLa; lo0 = cLo - hLo; lo1 = cLo + hLo;
     }
     var lc = Math.cos(((la0 + la1) / 2) * Math.PI / 180);
-    var dx = (lo1 - lo0) * lc, dy = la1 - la0, m = 16 * dpr;
+    var dx = (lo1 - lo0) * lc, dy = la1 - la0, m = 22 * dpr;
     var sc = Math.min((W - 2 * m) / dx, (H - 2 * m) / dy);
     var ox = (W - dx * sc) / 2, oy = (H - dy * sc) / 2;
     function X(lo) { return ox + (lo - lo0) * lc * sc; }
@@ -190,7 +194,11 @@
       g.fillStyle = cssVar("--sign"); g.strokeStyle = "#fff"; g.lineWidth = 2 * dpr;
       g.beginPath(); g.arc(X(p.lon), Y(p.lat), 5 * dpr, 0, 7); g.fill(); g.stroke();
       g.fillStyle = cssVar("--fg");
-      g.fillText(p.n, X(p.lon) + 8 * dpr, Y(p.lat));
+      var tw = g.measureText(p.n).width, tx = X(p.lon) + 8 * dpr, ty = Y(p.lat);
+      if (tx + tw > W - 4 * dpr) tx = X(p.lon) - 8 * dpr - tw;
+      tx = Math.max(4 * dpr, tx);
+      ty = Math.min(H - 10 * dpr, Math.max(10 * dpr, ty));
+      g.fillText(p.n, tx, ty);
     });
     if (pts.length < 2) {
       g.fillStyle = cssVar("--muted"); g.textAlign = "center";
