@@ -30,6 +30,7 @@ En Ajustes, bajo **Probar sin salir de casa**, hay cuatro rutas simuladas (por e
 
 ## Qué hace
 
+- Al empezar el viaje se abre la **vista de conducción**: el lugar actual en grande, el próximo lugar, el dato contraído en tres líneas (con "Leer entero" para verlo completo), velocidad, kilómetros y tiempo, y cuatro botones grandes. "Ver la pantalla completa" vuelve a la vista normal, y el botón "Conducción" la recupera. Se puede desactivar en Ajustes.
 - Avisa al entrar en cada lugar y cuenta un dato; si sigues dentro, cuenta más (hasta tres).
 - Avisa del siguiente lugar cuando te acercas a uno que aún no has visto.
 - Dice "Entrando en Cantabria" o "Entrando en Asturias" al cruzar.

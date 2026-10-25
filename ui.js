@@ -79,7 +79,7 @@
 
   function renderButtons() {
     var b = $("btnStart");
-    b.textContent = run.on ? (run.sim ? "Parar la prueba" : "Parar viaje") : "Empezar viaje";
+    b.textContent = run.on ? (run.sim ? "Parar prueba" : "Parar viaje") : "Empezar viaje";
     b.classList.toggle("stop", run.on);
     var can = !!(run.on && (run.here || run.lastFact));
     $("btnMore").disabled = !can; $("btnRepeat").disabled = !(run.on && run.lastFact);
