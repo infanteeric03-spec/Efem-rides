@@ -307,7 +307,7 @@
     persist(true);
     run.on = false; run.sim = false; run.here = null; run.next = null;
     status("off", "GPS apagado");
-    emit("trip"); emit("here", null);
+    emit("trip"); emit("here", null); emit("stopped");
   };
 
   App.gpx = function () {

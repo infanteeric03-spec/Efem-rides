@@ -221,6 +221,8 @@
     } catch (e) { /* controles del sistema no disponibles */ }
   }
 
+  /* Al parar el viaje, se para también la radio. */
+  A.on("stopped", function () { if (want) stop(); });
   A.radio = { play: play, stop: stop, toggle: toggle, next: next, audio: audio, state: function () { return { want: want, st: st }; } };
 
   /* ---------- Interfaz ---------- */

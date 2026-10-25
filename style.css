@@ -336,3 +336,4 @@ body.driving main, body.driving .dock { display: none !important; }
 .d-fact .d-fact-text { display: none; }
 .d-fact.open .d-fact-text { display: block; }
 .d-fact:not(.open) { gap: 0; }
+.d-radio { margin-top: -6px; }
