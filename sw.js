@@ -1,5 +1,5 @@
 /* Service worker: guarda la app para que abra sin cobertura. */
-var CACHE = "ruta-historia-v1";
+var CACHE = "ruta-historia-v2";
 var ARCHIVOS = [
   "./", "./index.html", "./style.css", "./engine.js", "./ui.js", "./core.js",
   "./data-asturias.js", "./data-cantabria.js", "./data-dias.js",

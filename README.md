@@ -34,6 +34,7 @@ En Ajustes, bajo **Probar sin salir de casa**, hay cuatro rutas simuladas (por e
 - Avisa del siguiente lugar cuando te acercas a uno que aún no has visto.
 - Dice "Entrando en Cantabria" o "Entrando en Asturias" al cruzar.
 - Al empezar, cuenta la efeméride del día, o una del mes si no hay del día.
+- Modo ahorro en Ajustes: atiende una posición cada 3 o 5 segundos (por defecto, todas, que suele ser una por segundo). Reduce el trabajo del móvil, pero el GPS sigue encendido, así que la batería mejora poco. Lo que más gasta es la pantalla.
 - Guarda el recorrido, calcula distancia y velocidades, y lo exporta como GPX.
 
 ## Añadir o corregir lugares

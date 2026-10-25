@@ -250,7 +250,7 @@
   A.SIMS.forEach(function (r, i) { var o = el("option", null, r.n); o.value = String(i); sims.appendChild(o); });
 
   [["voice", "s_voice"], ["rate", "s_rate"], ["vol", "s_vol"], ["auto", "s_auto"], ["approach", "s_approach"], ["today", "s_today"],
-    ["zone", "s_zone"], ["wake", "s_wake"], ["dim", "s_dim"], ["theme", "s_theme"], ["sim", "s_sim"], ["simSpeed", "s_simSpeed"]
+    ["zone", "s_zone"], ["ahorro", "s_ahorro"], ["wake", "s_wake"], ["dim", "s_dim"], ["theme", "s_theme"], ["sim", "s_sim"], ["simSpeed", "s_simSpeed"]
   ].forEach(function (pair) {
     var key = pair[0], inp = $(pair[1]), box = inp.type === "checkbox";
     if (box) inp.checked = !!S[key]; else inp.value = S[key];
@@ -258,6 +258,7 @@
       A.setS(key, box ? inp.checked : inp.value);
       if (key === "theme") applyTheme();
       if (key === "dim") renderButtons();
+      if (key === "ahorro" && run.on && !run.sim && S.ahorro !== "0") toast("Ahorro activado: con " + S.ahorro + " s entre posiciones, a 90 km/h comprueba cada " + Math.round(25 * +S.ahorro) + " m.");
       if (key === "wake" && !S.wake) toast("Sin esto, el móvil puede apagar la pantalla y parar el GPS.");
     });
   });

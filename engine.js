@@ -14,7 +14,7 @@
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento */ } }
 
   var DEF = { voice: "", rate: 1, vol: 1, auto: true, maxFacts: 3, approach: true, today: true,
-    zone: 1, wake: true, dim: false, theme: "dark", sim: "0", simSpeed: "10" };
+    zone: 1, ahorro: "0", wake: true, dim: false, theme: "dark", sim: "0", simSpeed: "10" };
   var S = App.S = Object.assign({}, DEF, load("rch.settings", {}));
   App.setS = function (k, v) { S[k] = v; save("rch.settings", S); emit("settings", k); };
 
@@ -39,7 +39,7 @@
   function persist(force) {
     if (run.sim || !real) return;
     var now = Date.now();
-    if (!force && now - run.lastSave < 10000) return;
+    if (!force && now - run.lastSave < (+S.ahorro ? 30000 : 10000)) return;
     run.lastSave = now;
     if (real.pts.length > 8000) real.pts = real.pts.filter(function (_, i) { return i % 2 === 0; });
     save("rch.trip", real);
@@ -151,6 +151,10 @@
   function onFix(lat, lon, acc, spd, t) {
     var T = App.trip();
     if (!T || !run.on) return;
+    /* Modo ahorro: se atiende una posición cada N segundos y se descartan las demás. */
+    var gap = run.sim ? 0 : (+S.ahorro || 0) * 1000;
+    if (gap && run.lastProc && t - run.lastProc < gap) return;
+    run.lastProc = t;
     var prev = run.lastFix, kmh = null;
     if (spd != null && !isNaN(spd) && spd >= 0) kmh = spd * 3.6;
     else if (prev && t - prev.t > 500) kmh = C.dist(prev.lat, prev.lon, lat, lon) / ((t - prev.t) / 3600000);
@@ -235,7 +239,7 @@
     if (sim) run.simTrip = newTrip();
     else if (!real || Date.now() - real.last > 12 * 3600000) { real = newTrip(); save("rch.trip", real); }
     run.on = true; run.here = null; run.hereN = 0; run.region = null; run.regCand = null; run.regN = 0;
-    run.prev = {}; run.appr = {}; run.previewed = {}; run.heading = null; run.anchor = null; run.lastFix = null;
+    run.prev = {}; run.appr = {}; run.previewed = {}; run.heading = null; run.anchor = null; run.lastFix = null; run.lastProc = 0;
     run.next = null; run.lastFact = null; run.kmh = 0; run.cur = null;
     wakeOn();
     speak(sim ? "Empieza la ruta de prueba." : "Viaje iniciado. Buenas carreteras.", true);
