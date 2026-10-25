@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ruta con Historia</title>
+<meta name="description" content="Efemérides y curiosidades de Asturias y Cantabria, contadas en voz alta según pasas por cada lugar.">
+<meta name="theme-color" content="#0e1a1b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <h1>Ruta con Historia</h1>
+  <div class="gps" id="gps"><span class="dot" id="gpsDot"></span><span id="gpsTxt">GPS apagado</span></div>
+</header>
+
+<main>
+  <section class="tab" id="tab-ruta" role="tabpanel" aria-labelledby="t-ruta">
+    <div class="sign" id="sign">
+      <div class="sign-in">
+        <p class="sign-reg" id="signReg">Asturias · Cantabria</p>
+        <h2 class="sign-name" id="signName">Listo para salir</h2>
+        <p class="sign-sub" id="signSub">Deja el móvil en el soporte, conectado al coche, y pulsa Empezar viaje.</p>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div><span id="mSpeed">0</span><small>km/h</small></div>
+      <div><span id="mKm">0,0</span><small>km</small></div>
+      <div><span id="mTime">0 min</span><small>tiempo</small></div>
+    </div>
+
+    <article class="fact" aria-live="polite">
+      <p class="fact-meta" id="factMeta"></p>
+      <p class="fact-text" id="factText">Cuando entres en un pueblo o un paraje con historia, te lo contaré en voz alta.</p>
+      <div class="row">
+        <button class="btn" id="btnMore" type="button" disabled>Otro dato</button>
+        <button class="btn ghost" id="btnRepeat" type="button" disabled>Repetir</button>
+        <button class="btn ghost" id="btnMute" type="button" aria-pressed="false">Silenciar</button>
+      </div>
+    </article>
+
+    <div class="next" id="nextCard">
+      <small>Próximo lugar</small>
+      <strong id="nextName">—</strong>
+      <span id="nextDist">Empieza el viaje para ver el siguiente.</span>
+    </div>
+
+    <div class="today" id="todayCard">
+      <small id="todayHead">Hoy</small>
+      <p id="todayText"></p>
+    </div>
+
+    <p class="note warn">Pensada para escuchar. Configúrala antes de arrancar y no la manejes mientras conduces.</p>
+  </section>
+
+  <section class="tab" id="tab-lugares" role="tabpanel" aria-labelledby="t-lugares" hidden>
+    <input class="search" id="q" type="search" placeholder="Buscar un lugar" autocomplete="off" aria-label="Buscar un lugar">
+    <div id="placesList" class="tab"></div>
+  </section>
+
+  <section class="tab" id="tab-viaje" role="tabpanel" aria-labelledby="t-viaje" hidden>
+    <div class="map-wrap"><canvas id="map" width="640" height="480" role="img" aria-label="Mapa esquemático del recorrido"></canvas></div>
+    <div class="stats">
+      <div class="stat"><small>Distancia</small><b id="vKm">0 km</b></div>
+      <div class="stat"><small>Duración</small><b id="vTime">0 min</b></div>
+      <div class="stat"><small>Velocidad media</small><b id="vAvg">0 km/h</b></div>
+      <div class="stat"><small>Velocidad máxima</small><b id="vMax">0 km/h</b></div>
+    </div>
+    <h2 class="sec">Lo que te he contado</h2>
+    <div class="log" id="log"></div>
+    <div class="row">
+      <button class="btn ghost" id="btnGpx" type="button">Exportar GPX</button>
+      <button class="btn ghost" id="btnNew" type="button">Nuevo viaje</button>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-ajustes" role="tabpanel" aria-labelledby="t-ajustes" hidden>
+    <h2 class="sec">Voz</h2>
+    <div class="set">
+      <label for="s_voice"><span class="lbl">Voz<small>Solo aparecen las voces en español del móvil</small></span><select id="s_voice"></select></label>
+      <label for="s_rate"><span class="lbl">Velocidad</span><input id="s_rate" type="range" min="0.7" max="1.3" step="0.05"></label>
+      <label for="s_vol"><span class="lbl">Volumen de la voz</span><input id="s_vol" type="range" min="0.3" max="1" step="0.05"></label>
+      <div class="line"><span class="lbl">Probar la voz</span><button class="btn small" id="btnTest" type="button" style="flex:0 0 auto">Escuchar</button></div>
+    </div>
+
+    <h2 class="sec">Durante el viaje</h2>
+    <div class="set">
+      <label for="s_auto"><span class="lbl">Seguir contando<small>Más datos mientras sigas en el mismo lugar</small></span><input id="s_auto" type="checkbox"></label>
+      <label for="s_approach"><span class="lbl">Avisar del siguiente lugar<small>Cuando te acercas a uno que aún no has visto</small></span><input id="s_approach" type="checkbox"></label>
+      <label for="s_today"><span class="lbl">Efeméride del día<small>Al empezar el viaje</small></span><input id="s_today" type="checkbox"></label>
+      <label for="s_zone"><span class="lbl">Tamaño de la zona<small>Cuánto antes me avisa de cada lugar</small></span>
+        <select id="s_zone"><option value="0.7">Pequeña</option><option value="1">Normal</option><option value="1.4">Amplia</option></select></label>
+    </div>
+
+    <h2 class="sec">Pantalla</h2>
+    <div class="set">
+      <label for="s_wake"><span class="lbl">Mantener la pantalla encendida<small>Necesario para que siga el GPS y la voz</small></span><input id="s_wake" type="checkbox"></label>
+      <label for="s_dim"><span class="lbl">Pantalla tenue<small>Oscurece la pantalla sin apagarla</small></span><input id="s_dim" type="checkbox"></label>
+      <label for="s_theme"><span class="lbl">Tema</span><select id="s_theme"><option value="dark">Oscuro</option><option value="light">Claro</option><option value="auto">Según el móvil</option></select></label>
+    </div>
+
+    <div class="set" id="installRow" hidden>
+      <div class="line"><span class="lbl">Instalar en el móvil<small>Se abre como una app, sin barra del navegador</small></span><button class="btn small" id="btnInstall" type="button" style="flex:0 0 auto">Instalar</button></div>
+    </div>
+
+    <h2 class="sec">Probar sin salir de casa</h2>
+    <div class="set">
+      <label for="s_sim"><span class="lbl">Ruta de prueba</span><select id="s_sim"></select></label>
+      <label for="s_simSpeed"><span class="lbl">Velocidad simulada</span>
+        <select id="s_simSpeed"><option value="5">×5</option><option value="10">×10</option><option value="20">×20</option></select></label>
+      <div class="line"><span class="lbl">La prueba no se guarda en tu viaje</span><button class="btn small" id="btnSim" type="button" style="flex:0 0 auto">Simular</button></div>
+    </div>
+
+    <p class="note">Los datos están guardados en la propia aplicación, así que funciona sin cobertura una vez instalada. Las fechas y cifras proceden de fuentes generales; si vas a citar alguna, compruébala antes.</p>
+  </section>
+</main>
+
+<div class="startbar"><button class="btn big" id="btnStart" type="button">Empezar viaje</button></div>
+
+<nav class="tabs" role="tablist" aria-label="Secciones">
+  <button id="t-ruta" role="tab" aria-selected="true" aria-controls="tab-ruta" data-tab="ruta" type="button">Ruta</button>
+  <button id="t-lugares" role="tab" aria-selected="false" aria-controls="tab-lugares" data-tab="lugares" type="button">Lugares</button>
+  <button id="t-viaje" role="tab" aria-selected="false" aria-controls="tab-viaje" data-tab="viaje" type="button">Viaje</button>
+  <button id="t-ajustes" role="tab" aria-selected="false" aria-controls="tab-ajustes" data-tab="ajustes" type="button">Ajustes</button>
+</nav>
+
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<div id="dimmer" hidden></div>
+
+<script src="data-asturias.js"></script>
+<script src="data-cantabria.js"></script>
+<script src="data-dias.js"></script>
+<script src="core.js"></script>
+<script src="engine.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

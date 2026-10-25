@@ -1,0 +1,296 @@
+/* Motor de la app: ajustes, viaje, GPS, detección de lugares y voz. Sin tocar el DOM. */
+(function () {
+  "use strict";
+  var C = window.Core, L = window.LUGARES, E = window.EFEMERIDES;
+  var App = window.App = { C: C, L: L, byId: {} };
+  L.forEach(function (p) { App.byId[p.id] = p; });
+
+  var hs = {};
+  App.on = function (e, f) { (hs[e] = hs[e] || []).push(f); };
+  function emit(e, a) { (hs[e] || []).forEach(function (f) { try { f(a); } catch (x) { console.error(x); } }); }
+  App.emit = emit;
+
+  function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento */ } }
+
+  var DEF = { voice: "", rate: 1, vol: 1, auto: true, maxFacts: 3, approach: true, today: true,
+    zone: 1, wake: true, dim: false, theme: "dark", sim: "0", simSpeed: "10" };
+  var S = App.S = Object.assign({}, DEF, load("rch.settings", {}));
+  App.setS = function (k, v) { S[k] = v; save("rch.settings", S); emit("settings", k); };
+
+  /* Rutas de prueba: líneas rectas entre lugares, solo para comprobar avisos y voz. */
+  App.SIMS = [
+    { n: "Oviedo a Covadonga", ids: ["oviedo", "nava", "arriondas", "cangas-onis", "covadonga"] },
+    { n: "Costa: Gijón a Llanes", ids: ["gijon", "villaviciosa", "lastres", "ribadesella", "llanes"] },
+    { n: "Ribadesella a Santander", ids: ["ribadesella", "llanes", "colombres", "san-vicente", "comillas", "santillana", "santander"] },
+    { n: "Santander a Potes", ids: ["santander", "torrelavega", "santillana", "comillas", "san-vicente", "potes"] }
+  ];
+
+  /* ---------- Viaje ---------- */
+  function newTrip() { return { id: Date.now(), start: Date.now(), last: Date.now(), pts: [], log: [], told: {}, visited: {}, dayMsg: "" }; }
+  var real = load("rch.trip", null);
+  var run = App.run = { on: false, sim: false, watch: null, timer: null, cur: null, kmh: 0, here: null, hereN: 0,
+    region: null, regCand: null, regN: 0, lastEnd: 0, mute: false, wake: null, prev: {}, appr: {}, previewed: {},
+    heading: null, anchor: null, lastFix: null, simTrip: null, simPath: null, simI: 0, simT0: 0, lastSave: 0,
+    next: null, lastFact: null, acc: null };
+  App.trip = function () { return run.sim ? run.simTrip : real; };
+  App.newTrip = function () { if (run.on && !run.sim) App.stop(); real = newTrip(); save("rch.trip", real); emit("trip"); };
+
+  function persist(force) {
+    if (run.sim || !real) return;
+    var now = Date.now();
+    if (!force && now - run.lastSave < 10000) return;
+    run.lastSave = now;
+    if (real.pts.length > 8000) real.pts = real.pts.filter(function (_, i) { return i % 2 === 0; });
+    save("rch.trip", real);
+  }
+
+  /* ---------- Voz ---------- */
+  var synth = window.speechSynthesis || null, voices = [];
+  App.hasVoice = !!synth;
+  App.voices = function () { return voices; };
+  function refreshVoices() {
+    if (!synth) return;
+    voices = synth.getVoices().filter(function (v) { return /^es([-_]|$)/i.test(v.lang); });
+    emit("voices", voices);
+  }
+  if (synth) {
+    refreshVoices();
+    if (synth.addEventListener) synth.addEventListener("voiceschanged", refreshVoices); else synth.onvoiceschanged = refreshVoices;
+  }
+  function pickVoice() {
+    if (!voices.length) return null;
+    if (S.voice) {
+      var f = voices.filter(function (v) { return v.voiceURI === S.voice || v.name === S.voice; })[0];
+      if (f) return f;
+    }
+    return voices.filter(function (v) { return /es[-_]ES/i.test(v.lang); })[0] || voices[0];
+  }
+  function busy() { return !!synth && (synth.speaking || synth.pending); }
+  function speak(text, interrupt, force) {
+    if (!synth || !text || (run.mute && !force)) return false;
+    function go() {
+      C.chunks(text).forEach(function (c, i, a) {
+        var u = new SpeechSynthesisUtterance(c);
+        u.lang = "es-ES";
+        var v = pickVoice(); if (v) u.voice = v;
+        u.rate = +S.rate; u.volume = +S.vol;
+        if (i === a.length - 1) u.onend = u.onerror = function () { run.lastEnd = Date.now(); };
+        synth.speak(u);
+      });
+    }
+    run.lastEnd = Date.now();
+    if (interrupt) { synth.cancel(); setTimeout(go, 80); } else go();
+    return true;
+  }
+  App.speak = speak;
+  App.setMute = function (b) { run.mute = b; if (b && synth) synth.cancel(); emit("mute", b); };
+  App.testVoice = function () { speak("Así sonará la voz durante el viaje. Bienvenido a Asturias y Cantabria.", true, true); };
+  App.speakPlace = function (p) {
+    speak(p.h[0], true, true);
+    for (var i = 1; i < p.h.length; i++) speak(p.h[i], false, true);
+  };
+
+  /* ---------- Pantalla encendida ---------- */
+  function wakeOn() {
+    if (!S.wake || !("wakeLock" in navigator) || run.wake) return;
+    navigator.wakeLock.request("screen").then(function (w) {
+      run.wake = w;
+      w.addEventListener("release", function () { run.wake = null; });
+    }).catch(function () { /* lo intentará de nuevo al volver a la app */ });
+  }
+  function wakeOff() { if (run.wake) { try { run.wake.release(); } catch (e) { /* ya liberado */ } run.wake = null; } }
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible" && run.on) wakeOn(); });
+
+  /* ---------- Estado visible del GPS ---------- */
+  function status(kind, text) { App.status = { kind: kind, text: text }; emit("status", App.status); }
+  App.status = { kind: "off", text: "GPS apagado" };
+
+  /* ---------- Contar un dato ---------- */
+  function tell(p, mode) {
+    var T = App.trip(), v = T.visited[p.id] || (T.visited[p.id] = { t: Date.now(), n: 0 }), f;
+    if (mode === "repeat" && run.lastFact && run.lastFact.id === p.id) f = run.lastFact.f;
+    else { f = C.pickFact(p, T.told[p.id] || 0); T.told[p.id] = (T.told[p.id] || 0) + 1; v.n++; }
+    v.t = Date.now();
+    var text = f.text;
+    if (text.toLowerCase().indexOf(p.n.toLowerCase().split(" ")[0]) < 0) text = p.n + ". " + text;
+    run.lastFact = { id: p.id, f: f, text: text };
+    if (mode !== "repeat") {
+      T.log.push({ t: Date.now(), id: p.id, n: p.n, reg: p.reg, text: f.text });
+      if (T.log.length > 300) T.log.shift();
+    }
+    speak(text, mode !== "auto");
+    emit("fact", { p: p, f: f, text: text });
+    persist(true);
+  }
+  App.more = function () {
+    var id = run.here || (run.lastFact && run.lastFact.id);
+    if (id) tell(App.byId[id], "more");
+  };
+  App.repeat = function () {
+    if (run.lastFact) speak(run.lastFact.text, true);
+  };
+
+  function bearing(a, b, c, d) {
+    var R = Math.PI / 180, y = Math.sin((d - b) * R) * Math.cos(c * R);
+    var x = Math.cos(a * R) * Math.sin(c * R) - Math.sin(a * R) * Math.cos(c * R) * Math.cos((d - b) * R);
+    return (Math.atan2(y, x) / R + 360) % 360;
+  }
+
+  function todayMsg(T) {
+    var d = new Date(), key = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+    if (T.dayMsg === key) return;
+    T.dayMsg = key;
+    var r = C.today(d, E), txt = "";
+    if (r.exact.length) txt = r.exact[0].t;
+    else if (r.month.length) txt = "Una efeméride de este mes. " + r.month[0].t;
+    if (txt) speak("Hoy es " + C.dateEs(d) + ". " + txt, false);
+  }
+
+  /* ---------- Cada posición ---------- */
+  function onFix(lat, lon, acc, spd, t) {
+    var T = App.trip();
+    if (!T || !run.on) return;
+    var prev = run.lastFix, kmh = null;
+    if (spd != null && !isNaN(spd) && spd >= 0) kmh = spd * 3.6;
+    else if (prev && t - prev.t > 500) kmh = C.dist(prev.lat, prev.lon, lat, lon) / ((t - prev.t) / 3600000);
+    if (kmh != null && kmh > 250) kmh = null;
+    run.kmh = kmh || 0;
+    run.acc = acc;
+    run.lastFix = { lat: lat, lon: lon, t: t };
+    run.cur = { lat: lat, lon: lon };
+    if (!run.anchor) run.anchor = { lat: lat, lon: lon };
+    else if (C.dist(run.anchor.lat, run.anchor.lon, lat, lon) > 0.03) {
+      run.heading = bearing(run.anchor.lat, run.anchor.lon, lat, lon);
+      run.anchor = { lat: lat, lon: lon };
+    }
+
+    if (acc == null || acc <= 100) {
+      var lastPt = T.pts[T.pts.length - 1];
+      if (C.shouldRecord(lastPt, lat, lon, t)) T.pts.push([+lat.toFixed(5), +lon.toFixed(5), t, kmh != null ? Math.round(kmh) : null]);
+      T.last = Date.now();
+    }
+    status(run.sim ? "sim" : (acc > 80 ? "warn" : "ok"),
+      run.sim ? "Prueba" : (acc > 80 ? "Señal débil ±" + Math.round(acc) + " m" : "GPS ±" + Math.round(acc || 0) + " m"));
+
+    /* Cambio de comunidad: se confirma con tres posiciones seguidas. */
+    var reg = C.regionAt(lat, lon, L, 40);
+    if (reg && reg !== run.region) {
+      if (run.regCand === reg) run.regN++; else { run.regCand = reg; run.regN = 1; }
+      if (run.regN >= 3) {
+        var first = run.region === null;
+        run.region = reg;
+        if (!first) speak("Entrando en " + C.REGIONES[reg] + ".", false);
+        emit("region", reg);
+      }
+    } else if (reg) { run.regCand = null; run.regN = 0; }
+
+    /* Lugar en el que estás. */
+    var hit = C.inside(lat, lon, L, +S.zone), now = Date.now();
+    if (hit) {
+      if (run.here !== hit.p.id) {
+        run.here = hit.p.id; run.hereN = 0;
+        var vis = T.visited[hit.p.id];
+        if (!vis || now - vis.t > 20 * 60000) { run.hereN = 1; tell(hit.p, "enter"); }
+        emit("here", hit.p);
+      } else if (S.auto && run.hereN < +S.maxFacts && !busy() && now - run.lastEnd > 18000) {
+        run.hereN++; tell(hit.p, "auto");
+      }
+    } else if (run.here) {
+      var hp = App.byId[run.here];
+      if (C.dist(lat, lon, hp.lat, hp.lon) > hp.rad * +S.zone * 1.3) { run.here = null; emit("here", null); }
+    }
+
+    /* Siguiente lugar por delante y aviso al acercarse. */
+    var cand = null, best = 1e9;
+    for (var i = 0; i < L.length; i++) {
+      var p = L[i];
+      if (T.visited[p.id] || p.id === run.here) continue;
+      var d = C.dist(lat, lon, p.lat, p.lon);
+      if (d > 30 || d >= best) continue;
+      if (kmh > 8 && run.heading != null) {
+        var b = bearing(lat, lon, p.lat, p.lon), diff = Math.abs(((b - run.heading + 540) % 360) - 180);
+        if (diff > 70) continue;
+      }
+      best = d; cand = p;
+    }
+    run.next = cand ? { p: cand, d: best } : null;
+    if (S.approach && cand && best <= 8 && best > cand.rad * +S.zone && !run.previewed[cand.id]) {
+      var pd = run.prev[cand.id];
+      run.prev[cand.id] = best;
+      if (pd != null && best < pd - 0.02) run.appr[cand.id] = (run.appr[cand.id] || 0) + 1; else if (pd != null) run.appr[cand.id] = 0;
+      if ((run.appr[cand.id] || 0) >= 3 && !busy()) {
+        run.previewed[cand.id] = true;
+        speak("Más adelante, a unos " + Math.max(2, Math.round(best)) + " kilómetros: " + cand.n + ".", false);
+      }
+    }
+
+    emit("fix", { lat: lat, lon: lon, kmh: kmh, T: T });
+    persist(false);
+  }
+
+  /* ---------- Empezar y parar ---------- */
+  function begin(sim) {
+    run.sim = !!sim;
+    if (sim) run.simTrip = newTrip();
+    else if (!real || Date.now() - real.last > 12 * 3600000) { real = newTrip(); save("rch.trip", real); }
+    run.on = true; run.here = null; run.hereN = 0; run.region = null; run.regCand = null; run.regN = 0;
+    run.prev = {}; run.appr = {}; run.previewed = {}; run.heading = null; run.anchor = null; run.lastFix = null;
+    run.next = null; run.lastFact = null; run.kmh = 0; run.cur = null;
+    wakeOn();
+    speak(sim ? "Empieza la ruta de prueba." : "Viaje iniciado. Buenas carreteras.", true);
+    if (S.today) todayMsg(App.trip());
+    emit("trip"); emit("status", App.status);
+  }
+
+  App.start = function () {
+    if (run.on) return;
+    if (!window.isSecureContext || !navigator.geolocation) {
+      status("warn", "Sin GPS: abre la app desde una dirección https");
+      emit("toast", "Este navegador no da acceso al GPS. Abre la app desde una dirección https.");
+      return;
+    }
+    begin(false);
+    status("warn", "Buscando señal…");
+    run.watch = navigator.geolocation.watchPosition(function (pos) {
+      onFix(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed, pos.timestamp || Date.now());
+    }, function (err) {
+      if (err.code === 1) {
+        status("warn", "Permiso de ubicación denegado");
+        emit("toast", "Falta el permiso de ubicación. En Chrome: Ajustes del sitio, Ubicación, Permitir.");
+        App.stop();
+      } else if (err.code === 2) status("warn", "Sin posición disponible");
+      else status("warn", "Buscando señal…");
+    }, { enableHighAccuracy: true, maximumAge: 2000, timeout: 30000 });
+  };
+
+  App.startSim = function () {
+    if (run.on) App.stop();
+    var route = App.SIMS[+S.sim] || App.SIMS[0], factor = +S.simSpeed || 10;
+    run.simPath = C.simPath(route.ids, L, 0.025 * factor);
+    run.simI = 0; run.simT0 = Date.now();
+    begin(true);
+    run.timer = setInterval(function () {
+      if (run.simI >= run.simPath.length) { App.stop(); emit("toast", "Fin de la ruta de prueba."); return; }
+      var p = run.simPath[run.simI];
+      onFix(p[0], p[1], 8, 25, run.simT0 + run.simI * 1000 * factor);
+      run.simI++;
+    }, 1000);
+  };
+
+  App.stop = function () {
+    if (run.watch != null) { navigator.geolocation.clearWatch(run.watch); run.watch = null; }
+    if (run.timer) { clearInterval(run.timer); run.timer = null; }
+    wakeOff();
+    if (synth) synth.cancel();
+    persist(true);
+    run.on = false; run.sim = false; run.here = null; run.next = null;
+    status("off", "GPS apagado");
+    emit("trip"); emit("here", null);
+  };
+
+  App.gpx = function () {
+    var T = real;
+    return T && T.pts.length ? C.gpx(T.pts, "Ruta con Historia " + new Date(T.start).toLocaleDateString("es-ES")) : null;
+  };
+})();

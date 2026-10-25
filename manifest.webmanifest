@@ -1,0 +1,17 @@
+{
+  "name": "Ruta con Historia: Asturias y Cantabria",
+  "short_name": "Ruta con Historia",
+  "description": "Efemérides y curiosidades de cada lugar por el que pasas, contadas en voz alta, con seguimiento del viaje.",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e1a1b",
+  "theme_color": "#0e1a1b",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
