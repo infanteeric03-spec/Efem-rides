@@ -34,7 +34,7 @@
 
   /* ---------- Señal y tarjetas de la pestaña Ruta ---------- */
   function renderSign() {
-    var reg = "Asturias · Cantabria", name, sub;
+    var reg = (A.homeLabel && A.homeLabel()) || "Tu ubicación", name, sub;
     if (!run.on) {
       var T = A.trip();
       name = "Listo para salir";

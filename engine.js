@@ -261,7 +261,7 @@
 
   /* Hay un viaje guardado que se puede continuar (menos de 12 horas desde la última posición). */
   App.savedTrip = function () {
-    return !!(real && (real.log.length || real.pts.length > 1) && Date.now() - real.last <= 12 * 3600000);
+    return !!(real && real.pts.length > 1 && C.stats(real.pts).km >= 0.5 && Date.now() - real.last <= 12 * 3600000);
   };
   App.start = function (mode) {
     if (run.on) return;

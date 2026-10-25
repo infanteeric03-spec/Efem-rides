@@ -30,6 +30,7 @@ En Ajustes, bajo **Probar sin salir de casa**, hay cuatro rutas simuladas (por e
 
 ## Qué hace
 
+- En la pantalla de inicio, la señal muestra la **provincia y la localidad** donde está el móvil (por GPS y OpenStreetMap; sin conexión, el lugar conocido más cercano). La tarjeta de efemérides muestra varias de esa provincia, con **Anterior** y **Siguiente** o deslizando el dedo: primero las de hoy en Wikipedia que mencionan la provincia o la localidad, después las propias de Asturias y Cantabria más cercanas en el calendario y, si hacen falta, las de hoy en España.
 - Al abrir la app con un viaje sin terminar (de menos de 12 horas), elige **Continuar** para seguirlo o **Nuevo viaje** para empezar de cero. Mientras no hay viaje en marcha, los contadores de la pestaña Ruta están a cero; el viaje guardado se ve en la pestaña Viaje.
 - Al empezar el viaje se abre la **vista de conducción**, dividida en zonas de altura fija para que los botones no se muevan nunca durante el viaje: arriba la señal con el lugar, el próximo lugar y la distancia (el nombre se encoge si es largo), la radio y **Mostrar contenido**; abajo, los botones grandes. **Mostrar contenido** y **Parar viaje** piden un segundo toque. El texto se abre en una ventana sobre la señal que se cierra sola a los 30 segundos o al llegar a otro lugar. En Ajustes se puede ocultar el texto durante el viaje (la voz sigue contando los datos) o desactivar la vista de conducción.
 - Avisa al entrar en cada lugar y cuenta un dato; si sigues dentro, cuenta más (hasta tres).

@@ -475,3 +475,11 @@ body.driving .d-btn.d-wide { font-size: clamp(24px, min(9vw, 4.8vh), 42px); lett
 .startbar .btn.big { font-size: clamp(26px, 8vw, 36px); }
 .startrow.two .btn.big { font-size: clamp(20px, 6vw, 28px); }
 .d-btn.armed, .d-link.armed { white-space: nowrap; overflow: hidden; }
+
+/* Efemérides de inicio con anterior y siguiente */
+.today-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.today-pos { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+#todayText { min-height: 4.4em; }
+.today-nav { display: flex; gap: 8px; margin-top: 4px; }
+.today-nav .btn { flex: 1 1 0; }
+#signReg.tap { text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
