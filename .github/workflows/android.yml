@@ -41,8 +41,16 @@ jobs:
         working-directory: app/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease -PversionCode=${{ github.run_number }} --no-daemon --stacktrace
+          set -o pipefail
+          ./gradlew assembleRelease -PversionCode=${{ github.run_number }} --no-daemon 2>&1 | tee build.log
           cp app/build/outputs/apk/release/app-release.apk ../../ruta-con-historia.apk
+
+      - name: Resumen del error
+        if: failure()
+        working-directory: app/android
+        run: |
+          { grep -E "^e: |error:|ERROR:" build.log | head -15; grep -A 12 "What went wrong" build.log | head -25; } | sed 's/%/%25/g' | while IFS= read -r l; do [ -n "$l" ] && echo "::error::$l"; done
+          exit 1
 
       - uses: actions/upload-artifact@v4
         with:
