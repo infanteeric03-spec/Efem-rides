@@ -1,0 +1,20 @@
+{
+  "name": "ruta-con-historia-android",
+  "private": true,
+  "version": "1.0.0",
+  "description": "App Android de Ruta con Historia (Capacitor). La web sigue en la raíz del repositorio.",
+  "scripts": {
+    "copy-web": "node scripts/copy-web.js",
+    "sync": "npm run copy-web && npx cap sync android",
+    "build:apk": "npm run sync && cd android && ./gradlew assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capacitor-community/background-geolocation": "1.2.26",
+    "@capacitor-community/keep-awake": "8.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

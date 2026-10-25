@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Ruta con Historia</string>
+    <string name="title_activity_main">Ruta con Historia</string>
+    <string name="package_name">io.github.infanteeric03.rutaconhistoria</string>
+    <string name="custom_url_scheme">io.github.infanteeric03.rutaconhistoria</string>
+    <string name="capacitor_background_geolocation_notification_channel_name">Seguimiento del viaje</string>
+</resources>

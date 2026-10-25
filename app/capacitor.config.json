@@ -1,0 +1,10 @@
+{
+  "appId": "io.github.infanteeric03.rutaconhistoria",
+  "appName": "Ruta con Historia",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#0e1a1b",
+    "useLegacyBridge": true
+  }
+}

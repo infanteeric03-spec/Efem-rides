@@ -45,9 +45,21 @@
     save("rch.trip", real);
   }
 
+  /* ---------- App nativa (Android) ---------- */
+  var CAP = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform() ? window.Capacitor : null;
+  var NS = CAP ? CAP.registerPlugin("SpeechDuck") : null;           // voz con foco de audio: baja Spotify mientras habla
+  var BG = CAP ? CAP.registerPlugin("BackgroundGeolocation") : null; // GPS con la pantalla apagada
+  var KA = CAP ? CAP.registerPlugin("KeepAwake") : null;
+  var nativeBusy = false;
+  App.native = !!CAP;
+  if (NS) {
+    NS.addListener("start", function () { nativeBusy = true; });
+    NS.addListener("end", function () { nativeBusy = false; run.lastEnd = Date.now(); voiceMaybeDone(); });
+  }
+
   /* ---------- Voz ---------- */
-  var synth = window.speechSynthesis || null, voices = [];
-  App.hasVoice = !!synth;
+  var synth = NS ? null : (window.speechSynthesis || null), voices = [];
+  App.hasVoice = !!synth || !!NS;
   App.voices = function () { return voices; };
   function refreshVoices() {
     if (!synth) return;
@@ -66,9 +78,20 @@
     }
     return voices.filter(function (v) { return /es[-_]ES/i.test(v.lang); })[0] || voices[0];
   }
-  function busy() { return !!synth && (synth.speaking || synth.pending); }
+  function busy() { return NS ? nativeBusy : !!synth && (synth.speaking || synth.pending); }
   function speak(text, interrupt, force) {
-    if (!synth || !text || (run.mute && !force)) return false;
+    if (!text || (run.mute && !force)) return false;
+    if (NS) {
+      /* Voz del sistema: Android baja el volumen de Spotify u otras apps mientras habla. */
+      nativeBusy = true; run.lastEnd = Date.now();
+      emit("voice", true);
+      var wait = App.radioOn && App.radioOn() ? 450 : 0;
+      setTimeout(function () {
+        NS.speak({ text: text, rate: +S.rate, volume: +S.vol, flush: !!interrupt }).catch(function () { nativeBusy = false; voiceMaybeDone(); });
+      }, wait);
+      return true;
+    }
+    if (!synth) return false;
     pendingGo++;
     function go() {
       pendingGo = Math.max(0, pendingGo - 1);
@@ -95,7 +118,7 @@
   }
   App.voiceBusy = function () { return pendingGo > 0 || busy(); };
   App.speak = speak;
-  App.setMute = function (b) { run.mute = b; if (b && synth) { synth.cancel(); voiceMaybeDone(); } emit("mute", b); };
+  App.setMute = function (b) { run.mute = b; if (b) { if (NS) NS.stop(); else if (synth) synth.cancel(); voiceMaybeDone(); } emit("mute", b); };
   App.testVoice = function () { speak("Así sonará la voz durante el viaje. Bienvenido a Asturias y Cantabria.", true, true); };
   App.speakPlace = function (p) {
     speak(p.h[0], true, true);
@@ -104,13 +127,14 @@
 
   /* ---------- Pantalla encendida ---------- */
   function wakeOn() {
+    if (KA) { if (S.wake) KA.keepAwake().catch(function () {}); return; }
     if (!S.wake || !("wakeLock" in navigator) || run.wake) return;
     navigator.wakeLock.request("screen").then(function (w) {
       run.wake = w;
       w.addEventListener("release", function () { run.wake = null; });
     }).catch(function () { /* lo intentará de nuevo al volver a la app */ });
   }
-  function wakeOff() { if (run.wake) { try { run.wake.release(); } catch (e) { /* ya liberado */ } run.wake = null; } }
+  function wakeOff() { if (KA) KA.allowSleep().catch(function () {}); if (run.wake) { try { run.wake.release(); } catch (e) { /* ya liberado */ } run.wake = null; } }
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible" && run.on) wakeOn(); });
 
   /* ---------- Estado visible del GPS ---------- */
@@ -265,6 +289,27 @@
   };
   App.start = function (mode) {
     if (run.on) return;
+    if (BG) {
+      /* App Android: GPS con un servicio en primer plano, sigue con la pantalla apagada. */
+      begin(false, mode);
+      status("warn", "Buscando señal…");
+      BG.addWatcher({
+        backgroundTitle: "Ruta con Historia",
+        backgroundMessage: "Siguiendo el viaje para contarte los lugares por los que pasas.",
+        requestPermissions: true, stale: false, distanceFilter: 10
+      }, function (loc, err) {
+        if (err) {
+          if (err.code === "NOT_AUTHORIZED") {
+            status("warn", "Permiso de ubicación denegado");
+            emit("toast", "Falta el permiso de ubicación. Actívalo en los ajustes de Android para esta app.");
+            App.stop();
+          }
+          return;
+        }
+        if (loc) onFix(loc.latitude, loc.longitude, loc.accuracy, loc.speed, loc.time || Date.now());
+      }).then(function (id) { run.bgId = id; if (!run.on) BG.removeWatcher({ id: id }); });
+      return;
+    }
     if (!window.isSecureContext || !navigator.geolocation) {
       status("warn", "Sin GPS: abre la app desde una dirección https");
       emit("toast", "Este navegador no da acceso al GPS. Abre la app desde una dirección https.");
@@ -301,9 +346,11 @@
 
   App.stop = function () {
     if (run.watch != null) { navigator.geolocation.clearWatch(run.watch); run.watch = null; }
+    if (BG && run.bgId) { BG.removeWatcher({ id: run.bgId }); run.bgId = null; }
     if (run.timer) { clearInterval(run.timer); run.timer = null; }
     wakeOff();
-    if (synth) { synth.cancel(); voiceMaybeDone(); }
+    if (NS) NS.stop(); else if (synth) synth.cancel();
+    voiceMaybeDone();
     persist(true);
     run.on = false; run.sim = false; run.here = null; run.next = null;
     status("off", "GPS apagado");

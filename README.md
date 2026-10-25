@@ -52,6 +52,24 @@ Además, con **Buscar lugares sobre la marcha** activado y cobertura, la app con
 
 Los lugares propios de Asturias y Cantabria tienen prioridad: no se añade ningún pueblo de Wikipedia a menos de 3 km de uno de ellos. Los textos de Wikipedia se publican con licencia CC BY-SA; cada lugar enlaza a su artículo en la pestaña Lugares.
 
+## App Android
+
+Además de la web, el repositorio genera una **app Android** (carpeta `app/`, hecha con Capacitor a partir de la misma web). Frente a la web tiene tres ventajas:
+
+- **La voz baja la música de otras apps** (Spotify, YouTube Music…) mientras cuenta un dato y la vuelve a subir al terminar, igual que las indicaciones de Google Maps.
+- **Sigue funcionando con la pantalla apagada**: el GPS usa un servicio de Android con una notificación fija ("Siguiendo el viaje…").
+- Se abre como cualquier app, sin navegador.
+
+### Instalarla
+
+1. En el móvil, abre la página de **Releases** del repositorio y descarga `ruta-con-historia.apk` de la última versión (o directamente: `https://github.com/infanteeric03-spec/efem-rides/releases/latest/download/ruta-con-historia.apk`).
+2. Ábrelo. Android pedirá permitir **instalar apps de origen desconocido** para el navegador o el gestor de archivos: acéptalo solo para esto.
+3. Al abrir la app y pulsar Empezar viaje, concede **ubicación** y **notificaciones**.
+
+Cada vez que se suben cambios a `main`, GitHub compila una versión nueva (pestaña **Actions**). Para actualizar, descarga el APK nuevo e instálalo encima: se conservan tus ajustes y viajes.
+
+La app está firmada con una clave de uso personal incluida en el repositorio (`app/android/app/ruta-con-historia.keystore`). Sirve para instalarla y actualizarla en tus móviles, no para publicarla en Google Play.
+
 ## Radio
 
 La pestaña **Radio** reproduce emisoras por internet. Vienen como favoritas Europa FM, COPE, Cadena SER, LOS40 y LOS40 Classic, y con el buscador se puede añadir cualquier otra. Las emisoras se buscan en [Radio Browser](https://www.radio-browser.info), un directorio público y gratuito, así que la app usa siempre el enlace vigente de cada una.

@@ -303,6 +303,6 @@
 
   /* ---------- Arranque ---------- */
   applyTheme(); fillVoices(); renderToday(); renderSign(); renderNext(); renderMetrics(); renderButtons();
-  if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) navigator.serviceWorker.register("sw.js").catch(function () { /* sin modo sin conexión */ });
+  if (!A.native && "serviceWorker" in navigator && location.protocol.indexOf("http") === 0) navigator.serviceWorker.register("sw.js").catch(function () { /* sin modo sin conexión */ });
   window.RCH_READY = true;
 })();
