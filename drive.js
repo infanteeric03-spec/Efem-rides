@@ -1,43 +1,113 @@
-/* Vista de conducción: lo imprescindible en grande mientras el viaje está en marcha. */
+/* Vista de conducción: lo imprescindible en grande mientras el viaje está en marcha.
+   La pantalla se divide en zonas de altura fija para que los botones no se muevan nunca durante el viaje:
+   el texto se adapta a su hueco (el nombre se encoge si es largo) en lugar de empujar lo de abajo. */
 (function () {
   "use strict";
   var A = window.App, C = A.C, S = A.S, run = A.run;
   function $(id) { return document.getElementById(id); }
   if (S.drive === undefined) S.drive = true;
+  if (S.driveText === undefined) S.driveText = true;
 
-  var shown = false, closedThisTrip = false, lastFactKey = "";
+  var shown = false, closedThisTrip = false, lastFactKey = "", lastName = "", lastNext = "";
+  var POP_SECONDS = 30, popTimer = null, popLeft = 0;
+
+  function setText(id, t) { var e = $(id); if (e.textContent !== t) e.textContent = t; }
+  function setVisible(el, on) { el.style.visibility = on ? "visible" : "hidden"; }
 
   function show(on) {
     shown = on;
     $("drive").hidden = !on;
     document.body.classList.toggle("driving", on);
+    $("drive").classList.toggle("no-text", !S.driveText);
+    if (!on) closePop();
     syncDriveBtn();
-    if (on) { window.scrollTo(0, 0); render(); }
+    if (on) { window.scrollTo(0, 0); render(); layout(); }
   }
-
   function syncDriveBtn() {
-    var hide = shown || !run.on;
-    $("btnDrive").hidden = hide;
+    $("btnDrive").hidden = shown || !run.on;
     if (A.syncStartRow) A.syncStartRow();
   }
 
-  function setText(id, t) { var e = $(id); if (e.textContent !== t) e.textContent = t; }
+  /* ---------- Tamaños dentro de la señal ---------- */
+  /* La distancia mide un 40 % del alto de la señal y tiene ancho fijo (tres cifras), así el nombre no cambia de líneas cuando pasa de 9 a 10 km. */
+  function layout() {
+    if (!shown) return;
+    var sign = document.querySelector(".d-sign"), h = sign.clientHeight, w = sign.clientWidth;
+    if (!h) return;
+    /* 40 % del alto, sin pasar de un 38 % del ancho para dejar sitio al nombre. */
+    var num = Math.max(30, Math.round(Math.min(h * 0.40 / 0.85, w * 0.38 / 1.75)));
+    var box = $("dDistBox");
+    box.style.fontSize = num + "px";
+    box.style.width = Math.round(num * 1.75) + "px";
+    fitName();
+  }
+  /* Busca el mayor tamaño de letra con el que región, nombre y próximo lugar caben en la señal. */
+  function fitName() {
+    var name = $("dName"), main = $("dSignMain"), inner = $("dSignIn");
+    var cs = getComputedStyle(inner);
+    var avail = inner.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    if (avail <= 0) return;
+    var lo = 16, hi = Math.min(72, Math.round(avail * 0.55)), best = lo;
+    function fits(px) {
+      name.style.fontSize = px + "px";
+      return main.scrollHeight <= avail + 1 && name.scrollWidth <= name.clientWidth + 1;
+    }
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      if (fits(mid)) { best = mid; lo = mid + 1; } else hi = mid - 1;
+    }
+    name.style.fontSize = best + "px";
+  }
+  window.addEventListener("resize", function () { if (shown) layout(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (shown) layout(); });
 
+  /* ---------- Doble toque para acciones delicadas ---------- */
+  var armed = {};
+  function confirmTap(btn, armedText, action) {
+    var id = btn.id;
+    if (armed[id]) {
+      clearTimeout(armed[id]); delete armed[id];
+      btn.classList.remove("armed");
+      action();
+      render();
+      return;
+    }
+    btn.textContent = armedText;
+    btn.classList.add("armed");
+    armed[id] = setTimeout(function () { delete armed[id]; btn.classList.remove("armed"); render(); }, 3000);
+  }
+
+  /* ---------- Ventana flotante con el texto ---------- */
+  function openPop() {
+    var f = run.lastFact; if (!f) return;
+    var p = A.byId[f.id];
+    setText("dPopTitle", (p ? p.n : "") + (p && p.src ? " · Wikipedia" : ""));
+    setText("dFactText", f.f.text);
+    $("dPop").hidden = false;
+    $("dFactText").scrollTop = 0;
+    popLeft = POP_SECONDS; tick();
+    clearInterval(popTimer);
+    popTimer = setInterval(function () { popLeft--; if (popLeft <= 0) closePop(); else tick(); }, 1000);
+  }
+  function tick() { setText("dPopTimer", "Se cierra en " + popLeft + " s"); }
+  function closePop() { clearInterval(popTimer); popTimer = null; $("dPop").hidden = true; }
+
+  /* ---------- Pintar ---------- */
   function render() {
     if (!shown) return;
     var p = run.here ? A.byId[run.here] : null;
     setText("dReg", p ? C.regName(p.reg) : (run.region ? C.regName(run.region) : "En ruta"));
-    setText("dName", p ? p.n : (run.lastFix ? "En ruta" : "Buscando GPS…"));
-    /* Próximo lugar dentro de la señal, con la distancia en grande a la derecha. */
+    var name = p ? p.n : (run.lastFix ? "En ruta" : "Buscando GPS…");
+    var nextTxt, distOn = false;
     if (run.next) {
       var dk = C.fmtKm(run.next.d).split(" ");
-      setText("dNextName", "Próximo: " + run.next.p.n);
+      nextTxt = "Próximo: " + run.next.p.n;
       setText("dDist", dk[0]); setText("dDistU", dk[1] || "km");
-      $("dNextName").hidden = false; $("dDistBox").hidden = false; $("dNext").hidden = true;
-    } else {
-      $("dNextName").hidden = true; $("dDistBox").hidden = true; $("dNext").hidden = false;
-      setText("dNext", run.lastFix ? "Sin lugares catalogados cerca" : "Esperando la señal del GPS");
-    }
+      distOn = true;
+    } else nextTxt = run.lastFix ? "Sin lugares catalogados cerca" : "Esperando la señal del GPS";
+    setText("dName", name); setText("dNextName", nextTxt);
+    setVisible($("dDistBox"), distOn);
+    if (name !== lastName || nextTxt !== lastNext) { lastName = name; lastNext = nextTxt; fitName(); }
 
     var T = A.trip(), st = T && T.pts.length > 1 ? C.stats(T.pts) : { km: 0, ms: 0 };
     var mins = Math.floor(st.ms / 60000);
@@ -48,24 +118,15 @@
 
     var f = run.lastFact;
     var key = f ? f.id + ":" + f.f.i + ":" + (T ? T.log.length : 0) : "";
-    if (key !== lastFactKey) {
-      lastFactKey = key;
-      $("dFact").classList.remove("open");
-      $("drive").classList.remove("fact-open");
-      $("dFactToggle").setAttribute("aria-expanded", "false");
-      setText("dFactToggle", "Mostrar contenido");
-    }
-    setText("dFactText", f ? f.f.text : "Cuando entres en un lugar con historia, te lo contaré en voz alta.");
-    var tg = $("dFactToggle");
-    tg.hidden = !f;
-    $("dFact").hidden = !f;
+    if (key !== lastFactKey) { lastFactKey = key; closePop(); }
+    setVisible($("dFactToggle"), !!f && S.driveText);
+    if (!armed.dFactToggle) setText("dFactToggle", "Mostrar contenido");
 
     $("dMore").disabled = !(run.here || run.lastFact);
     $("dRepeat").disabled = !run.lastFact;
-    var m = $("dMute");
-    m.setAttribute("aria-pressed", run.mute ? "true" : "false");
+    $("dMute").setAttribute("aria-pressed", run.mute ? "true" : "false");
     setText("dMute", run.mute ? "Voz silenciada" : "Silenciar");
-    setText("dStop", run.sim ? "Parar prueba" : "Parar viaje");
+    if (!armed.dStop) setText("dStop", run.sim ? "Parar prueba" : "Parar viaje");
   }
 
   A.on("trip", function () {
@@ -79,29 +140,29 @@
   $("dMore").addEventListener("click", A.more);
   $("dRepeat").addEventListener("click", A.repeat);
   $("dMute").addEventListener("click", function () { A.setMute(!run.mute); });
-  $("dStop").addEventListener("click", function () { A.stop(); });
+  $("dStop").addEventListener("click", function () { confirmTap(this, "Toca otra vez para parar", function () { A.stop(); }); });
+  $("dFactToggle").addEventListener("click", function () { confirmTap(this, "Toca otra vez para mostrar", openPop); });
+  $("dPopClose").addEventListener("click", closePop);
   $("dRadio").addEventListener("click", function () { if (A.radio) A.radio.toggle(); });
   $("dStation").addEventListener("click", function () { if (A.radio) A.radio.next(); });
   A.on("radio", function (r) {
     setText("dRadio", r.playing ? "Parar radio" : "Radio");
     $("dRadio").setAttribute("aria-pressed", r.playing ? "true" : "false");
     var info = $("dRadioInfo");
-    info.hidden = !r.playing && r.kind !== "error";
-    setText("dRadioInfo", r.text);
+    setText("dRadioInfo", r.text || "");
+    setVisible(info, r.playing || r.kind === "error");
     info.className = "d-radio " + r.kind;
   });
   $("dExit").addEventListener("click", function () { closedThisTrip = true; show(false); });
   $("btnDrive").addEventListener("click", function () { closedThisTrip = false; show(true); });
-  $("dFactToggle").addEventListener("click", function () {
-    var open = $("dFact").classList.toggle("open");
-    $("drive").classList.toggle("fact-open", open);
-    this.setAttribute("aria-expanded", open ? "true" : "false");
-    this.textContent = open ? "Ocultar contenido" : "Mostrar contenido";
-  });
 
   var sd = $("s_drive");
   sd.checked = !!S.drive;
   sd.addEventListener("change", function () { A.setS("drive", sd.checked); });
+  var st2 = $("s_driveText");
+  st2.checked = !!S.driveText;
+  st2.addEventListener("change", function () { A.setS("driveText", st2.checked); $("drive").classList.toggle("no-text", !S.driveText); });
 
+  setVisible($("dRadioInfo"), false);
   show(false);
 })();

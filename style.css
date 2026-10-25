@@ -393,3 +393,59 @@ body.driving .d-sign .sign-name { font-size: clamp(24px, min(9.6vw, 6.6vh), 64px
 /* La unidad va debajo del número: la columna de la distancia es estrecha y deja más sitio al nombre. */
 .d-sign-dist { display: flex; flex-direction: column; align-items: center; text-align: center; font-size: clamp(38px, min(14.5vw, 7.2vh), 84px); line-height: .85; }
 .d-sign-dist #dDistU { font-size: .34em; line-height: 1; letter-spacing: .08em; margin-top: .12em; }
+
+/* ===== Vista de conducción con zonas fijas (sustituye a los ajustes anteriores) =====
+   Filas: zona superior (42 %) · contadores · botones (resto) · enlace de salida.
+   La altura de cada zona solo cambia si cambia la pantalla (girar el móvil), nunca por el contenido. */
+body.driving .drive {
+  display: grid; overflow: hidden;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 42fr) auto minmax(0, 58fr) auto;
+  gap: clamp(6px, 1.2vh, 12px);
+}
+.d-top { position: relative; min-height: 0; display: flex; flex-direction: column; gap: clamp(4px, .8vh, 8px); }
+body.driving .d-top .d-sign { flex: 1 1 0; min-height: 0; display: flex; padding: clamp(4px, .6vh, 6px); }
+body.driving .d-top .d-sign-in { flex: 1 1 auto; min-height: 0; height: 100%; overflow: hidden; align-items: center; padding: clamp(6px, 1.2vh, 14px) 14px; }
+body.driving .d-sign-main { max-height: 100%; }
+body.driving .d-sign .sign-name { line-height: 1.02; overflow-wrap: normal; hyphens: manual; }
+body.driving .d-sign-dist { line-height: .85; justify-content: center; align-self: center; }
+body.driving .d-radio { flex: none; height: 1.45em; line-height: 1.45em; margin: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+body.driving .d-fact { flex: none; height: clamp(34px, 4.8vh, 44px); display: flex; align-items: center; }
+body.driving .drive.no-text .d-fact { display: none; }
+body.driving .d-stats { padding-block: clamp(4px, .9vh, 10px); }
+body.driving .d-grid {
+  min-height: 0; height: 100%;
+  grid-template-rows: 1.15fr 1fr 1fr 1.15fr;
+  gap: clamp(6px, 1.1vh, 10px);
+}
+body.driving .d-btn { min-height: 0; height: 100%; max-height: none; overflow: hidden; font-size: clamp(16px, min(6.2vw, 3.3vh), 28px); }
+body.driving .d-exit { min-height: clamp(28px, 4vh, 40px); }
+.d-btn.armed { outline: 3px solid var(--sign-ink); outline-offset: -6px; }
+.d-link.armed { color: var(--warn); }
+
+/* Ventana flotante: tapa solo la zona superior, los botones siguen donde estaban. */
+.d-pop {
+  position: absolute; inset: 0; z-index: 6;
+  display: flex; flex-direction: column; gap: 8px;
+  background: var(--panel-2); border: 2px solid var(--accent); border-radius: 14px; padding: 12px 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .45);
+}
+.d-pop-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.d-pop-head strong { font: 700 20px/1.1 var(--font-display); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.d-pop-head span { font-size: 13px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.d-pop-text { flex: 1 1 auto; min-height: 0; overflow-y: auto; font-size: clamp(16px, 2.2vh, 19px); line-height: 1.45; }
+.d-pop-close { flex: none; min-height: 44px; }
+
+@media (orientation: landscape) and (max-height: 520px) {
+  body.driving .drive {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    column-gap: 14px;
+  }
+  body.driving .d-top { grid-column: 1; grid-row: 1; }
+  body.driving .d-stats { grid-column: 1; grid-row: 2; }
+  body.driving .d-exit { grid-column: 1; grid-row: 3; }
+  body.driving .d-grid { grid-column: 2; grid-row: 1 / -1; }
+}
+body.driving .d-fact { justify-content: flex-start; }
+body.driving .d-fact { flex-direction: row; align-items: center; }
