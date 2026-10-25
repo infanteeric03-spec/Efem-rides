@@ -449,3 +449,18 @@ body.driving .d-exit { min-height: clamp(28px, 4vh, 40px); }
 }
 body.driving .d-fact { justify-content: flex-start; }
 body.driving .d-fact { flex-direction: row; align-items: center; }
+
+/* Prueba: distancia pequeña en la esquina inferior derecha de la señal; "Próximo" debajo de la señal;
+   la radio debajo de Mostrar contenido. Cada línea tiene su hueco fijo. */
+body.driving .d-top .d-sign-in { position: relative; display: block; }
+body.driving .d-sign-main { max-height: 100%; }
+body.driving .d-sign-dist {
+  position: absolute; right: 14px; bottom: 8px; width: auto;
+  display: flex; flex-direction: row; align-items: baseline; gap: .22em;
+  line-height: 1; white-space: nowrap; font-weight: 700;
+}
+body.driving .d-sign-dist #dDistU { font-size: 1em; margin: 0; letter-spacing: .04em; }
+.d-next-line {
+  flex: none; margin: 0; height: 1.3em; line-height: 1.3em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  font: 600 clamp(17px, min(5.4vw, 2.7vh), 23px)/1.3 var(--font-display); letter-spacing: .02em; color: var(--muted);
+}

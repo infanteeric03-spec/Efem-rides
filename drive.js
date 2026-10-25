@@ -34,11 +34,13 @@
     if (!shown) return;
     var sign = document.querySelector(".d-sign"), h = sign.clientHeight, w = sign.clientWidth;
     if (!h) return;
-    /* 40 % del alto, sin pasar de un 38 % del ancho para dejar sitio al nombre. */
-    var num = Math.max(30, Math.round(Math.min(h * 0.40 / 0.85, w * 0.38 / 1.75)));
+    /* Distancia pequeña en la esquina inferior derecha de la señal (un tercio del tamaño anterior).
+       Se reserva su franja abajo para que el nombre nunca la pise. */
+    var num = Math.max(14, Math.round(Math.min(h * 0.40 / 0.85, w * 0.38 / 1.75) / 3));
     var box = $("dDistBox");
     box.style.fontSize = num + "px";
-    box.style.width = Math.round(num * 1.75) + "px";
+    box.style.width = "";
+    $("dSignIn").style.paddingBottom = Math.round(num * 1.15 + 10) + "px";
     fitName();
   }
   /* Busca el mayor tamaño de letra con el que región, nombre y próximo lugar caben en la señal. */
