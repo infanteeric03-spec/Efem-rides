@@ -87,14 +87,18 @@
     var id = btn.id;
     if (armed[id]) {
       clearTimeout(armed[id]); delete armed[id];
-      btn.classList.remove("armed");
+      btn.classList.remove("armed"); btn.style.fontSize = "";
       action();
       render();
       return;
     }
     btn.textContent = armedText;
     btn.classList.add("armed");
-    armed[id] = setTimeout(function () { delete armed[id]; btn.classList.remove("armed"); render(); }, 3000);
+    /* Siempre en una línea: si no cabe, se reduce la letra solo mientras dura el aviso. */
+    btn.style.fontSize = "";
+    var fs = parseFloat(getComputedStyle(btn).fontSize);
+    while (btn.scrollWidth > btn.clientWidth && fs > 12) { fs -= 1; btn.style.fontSize = fs + "px"; }
+    armed[id] = setTimeout(function () { delete armed[id]; btn.classList.remove("armed"); btn.style.fontSize = ""; render(); }, 3000);
   }
 
   /* ---------- Ventana flotante con el texto ---------- */
@@ -160,7 +164,7 @@
   $("dMore").addEventListener("click", A.more);
   $("dRepeat").addEventListener("click", A.repeat);
   $("dMute").addEventListener("click", function () { A.setMute(!run.mute); });
-  $("dStop").addEventListener("click", function () { confirmTap(this, "Toca otra vez para parar", function () { A.stop(); }); });
+  $("dStop").addEventListener("click", function () { confirmTap(this, "Toca otra vez", function () { A.stop(); }); });
   $("dFactToggle").addEventListener("click", function () { confirmTap(this, "Toca otra vez para mostrar", openPop); });
   $("dPopClose").addEventListener("click", closePop);
   $("dRadio").addEventListener("click", function () { if (A.radio) A.radio.toggle(); });

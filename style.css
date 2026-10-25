@@ -474,3 +474,4 @@ body.driving .d-sign-dist #dDistU { font-size: 1em; margin: 0; letter-spacing: .
 body.driving .d-btn.d-wide { font-size: clamp(24px, min(9vw, 4.8vh), 42px); letter-spacing: .05em; }
 .startbar .btn.big { font-size: clamp(26px, 8vw, 36px); }
 .startrow.two .btn.big { font-size: clamp(20px, 6vw, 28px); }
+.d-btn.armed, .d-link.armed { white-space: nowrap; overflow: hidden; }
