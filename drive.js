@@ -69,6 +69,16 @@
   $("dRepeat").addEventListener("click", A.repeat);
   $("dMute").addEventListener("click", function () { A.setMute(!run.mute); });
   $("dStop").addEventListener("click", function () { A.stop(); });
+  $("dRadio").addEventListener("click", function () { if (A.radio) A.radio.toggle(); });
+  $("dStation").addEventListener("click", function () { if (A.radio) A.radio.next(); });
+  A.on("radio", function (r) {
+    setText("dRadio", r.playing ? "Parar radio" : "Radio");
+    $("dRadio").setAttribute("aria-pressed", r.playing ? "true" : "false");
+    var info = $("dRadioInfo");
+    info.hidden = !r.playing && r.kind !== "error";
+    setText("dRadioInfo", r.text);
+    info.className = "d-radio " + r.kind;
+  });
   $("dExit").addEventListener("click", function () { closedThisTrip = true; show(false); });
   $("btnDrive").addEventListener("click", function () { closedThisTrip = false; show(true); });
   $("dFactToggle").addEventListener("click", function () {

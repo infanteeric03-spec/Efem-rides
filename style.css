@@ -265,3 +265,44 @@ body.driving main, body.driving .dock { display: none !important; }
   .d-grid { grid-column: 2; grid-row: 1 / span 4; align-self: start; }
   .d-btn { min-height: 64px; } .d-wide { min-height: 72px; }
 }
+
+/* Cinco pestañas */
+.tabs { grid-template-columns: repeat(5, 1fr); }
+.tabs button { font-size: clamp(12px, 3.5vw, 15px); letter-spacing: .06em; padding: 0 2px; }
+
+/* Radio */
+.r-now { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.r-eyebrow { font: 600 13px/1 var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.r-name { font: 700 clamp(34px, 10vw, 46px)/1 var(--font-display); overflow-wrap: anywhere; }
+.r-status { font-size: 15px; color: var(--muted); min-height: 1.4em; }
+.r-status.on { color: var(--ok); }
+.r-status.error { color: var(--warn); }
+.r-now .row .btn.big { font-size: clamp(18px, 5.4vw, 24px); }
+.r-favs { display: flex; flex-direction: column; gap: 8px; }
+.r-fav { display: flex; gap: 8px; align-items: stretch; }
+.r-fav-play {
+  flex: 1 1 auto; min-width: 0; min-height: 56px; text-align: left; padding: 0 14px; cursor: pointer;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  font: 700 22px/1.1 var(--font-display); overflow-wrap: anywhere;
+}
+.r-fav.cur .r-fav-play { border-color: var(--accent); color: var(--accent); }
+.r-fav-del { flex: 0 0 auto; min-width: 76px; background: none; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); cursor: pointer; font-size: 14px; }
+.r-search { display: flex; gap: 8px; }
+.r-search .search { flex: 1 1 auto; min-width: 0; }
+.r-search .btn { flex: 0 0 auto; }
+.r-check { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--muted); min-height: 40px; }
+.r-check input { width: 22px; height: 22px; accent-color: var(--accent); }
+.r-results { display: flex; flex-direction: column; gap: 8px; }
+.r-res { display: flex; align-items: center; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; }
+.r-res-info { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.r-res-info strong { font-size: 16px; overflow-wrap: anywhere; }
+.r-res-info span { font-size: 13px; color: var(--muted); }
+.r-res .btn { flex: 0 0 auto; padding: 0 10px; }
+
+/* Radio en la vista de conducción */
+.d-radio { font-size: 15px; color: var(--muted); }
+.d-radio.on { color: var(--ok); }
+.d-radio.error { color: var(--warn); }
+.d-btn { min-height: 74px; }
+.d-wide { min-height: 84px; }
+#dRadio[aria-pressed="true"] { border-color: var(--ok); color: var(--ok); }

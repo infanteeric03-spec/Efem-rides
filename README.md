@@ -38,6 +38,15 @@ En Ajustes, bajo **Probar sin salir de casa**, hay cuatro rutas simuladas (por e
 - Modo ahorro en Ajustes: atiende una posición cada 3 o 5 segundos (por defecto, todas, que suele ser una por segundo). Reduce el trabajo del móvil, pero el GPS sigue encendido, así que la batería mejora poco. Lo que más gasta es la pantalla.
 - Guarda el recorrido, calcula distancia y velocidades, y lo exporta como GPX.
 
+## Radio
+
+La pestaña **Radio** reproduce emisoras por internet. Vienen como favoritas Europa FM, COPE, Cadena SER, LOS40 y LOS40 Classic, y con el buscador se puede añadir cualquier otra. Las emisoras se buscan en [Radio Browser](https://www.radio-browser.info), un directorio público y gratuito, así que la app usa siempre el enlace vigente de cada una.
+
+- Mientras la app cuenta un dato, la radio baja (o se pausa, según Ajustes de la pestaña Radio) y vuelve a subir al terminar.
+- Si se corta por falta de cobertura, reconecta sola cuando vuelve la señal.
+- En la vista de conducción hay dos botones: **Radio** (encender o apagar) y **Otra emisora**.
+- Gasta unos 60 MB de datos por hora.
+
 ## Añadir o corregir lugares
 
 Los datos están en `data-asturias.js` y `data-cantabria.js`. Cada lugar tiene este formato:

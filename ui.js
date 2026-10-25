@@ -19,7 +19,7 @@
   A.on("toast", toast);
 
   /* ---------- Pestañas ---------- */
-  var TABS = ["ruta", "lugares", "viaje", "ajustes"], current = "ruta";
+  var TABS = ["ruta", "lugares", "viaje", "radio", "ajustes"], current = "ruta";
   function showTab(n) {
     current = n;
     TABS.forEach(function (t) {

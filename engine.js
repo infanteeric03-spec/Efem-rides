@@ -69,22 +69,33 @@
   function busy() { return !!synth && (synth.speaking || synth.pending); }
   function speak(text, interrupt, force) {
     if (!synth || !text || (run.mute && !force)) return false;
+    pendingGo++;
     function go() {
+      pendingGo = Math.max(0, pendingGo - 1);
       C.chunks(text).forEach(function (c, i, a) {
         var u = new SpeechSynthesisUtterance(c);
         u.lang = "es-ES";
         var v = pickVoice(); if (v) u.voice = v;
         u.rate = +S.rate; u.volume = +S.vol;
-        if (i === a.length - 1) u.onend = u.onerror = function () { run.lastEnd = Date.now(); };
+        if (i === a.length - 1) u.onend = u.onerror = function () { run.lastEnd = Date.now(); voiceMaybeDone(); };
         synth.speak(u);
       });
     }
     run.lastEnd = Date.now();
-    if (interrupt) { synth.cancel(); setTimeout(go, 80); } else go();
+    /* Avisa a la radio para que baje antes de hablar, y le da medio segundo para hacerlo. */
+    emit("voice", true);
+    var wait = App.radioOn && App.radioOn() ? 450 : 0;
+    if (interrupt) { synth.cancel(); setTimeout(go, Math.max(80, wait)); } else if (wait && !busy()) setTimeout(go, wait); else go();
     return true;
   }
+  var doneTimer = null, pendingGo = 0;
+  function voiceMaybeDone() {
+    clearTimeout(doneTimer);
+    doneTimer = setTimeout(function () { if (!App.voiceBusy()) emit("voice", false); }, 350);
+  }
+  App.voiceBusy = function () { return pendingGo > 0 || busy(); };
   App.speak = speak;
-  App.setMute = function (b) { run.mute = b; if (b && synth) synth.cancel(); emit("mute", b); };
+  App.setMute = function (b) { run.mute = b; if (b && synth) { synth.cancel(); voiceMaybeDone(); } emit("mute", b); };
   App.testVoice = function () { speak("Así sonará la voz durante el viaje. Bienvenido a Asturias y Cantabria.", true, true); };
   App.speakPlace = function (p) {
     speak(p.h[0], true, true);
@@ -286,7 +297,7 @@
     if (run.watch != null) { navigator.geolocation.clearWatch(run.watch); run.watch = null; }
     if (run.timer) { clearInterval(run.timer); run.timer = null; }
     wakeOff();
-    if (synth) synth.cancel();
+    if (synth) { synth.cancel(); voiceMaybeDone(); }
     persist(true);
     run.on = false; run.sim = false; run.here = null; run.next = null;
     status("off", "GPS apagado");
