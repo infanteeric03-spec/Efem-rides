@@ -13,6 +13,7 @@
 
   /* ---------- Dónde estoy ---------- */
   function getJSON(url, ms) {
+    if (!window.fetch) return Promise.reject(new Error("sin fetch"));
     var ctl = window.AbortController ? new AbortController() : null;
     var to = setTimeout(function () { if (ctl) ctl.abort(); }, ms || 10000);
     return fetch(url, { signal: ctl ? ctl.signal : undefined, headers: { "Accept": "application/json" } }).then(function (r) {
