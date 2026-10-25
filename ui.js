@@ -64,7 +64,9 @@
     var T = A.trip(), st = T && T.pts.length > 1 ? C.stats(T.pts) : { km: 0, ms: 0 };
     $("mSpeed").textContent = Math.round(run.on ? run.kmh : 0);
     $("mKm").textContent = st.km.toFixed(1).replace(".", ",");
-    $("mTime").textContent = C.fmtDur(st.ms);
+    var mins = Math.floor(st.ms / 60000);
+    if (mins >= 60) { $("mTime").textContent = Math.floor(mins / 60) + ":" + ("0" + (mins % 60)).slice(-2); $("mTimeU").textContent = "h de viaje"; }
+    else { $("mTime").textContent = String(mins); $("mTimeU").textContent = "min de viaje"; }
   }
 
   function renderToday() {

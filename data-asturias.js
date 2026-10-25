@@ -17,16 +17,16 @@
   add("gijon", "Gijón", 43.5322, -5.6611, 6, [
     "Gijón, la ciudad más poblada de Asturias, se abre a la bahía de San Lorenzo. Su barrio viejo, Cimadevilla, ocupa una pequeña península que ya habitaron los romanos.",
     "En Cimadevilla están las termas romanas de Campo Valdés. En lo alto del cerro de Santa Catalina se alza Elogio del Horizonte, la escultura de Eduardo Chillida inaugurada en 1990.",
-    "Gaspar Melchor de Jovellanos, escritor, jurista y político de la Ilustración, nació en Gijón en 1744.",
+    "Gaspar Melchor de Jovellanos nació en Gijón en 1744. Fue escritor, jurista y ministro de Gracia y Justicia, una de las grandes figuras de la Ilustración española. En 1794 fundó en Gijón el Real Instituto Asturiano de Náutica y Mineralogía, y su casa natal es hoy un museo.",
     "La Laboral, cuyas obras empezaron en 1946, nació como un centro para los huérfanos de mineros. Su torre mide 117 metros, y desde 2007 es la Laboral Ciudad de la Cultura.",
-    "El Real Sporting se fundó en 1905 y juega en El Molinón, un estadio que se inauguró en 1908."
+    "El Real Sporting de Gijón se fundó en 1905 y juega en El Molinón, inaugurado en 1908 y considerado el estadio en uso más antiguo de España. Por su escuela de Mareo pasaron futbolistas como Luis Enrique o David Villa."
   ]);
 
   add("aviles", "Avilés", 43.5547, -5.9248, 4, [
     "Avilés tiene un casco histórico muy bien conservado, con calles con soportales como la de Galiana y plazas de aire medieval.",
     "En Avilés nació en 1519 Pedro Menéndez de Avilés, que fundó San Agustín, en Florida, en 1565, una de las ciudades más antiguas de Estados Unidos.",
     "El Centro Niemeyer, inaugurado en 2011 junto a la ría, es la única obra en España del arquitecto brasileño Oscar Niemeyer.",
-    "La siderurgia de Ensidesa, empresa creada en 1950, transformó la economía y el paisaje de toda la comarca de Avilés."
+    "La siderurgia de Ensidesa, una empresa pública creada en 1950, transformó la comarca de Avilés. En pocos años la población se multiplicó con trabajadores llegados de toda España, y hoy la acería sigue funcionando en manos de ArcelorMittal."
   ]);
 
   add("peñas", "Cabo de Peñas", 43.6556, -5.8480, 3, [
@@ -35,30 +35,30 @@
   ]);
 
   add("cudillero", "Cudillero", 43.5617, -6.1456, 3, [
-    "Cudillero, un pueblo marinero con las casas colgadas en forma de anfiteatro sobre el puerto.",
+    "Cudillero es un pueblo marinero con las casas de colores colgadas en forma de anfiteatro sobre el puerto. Está escondido en una pequeña ensenada, así que no se ve entero hasta que llegas abajo, a la plaza junto al muelle.",
     "Sus vecinos hablan el pixueto, una variedad propia de la lengua asturiana que se conserva casi solo en este pueblo y sus alrededores."
   ]);
 
   add("luarca", "Luarca", 43.5420, -6.5350, 3, [
     "Luarca, la Villa Blanca de la Costa Verde, con casas escalonadas a ambos lados del río Negro, justo antes de que desemboque en el mar.",
-    "En Luarca nació en 1905 Severo Ochoa, Premio Nobel de Medicina en 1959.",
+    "En Luarca nació en 1905 Severo Ochoa. Hizo casi toda su carrera en Estados Unidos y en 1959 recibió el Premio Nobel de Medicina, compartido con Arthur Kornberg, por sus trabajos sobre la síntesis del ARN. Está enterrado en el cementerio de su villa natal.",
     "El cementerio de Luarca está sobre un acantilado, junto al faro y la ermita de la Blanca, en la Atalaya, con vistas abiertas al Cantábrico. Es uno de los rincones más fotografiados de la villa."
   ]);
 
   add("pravia", "Pravia", 43.4833, -6.1167, 3, [
-    "Pravia fue capital del reino de Asturias entre los años 774 y 783, durante el reinado de Silo.",
+    "Pravia fue capital del reino de Asturias entre los años 774 y 783, durante el reinado de Silo, que trasladó aquí la corte desde Cangas de Onís. Años después, Alfonso Segundo la llevaría a Oviedo.",
     "La iglesia de Santianes, mandada construir en tiempos de Silo, es uno de los ejemplos más antiguos del prerrománico asturiano, aunque ha sido reformada a lo largo de los siglos."
   ]);
 
   add("salas", "Salas", 43.4130, -6.2530, 3, [
-    "Salas, villa del Camino Primitivo de Santiago, con una colegiata y un palacio renacentista de los Valdés Salas.",
-    "Aquí nació en 1483 Fernando de Valdés Salas, inquisidor general y fundador de la Universidad de Oviedo."
+    "Salas es una villa del Camino Primitivo de Santiago, la ruta que siguió Alfonso Segundo desde Oviedo hasta la tumba del apóstol. Tiene una colegiata del siglo dieciséis y el palacio y la torre de los Valdés Salas.",
+    "En Salas nació en 1483 Fernando de Valdés Salas, arzobispo de Sevilla e inquisidor general en tiempos de Felipe Segundo. En su testamento dejó los fondos para fundar la Universidad de Oviedo, y su sepulcro de alabastro está en la colegiata de Salas."
   ]);
 
   add("cangas-onis", "Cangas de Onís", 43.3510, -5.1290, 3.5, [
     "Cangas de Onís fue la primera capital del reino de Asturias, con Pelayo, su hijo Favila y Alfonso Primero, en el siglo ocho.",
     "El Puente Romano, de un solo arco apuntado sobre el río Sella, es en realidad de origen medieval. Bajo su arco cuelga una réplica de la Cruz de la Victoria.",
-    "La capilla de Santa Cruz, en las afueras, se levantó en el año 737 sobre un dolmen de la prehistoria."
+    "La capilla de Santa Cruz se levantó en el año 737, por orden del rey Favila, sobre un dolmen de la prehistoria. Fue destruida en 1936 y reconstruida después, y bajo el altar todavía se puede ver la cámara del dolmen."
   ]);
 
   add("covadonga", "Covadonga", 43.3086, -4.9863, 4, [
@@ -71,61 +71,61 @@
   add("arriondas", "Arriondas", 43.3833, -5.2000, 3, [
     "Arriondas, a orillas del Sella, es el punto de salida del Descenso del Sella, la fiesta de las piraguas que baja hasta Ribadesella.",
     "El Descenso del Sella se celebra desde 1930, el primer fin de semana de agosto, y es Fiesta de Interés Turístico Internacional. Lo impulsó Dionisio de la Huerta.",
-    "Cerca, el mirador del Fito ofrece vistas a la costa y a los Picos de Europa."
+    "Cerca de Arriondas, en la sierra del Sueve, está el mirador del Fito. Desde su balcón de piedra se ve a un lado la costa del Cantábrico y al otro los Picos de Europa. La sierra es también el hogar del asturcón, el pequeño caballo autóctono de Asturias."
   ]);
 
   add("ribadesella", "Ribadesella", 43.4636, -5.0586, 3.5, [
-    "Ribadesella, en la desembocadura del Sella, es la meta del Descenso de las piraguas.",
+    "Ribadesella está en la desembocadura del Sella y es la meta del Descenso de las piraguas, que sale de Arriondas y recorre unos veinte kilómetros río abajo. La villa se reparte entre el puerto, a un lado de la ría, y la playa de Santa Marina, con palacetes de indianos, al otro.",
     "La cueva de Tito Bustillo la descubrió en 1968 un grupo de jóvenes espeleólogos. Lleva el nombre de uno de ellos, Celestino Fernández Bustillo, Tito, que murió pocas semanas después. Algunas de sus pinturas tienen más de treinta mil años, y es Patrimonio Mundial desde 2008."
   ]);
 
   add("lastres", "Lastres", 43.5148, -5.2689, 3, [
-    "Lastres, un pueblo de casas en cuesta sobre el mar, que fue escenario de la serie Doctor Mateo.",
+    "Lastres es un pueblo de casas en cuesta que bajan hasta el puerto. Entre 2009 y 2011 fue San Martín del Sella, el pueblo ficticio de la serie Doctor Mateo, y desde entonces atrae a muchos visitantes.",
     "Estás en la Costa de los Dinosaurios: en estos acantilados hay huellas de dinosaurios del Jurásico, de hace unos ciento cincuenta millones de años.",
-    "En Colunga, muy cerca, el Museo del Jurásico de Asturias, inaugurado en 2004, tiene forma de huella de dinosaurio."
+    "En Colunga, muy cerca, está el Museo del Jurásico de Asturias, inaugurado en 2004. El edificio tiene forma de huella de dinosaurio y expone esqueletos y huellas fósiles encontradas en esta misma costa."
   ]);
 
   add("villaviciosa", "Villaviciosa", 43.4800, -5.4330, 3.5, [
-    "Villaviciosa, la capital de la manzana, el corazón de la sidra natural asturiana.",
+    "Villaviciosa es la capital de la manzana. En su concejo hay miles de manzanos y muchos llagares, que es como se llaman en Asturias las bodegas donde se hace la sidra. La sidra natural asturiana se elabora sin añadir gas ni azúcar, solo con el zumo fermentado de la manzana.",
     "En Tazones, en la costa de este concejo, desembarcó en 1517 Carlos Primero, que llegó a Asturias tras una tormenta cuando iba a tomar posesión de sus reinos.",
     "El monasterio de San Salvador de Valdediós, junto a Villaviciosa, tiene una iglesia prerrománica consagrada en el año 893."
   ]);
 
   add("llanes", "Llanes", 43.4200, -4.7550, 4, [
-    "Llanes, con restos de murallas medievales, un puerto pesquero y el paseo de San Pedro sobre el mar.",
+    "Llanes conserva restos de su muralla medieval, un puerto pesquero y el paseo de San Pedro, un camino de hierba sobre los acantilados. Muchas de sus casonas las levantaron indianos que volvieron ricos de América.",
     "En el rompeolas del puerto están los Cubos de la Memoria, bloques de hormigón que Agustín Ibarrola empezó a pintar en 2001.",
-    "En agosto, Llanes celebra las fiestas de San Roque, con ramos, gaiteros y mucha sidra."
+    "Entre julio y septiembre, Llanes celebra sus tres grandes fiestas: la Magdalena, San Roque y la Guía. Los vecinos se organizan en bandos rivales, desfilan con ramos adornados con panes y bailan con trajes tradicionales al son de las gaitas."
   ]);
 
   add("gulpiyuri", "Playa de Gulpiyuri", 43.4430, -4.8480, 1.5, [
     "Playa de Gulpiyuri, una de las playas interiores más famosas del mundo: está en un prado, a unos cien metros del mar, y el agua entra por túneles bajo la roca.",
-    "Su arena y su agua cambian con las mareas, porque el mar llega hasta ella por galerías naturales."
+    "Su arena y su agua suben y bajan con las mareas, porque el mar llega por galerías bajo la roca. La playa mide unos cuarenta metros y es Monumento Natural desde 2001."
   ]);
 
   add("cabrales", "Arenas de Cabrales", 43.3042, -4.8206, 4, [
     "Arenas de Cabrales, el centro del concejo del queso Cabrales, un queso azul que madura en cuevas naturales de la montaña.",
     "El Naranjo de Bulnes, o Picu Urriellu, de 2.519 metros, lo escalaron por primera vez en 1904 Pedro Pidal y Gregorio Pérez, El Cainejo.",
-    "Desde Poncebos arranca la Ruta del Cares, de unos doce kilómetros, por la garganta del río Cares hasta Caín."
+    "Desde Poncebos arranca la Ruta del Cares, de unos doce kilómetros, hasta Caín, ya en León. El sendero, excavado en la roca de la garganta, se construyó entre 1945 y 1950 para mantener el canal que lleva agua a la central eléctrica de Poncebos."
   ]);
 
   add("nava", "Nava", 43.3500, -5.5083, 3, [
-    "Nava, la capital de la sidra. Aquí está el Museo de la Sidra Asturiana, que explica cómo se elabora y se sirve.",
+    "Nava es la capital de la sidra. Aquí está el Museo de la Sidra Asturiana, que explica cómo se elabora y se sirve, y cada mes de julio el pueblo celebra el Festival de la Sidra, con concursos de escanciadores.",
     "La sidra asturiana se escancia: se sirve desde lo alto, con un chorro fino que rompe en el vaso para que se oxigene, y se bebe un culín, que es una pequeña cantidad."
   ]);
 
   add("mieres", "Mieres", 43.2500, -5.7700, 4, [
     "Mieres, el corazón de la cuenca minera del Caudal, una ciudad marcada por el carbón, el hierro y las luchas obreras.",
-    "La Revolución de octubre de 1934 tuvo su principal foco en las cuencas mineras, entre ellas la del Caudal."
+    "La Revolución de octubre de 1934 tuvo su principal foco en las cuencas mineras, entre ellas la del Caudal. Los mineros llegaron a dominar buena parte de Oviedo durante varios días, hasta que el Ejército sofocó el levantamiento, con cientos de muertos y miles de detenidos."
   ]);
 
   add("entrego", "El Entrego", 43.2950, -5.6150, 2.5, [
     "El Entrego, en San Martín del Rey Aurelio, donde está el Museo de la Minería y de la Industria de Asturias, con un recorrido por una mina recreada.",
-    "El concejo debe su nombre al rey Aurelio, que gobernó Asturias entre los años 768 y 774."
+    "El concejo de San Martín del Rey Aurelio debe su nombre al rey Aurelio, que gobernó Asturias entre los años 768 y 774. Según la Crónica de Alfonso Tercero, fue enterrado en la iglesia de San Martín, en este valle, donde hay una lápida con su nombre, aunque otras fuentes lo sitúan en otros lugares."
   ]);
 
   add("laviana", "Pola de Laviana", 43.2430, -5.5618, 3, [
     "Pola de Laviana, en el valle del Nalón. Aquí nació, en el pueblo de Entralgo, el novelista Armando Palacio Valdés, autor de La hermana San Sulpicio.",
-    "Al sur de Laviana está el Parque Natural de Redes, Reserva de la Biosfera desde 2001."
+    "Al sureste de Laviana está el Parque Natural de Redes, Reserva de la Biosfera desde 2001. Es un territorio de hayedos en la cabecera del río Nalón, con el embalse de Tanes y el pico Tiatordos entre sus paisajes más conocidos."
   ]);
 
   add("lena", "Pola de Lena", 43.1583, -5.8211, 3.5, [
@@ -135,7 +135,7 @@
 
   add("cangas-narcea", "Cangas del Narcea", 43.1750, -6.5500, 4, [
     "Cangas del Narcea, la capital del suroccidente asturiano y del Vino de Cangas, el único vino asturiano con denominación de origen.",
-    "El monasterio de Corias, fundado en 1032 y convertido hoy en Parador, está a pocos kilómetros.",
+    "El monasterio de Corias lo fundaron en 1032 los condes Piñolo y Aldonza. Por su tamaño lo llaman El Escorial de Asturias. El edificio actual se rehízo tras un incendio en el siglo dieciocho y hoy es Parador de Turismo.",
     "Cerca está la Reserva de Muniellos, un robledal muy extenso y bien conservado al que solo se puede entrar con permiso previo y cupo diario."
   ]);
 
@@ -146,6 +146,6 @@
 
   add("colombres", "Colombres", 43.3750, -4.5547, 3, [
     "Colombres, en Ribadedeva, el último pueblo de Asturias antes de Cantabria. Aquí está el Archivo de Indianos, en la Quinta Guadalupe, un edificio indiano.",
-    "El río Deva marca el límite entre Asturias y Cantabria, y el puente de Unquera lo cruza."
+    "El río Deva marca el límite entre Asturias y Cantabria. Nace en Fuente Dé, atraviesa el desfiladero de La Hermida y desemboca en la ría de Tina Mayor, junto al puente de Unquera."
   ]);
 })(typeof window !== "undefined" ? window : globalThis);
