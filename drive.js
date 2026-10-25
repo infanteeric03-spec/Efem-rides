@@ -42,6 +42,7 @@
     if (key !== lastFactKey) {
       lastFactKey = key;
       $("dFact").classList.remove("open");
+      $("drive").classList.remove("fact-open");
       $("dFactToggle").setAttribute("aria-expanded", "false");
       setText("dFactToggle", "Mostrar contenido");
     }
@@ -84,6 +85,7 @@
   $("btnDrive").addEventListener("click", function () { closedThisTrip = false; show(true); });
   $("dFactToggle").addEventListener("click", function () {
     var open = $("dFact").classList.toggle("open");
+    $("drive").classList.toggle("fact-open", open);
     this.setAttribute("aria-expanded", open ? "true" : "false");
     this.textContent = open ? "Ocultar contenido" : "Mostrar contenido";
   });

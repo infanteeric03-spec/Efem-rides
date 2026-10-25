@@ -57,7 +57,7 @@ La pestaña **Radio** reproduce emisoras por internet. Vienen como favoritas Eur
 
 - Mientras la app cuenta un dato, la radio baja (o se pausa, según Ajustes de la pestaña Radio) y vuelve a subir al terminar.
 - Si se corta por falta de cobertura, reconecta sola cuando vuelve la señal.
-- En la vista de conducción hay dos botones: **Radio** (encender o apagar) y **Otra emisora**.
+- En la vista de conducción hay dos botones: **Radio** (encender o apagar) y **Otra radio**.
 - Al pulsar **Parar viaje** se para también la radio.
 - Gasta unos 60 MB de datos por hora.
 

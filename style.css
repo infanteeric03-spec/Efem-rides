@@ -337,3 +337,42 @@ body.driving main, body.driving .dock { display: none !important; }
 .d-fact.open .d-fact-text { display: block; }
 .d-fact:not(.open) { gap: 0; }
 .d-radio { margin-top: -6px; }
+
+/* Vista de conducción a pantalla exacta: nada de desplazamiento.
+   La pantalla mide la altura disponible; los botones se reparten lo que sobra
+   y los tamaños de letra dependen también de la altura del móvil. */
+body.driving { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
+body.driving .top { padding-block: clamp(6px, 1.2vh, 14px) clamp(4px, .8vh, 8px); }
+body.driving .drive {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  gap: clamp(6px, 1.3vh, 14px);
+  padding-top: 2px; padding-bottom: calc(clamp(6px, 1.2vh, 14px) + env(safe-area-inset-bottom, 0px));
+}
+body.driving .d-sign { padding: clamp(4px, .6vh, 6px); flex: none; }
+body.driving .d-sign .sign-in { padding: clamp(6px, 1.2vh, 14px) 16px clamp(8px, 1.4vh, 16px); gap: 2px; }
+body.driving .d-sign .sign-reg { font-size: clamp(12px, 1.7vh, 15px); }
+body.driving .d-sign .sign-name { font-size: clamp(26px, min(11.5vw, 7.2vh), 68px); line-height: 1; overflow-wrap: break-word; hyphens: auto; }
+body.driving .d-next { font-size: clamp(16px, min(5.4vw, 2.6vh), 22px); flex: none; }
+body.driving .d-radio { font-size: clamp(13px, 1.8vh, 15px); margin-top: 0; flex: none; }
+body.driving .d-fact { flex: none; }
+body.driving .d-fact.open .d-fact-text { max-height: 28vh; overflow-y: auto; font-size: clamp(16px, 2.2vh, 19px); }
+body.driving .d-link { min-height: clamp(30px, 4.5vh, 44px); padding-block: 2px; }
+body.driving .d-stats { padding-block: clamp(4px, .9vh, 10px); flex: none; }
+body.driving .d-stats b { font-size: clamp(22px, min(8vw, 4.2vh), 34px); }
+body.driving .d-grid {
+  flex: 1 1 auto; min-height: 0;
+  grid-template-rows: minmax(48px, 1.15fr) repeat(2, minmax(44px, 1fr)) minmax(48px, 1.15fr);
+  gap: clamp(6px, 1.1vh, 10px);
+}
+body.driving .d-btn { min-height: 0; height: 100%; max-height: 110px; font-size: clamp(17px, min(6.4vw, 3.4vh), 28px); }
+body.driving .d-exit { flex: none; min-height: clamp(28px, 4vh, 40px); padding-block: 0; }
+@media (orientation: landscape) and (max-height: 520px) {
+  body.driving .drive { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto auto 1fr auto; align-content: stretch; }
+  body.driving .d-grid { grid-column: 2; grid-row: 1 / -1; align-self: stretch; }
+  body.driving .d-btn { max-height: none; }
+}
+/* Con el texto abierto, se ocultan velocidad/km/tiempo para dejarle sitio sin desplazar la pantalla. */
+body.driving .drive.fact-open .d-stats { display: none; }
+body.driving .drive.fact-open .d-fact.open .d-fact-text { max-height: 24vh; }
+body.driving .drive.fact-open .d-grid { grid-template-rows: minmax(42px, 1.1fr) repeat(2, minmax(40px, 1fr)) minmax(42px, 1.1fr); }
+body.driving .drive.fact-open .d-btn { font-size: clamp(15px, min(6vw, 2.8vh), 24px); }
