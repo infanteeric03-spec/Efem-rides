@@ -38,7 +38,10 @@
     if (!run.on) {
       var T = A.trip();
       name = "Listo para salir";
-      sub = T && T.log.length ? "Tienes un viaje guardado. Al empezar, continuará donde lo dejaste." : "Deja el móvil en el soporte, conectado al coche, y pulsa Empezar viaje.";
+      if (A.savedTrip()) {
+        var sv = T.pts.length > 1 ? C.stats(T.pts) : { km: 0 };
+        sub = "Tienes un viaje sin terminar de " + C.fmtKm(sv.km) + ". Pulsa Continuar para seguirlo o Nuevo viaje para empezar de cero.";
+      } else sub = "Deja el móvil en el soporte, conectado al coche, y pulsa Empezar viaje.";
     } else if (run.here) {
       var p = A.byId[run.here];
       reg = C.regName(p.reg); name = p.n; sub = "Estás aquí";
@@ -61,7 +64,8 @@
   }
 
   function renderMetrics() {
-    var T = A.trip(), st = T && T.pts.length > 1 ? C.stats(T.pts) : { km: 0, ms: 0 };
+    /* Con el viaje parado, los contadores empiezan en cero; el viaje guardado se ve en la pestaña Viaje. */
+    var T = run.on ? A.trip() : null, st = T && T.pts.length > 1 ? C.stats(T.pts) : { km: 0, ms: 0 };
     $("mSpeed").textContent = Math.round(run.on ? run.kmh : 0);
     $("mKm").textContent = st.km.toFixed(1).replace(".", ",");
     var mins = Math.floor(st.ms / 60000);
@@ -79,8 +83,11 @@
 
   function renderButtons() {
     var b = $("btnStart");
-    b.textContent = run.on ? (run.sim ? "Parar prueba" : "Parar viaje") : "Empezar viaje";
+    var saved = !run.on && A.savedTrip();
+    b.textContent = run.on ? (run.sim ? "Parar prueba" : "Parar viaje") : saved ? "Nuevo viaje" : "Empezar viaje";
     b.classList.toggle("stop", run.on);
+    $("btnContinue").hidden = !saved;
+    syncStartRow();
     var can = !!(run.on && (run.here || run.lastFact));
     $("btnMore").disabled = !can; $("btnRepeat").disabled = !(run.on && run.lastFact);
     $("dimmer").hidden = !(S.dim && run.on);
@@ -108,7 +115,14 @@
     b.setAttribute("aria-pressed", m ? "true" : "false"); b.textContent = m ? "Voz silenciada" : "Silenciar";
   });
 
-  $("btnStart").addEventListener("click", function () { if (run.on) A.stop(); else A.start(); renderButtons(); });
+  function syncStartRow() {
+    var row = $("btnStart").parentNode, n = 0;
+    [].forEach.call(row.children, function (c) { if (!c.hidden) n++; });
+    row.classList.toggle("two", n > 1);
+  }
+  A.syncStartRow = syncStartRow;
+  $("btnStart").addEventListener("click", function () { if (run.on) A.stop(); else A.start("new"); renderButtons(); });
+  $("btnContinue").addEventListener("click", function () { if (!run.on) A.start("continue"); renderButtons(); });
   $("btnMore").addEventListener("click", A.more);
   $("btnRepeat").addEventListener("click", A.repeat);
   $("btnMute").addEventListener("click", function () { A.setMute(!run.mute); });

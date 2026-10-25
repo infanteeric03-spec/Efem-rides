@@ -18,7 +18,7 @@
   function syncDriveBtn() {
     var hide = shown || !run.on;
     $("btnDrive").hidden = hide;
-    $("btnDrive").parentNode.classList.toggle("two", !hide);
+    if (A.syncStartRow) A.syncStartRow();
   }
 
   function setText(id, t) { var e = $(id); if (e.textContent !== t) e.textContent = t; }

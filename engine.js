@@ -245,10 +245,11 @@
   }
 
   /* ---------- Empezar y parar ---------- */
-  function begin(sim) {
+  /* mode: "continue" sigue el viaje guardado; cualquier otro valor empieza uno nuevo. */
+  function begin(sim, mode) {
     run.sim = !!sim;
     if (sim) run.simTrip = newTrip();
-    else if (!real || Date.now() - real.last > 12 * 3600000) { real = newTrip(); save("rch.trip", real); }
+    else if (mode !== "continue" || !real || Date.now() - real.last > 12 * 3600000) { real = newTrip(); save("rch.trip", real); }
     run.on = true; run.here = null; run.hereN = 0; run.region = null; run.regCand = null; run.regN = 0;
     run.prev = {}; run.appr = {}; run.previewed = {}; run.heading = null; run.anchor = null; run.lastFix = null; run.lastProc = 0;
     run.next = null; run.lastFact = null; run.kmh = 0; run.cur = null;
@@ -258,14 +259,18 @@
     emit("trip"); emit("status", App.status);
   }
 
-  App.start = function () {
+  /* Hay un viaje guardado que se puede continuar (menos de 12 horas desde la última posición). */
+  App.savedTrip = function () {
+    return !!(real && (real.log.length || real.pts.length > 1) && Date.now() - real.last <= 12 * 3600000);
+  };
+  App.start = function (mode) {
     if (run.on) return;
     if (!window.isSecureContext || !navigator.geolocation) {
       status("warn", "Sin GPS: abre la app desde una dirección https");
       emit("toast", "Este navegador no da acceso al GPS. Abre la app desde una dirección https.");
       return;
     }
-    begin(false);
+    begin(false, mode);
     status("warn", "Buscando señal…");
     run.watch = navigator.geolocation.watchPosition(function (pos) {
       onFix(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed, pos.timestamp || Date.now());
