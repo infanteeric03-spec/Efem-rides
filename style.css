@@ -389,3 +389,7 @@ body.driving .drive.fact-open .d-btn { font-size: clamp(15px, min(6vw, 2.8vh), 2
 .d-sign-dist { white-space: nowrap; text-align: right; font: 700 clamp(40px, min(15vw, 7.6vh), 88px)/.9 var(--font-display); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
 body.driving .d-sign .sign-name { font-size: clamp(24px, min(9.6vw, 6.6vh), 64px); hyphens: manual; overflow-wrap: break-word; }
 .d-sign-in:has(.d-sign-dist[hidden]) .sign-name { font-size: clamp(26px, min(11.5vw, 7.2vh), 68px) !important; }
+
+/* La unidad va debajo del número: la columna de la distancia es estrecha y deja más sitio al nombre. */
+.d-sign-dist { display: flex; flex-direction: column; align-items: center; text-align: center; font-size: clamp(38px, min(14.5vw, 7.2vh), 84px); line-height: .85; }
+.d-sign-dist #dDistU { font-size: .34em; line-height: 1; letter-spacing: .08em; margin-top: .12em; }
