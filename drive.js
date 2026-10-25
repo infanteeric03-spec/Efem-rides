@@ -43,11 +43,12 @@
       lastFactKey = key;
       $("dFact").classList.remove("open");
       $("dFactToggle").setAttribute("aria-expanded", "false");
-      setText("dFactToggle", "Leer entero");
+      setText("dFactToggle", "Mostrar contenido");
     }
     setText("dFactText", f ? f.f.text : "Cuando entres en un lugar con historia, te lo contaré en voz alta.");
     var tg = $("dFactToggle");
-    tg.hidden = !f || f.f.text.length < 110;
+    tg.hidden = !f;
+    $("dFact").hidden = !f;
 
     $("dMore").disabled = !(run.here || run.lastFact);
     $("dRepeat").disabled = !run.lastFact;
@@ -84,7 +85,7 @@
   $("dFactToggle").addEventListener("click", function () {
     var open = $("dFact").classList.toggle("open");
     this.setAttribute("aria-expanded", open ? "true" : "false");
-    this.textContent = open ? "Contraer" : "Leer entero";
+    this.textContent = open ? "Ocultar contenido" : "Mostrar contenido";
   });
 
   var sd = $("s_drive");
