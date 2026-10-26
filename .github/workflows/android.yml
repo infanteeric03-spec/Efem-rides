@@ -32,6 +32,8 @@ jobs:
 
       - name: Preparar la web dentro de la app
         working-directory: app
+        env:
+          APP_BUILD: ${{ github.run_number }}
         run: |
           npm ci
           npm run sync

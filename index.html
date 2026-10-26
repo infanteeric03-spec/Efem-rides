@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="style.css?v=27">
+<link rel="stylesheet" href="style.css?v=28">
 </head>
 <body>
 <header class="top">
@@ -229,7 +229,14 @@
       <div class="line"><span class="lbl">La prueba no se guarda en tu viaje</span><button class="btn small" id="btnSim" type="button" style="flex:0 0 auto">Simular</button></div>
     </div>
 
-    <p class="note">Versión 27. Los datos están guardados en la propia aplicación, así que funciona sin cobertura una vez instalada. Las fechas y cifras proceden de fuentes generales; si vas a citar alguna, compruébala antes.</p>
+    <div id="appSec" hidden>
+      <h2 class="sec">App</h2>
+      <div class="set">
+        <div class="line"><span class="lbl">Versión instalada<small id="appVer">—</small></span><button class="btn small" id="btnUpd" type="button" style="flex:0 0 auto">Buscar actualización</button></div>
+      </div>
+    </div>
+
+    <p class="note">Versión 28. Los datos están guardados en la propia aplicación, así que funciona sin cobertura una vez instalada. Las fechas y cifras proceden de fuentes generales; si vas a citar alguna, compruébala antes.</p>
   </section>
 </main>
 
@@ -245,18 +252,26 @@
 </nav>
 </div>
 
+<div class="upd" id="updBar" role="status" hidden>
+  <p id="updText">Hay una versión nueva de la app.</p>
+  <div class="row">
+    <button class="btn" id="updGo" type="button">Descargar</button>
+    <button class="btn ghost" id="updLater" type="button">Ahora no</button>
+  </div>
+</div>
 <div id="toast" role="status" aria-live="polite" hidden></div>
 <div id="dimmer" hidden></div>
 
-<script src="data-asturias.js?v=27"></script>
-<script src="data-cantabria.js?v=27"></script>
-<script src="data-dias.js?v=27"></script>
-<script src="core.js?v=27"></script>
-<script src="engine.js?v=27"></script>
-<script src="ui.js?v=27"></script>
-<script src="radio.js?v=27"></script>
-<script src="explore.js?v=27"></script>
-<script src="home.js?v=27"></script>
-<script src="drive.js?v=27"></script>
+<script src="data-asturias.js?v=28"></script>
+<script src="data-cantabria.js?v=28"></script>
+<script src="data-dias.js?v=28"></script>
+<script src="core.js?v=28"></script>
+<script src="engine.js?v=28"></script>
+<script src="ui.js?v=28"></script>
+<script src="radio.js?v=28"></script>
+<script src="explore.js?v=28"></script>
+<script src="home.js?v=28"></script>
+<script src="update.js?v=28"></script>
+<script src="drive.js?v=28"></script>
 </body>
 </html>

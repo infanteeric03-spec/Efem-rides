@@ -134,6 +134,21 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
         call.resolve();
     }
 
+    /** Abre un enlace en el navegador del sistema (se usa para descargar la versión nueva). */
+    @PluginMethod
+    public void openUrl(PluginCall call) {
+        String url = call.getString("url", "");
+        if (url == null || !url.startsWith("https://")) { call.reject("Enlace no válido"); return; }
+        try {
+            android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url));
+            i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(i);
+            call.resolve();
+        } catch (Exception e) {
+            call.reject("No se pudo abrir el enlace");
+        }
+    }
+
     @PluginMethod
     public void isAvailable(PluginCall call) {
         JSObject r = new JSObject();

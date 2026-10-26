@@ -67,6 +67,8 @@ Además de la web, el repositorio genera una **app Android** (carpeta `app/`, he
 2. Ábrelo. Android pedirá permitir **instalar apps de origen desconocido** para el navegador o el gestor de archivos: acéptalo solo para esto.
 3. Al abrir la app y pulsar Empezar viaje, concede **ubicación** y **notificaciones**.
 
+La app avisa sola cuando hay una versión nueva (lo comprueba en GitHub como mucho una vez al día, al abrirla con conexión) y en **Ajustes, App** hay un botón **Buscar actualización**. El aviso abre la descarga en Chrome; la instalación siempre la confirmas tú.
+
 La app no se recompila sola con cada cambio: se genera una versión nueva a petición, desde la pestaña **Actions**, flujo **App Android**, botón **Run workflow**. Para actualizar, descarga el APK nuevo e instálalo encima: se conservan tus ajustes y viajes.
 
 La app está firmada con una clave de uso personal incluida en el repositorio (`app/android/app/ruta-con-historia.keystore`). Sirve para instalarla y actualizarla en tus móviles, no para publicarla en Google Play.

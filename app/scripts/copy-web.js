@@ -11,8 +11,11 @@ for (const f of fs.readdirSync(root)) {
 }
 /* En la app se carga el puente de Capacitor antes que el resto de scripts. */
 fs.copyFileSync(path.resolve(__dirname, "..", "node_modules", "@capacitor", "core", "dist", "capacitor.js"), path.join(out, "capacitor.js"));
+/* Número de compilación (lo pone GitHub al compilar) para poder avisar de versiones nuevas. */
+const build = parseInt(process.env.APP_BUILD || "0", 10) || 0;
+fs.writeFileSync(path.join(out, "app-version.js"), "window.APP_BUILD = " + build + ";\n");
 const idx = path.join(out, "index.html");
 let html = fs.readFileSync(idx, "utf8");
-html = html.replace(/<script src="/, '<script src="capacitor.js"></script>\n<script src="');
+html = html.replace(/<script src="/, '<script src="capacitor.js"></script>\n<script src="app-version.js"></script>\n<script src="');
 fs.writeFileSync(idx, html);
 console.log("Web copiada en", out, "(" + fs.readdirSync(out).length + " archivos)");
