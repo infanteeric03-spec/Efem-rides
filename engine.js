@@ -162,7 +162,9 @@
       if (T.log.length > 300) T.log.shift();
     }
     /* La efeméride y el dato van en la misma frase para que se oigan en ese orden. */
-    speak(day ? p.n + ". " + day + " " + text : text, mode !== "auto");
+    /* Solo interrumpe lo que se está diciendo cuando lo pide la persona (Otro dato).
+       Al entrar en un lugar, el dato espera a que termine el saludo o la efeméride del día. */
+    speak(day ? p.n + ". " + day + " " + text : text, mode === "more");
     emit("fact", { p: p, f: f, text: text });
     persist(true);
   }
@@ -286,7 +288,9 @@
     run.prev = {}; run.appr = {}; run.previewed = {}; run.heading = null; run.anchor = null; run.lastFix = null; run.lastProc = 0;
     run.next = null; run.lastFact = null; run.kmh = 0; run.cur = null;
     wakeOn();
-    speak(sim ? "Empieza la ruta de prueba." : "Viaje iniciado. Buenas carreteras.", true);
+    /* Se calla lo anterior y el saludo entra el primero en la cola: saludo, efeméride del día y luego los datos. */
+    if (NS) NS.stop(); else if (synth) synth.cancel();
+    speak(sim ? "Empieza la ruta de prueba." : "Viaje iniciado. Buenas carreteras.", false);
     if (S.today) todayMsg(App.trip());
     emit("trip"); emit("status", App.status);
   }
