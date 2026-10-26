@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="style.css?v=28">
+<link rel="stylesheet" href="style.css?v=29">
 </head>
 <body>
 <header class="top">
@@ -229,14 +229,15 @@
       <div class="line"><span class="lbl">La prueba no se guarda en tu viaje</span><button class="btn small" id="btnSim" type="button" style="flex:0 0 auto">Simular</button></div>
     </div>
 
-    <div id="appSec" hidden>
+    <div id="appSec">
       <h2 class="sec">App</h2>
       <div class="set">
-        <div class="line"><span class="lbl">Versión instalada<small id="appVer">—</small></span><button class="btn small" id="btnUpd" type="button" style="flex:0 0 auto">Buscar actualización</button></div>
+        <div class="line" id="appNative" hidden><span class="lbl">Versión instalada<small id="appVer">—</small></span><button class="btn small" id="btnUpd" type="button" style="flex:0 0 auto">Buscar actualización</button></div>
+        <div class="line" id="appWeb"><span class="lbl">Instalar app Android<small id="appWebNote">La voz baja la música de Spotify u otras apps mientras habla y el GPS sigue con la pantalla apagada</small></span><a class="btn small" id="appApk" href="https://github.com/infanteeric03-spec/efem-rides/releases/latest/download/ruta-con-historia.apk" rel="noopener" style="flex:0 0 auto;display:inline-flex;align-items:center;text-decoration:none">Descargar APK</a></div>
       </div>
     </div>
 
-    <p class="note">Versión 28. Los datos están guardados en la propia aplicación, así que funciona sin cobertura una vez instalada. Las fechas y cifras proceden de fuentes generales; si vas a citar alguna, compruébala antes.</p>
+    <p class="note">Versión 29. Los datos están guardados en la propia aplicación, así que funciona sin cobertura una vez instalada. Las fechas y cifras proceden de fuentes generales; si vas a citar alguna, compruébala antes.</p>
   </section>
 </main>
 
@@ -262,16 +263,16 @@
 <div id="toast" role="status" aria-live="polite" hidden></div>
 <div id="dimmer" hidden></div>
 
-<script src="data-asturias.js?v=28"></script>
-<script src="data-cantabria.js?v=28"></script>
-<script src="data-dias.js?v=28"></script>
-<script src="core.js?v=28"></script>
-<script src="engine.js?v=28"></script>
-<script src="ui.js?v=28"></script>
-<script src="radio.js?v=28"></script>
-<script src="explore.js?v=28"></script>
-<script src="home.js?v=28"></script>
-<script src="update.js?v=28"></script>
-<script src="drive.js?v=28"></script>
+<script src="data-asturias.js?v=29"></script>
+<script src="data-cantabria.js?v=29"></script>
+<script src="data-dias.js?v=29"></script>
+<script src="core.js?v=29"></script>
+<script src="engine.js?v=29"></script>
+<script src="ui.js?v=29"></script>
+<script src="radio.js?v=29"></script>
+<script src="explore.js?v=29"></script>
+<script src="home.js?v=29"></script>
+<script src="update.js?v=29"></script>
+<script src="drive.js?v=29"></script>
 </body>
 </html>

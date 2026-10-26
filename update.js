@@ -5,7 +5,12 @@
   function $(id) { return document.getElementById(id); }
   function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento */ } }
-  if (!A.native) return;
+  /* Web: se ofrece la app Android (en otros sistemas se avisa de que es solo para Android). */
+  if (!A.native) {
+    if (!/Android/i.test(navigator.userAgent)) $("appWebNote").textContent = "Solo para móviles Android. Abre esta página desde el móvil y pulsa Descargar APK; después ábrelo para instalarlo.";
+    return;
+  }
+  $("appWeb").hidden = true; $("appNative").hidden = false;
 
   var REPO = "infanteeric03-spec/efem-rides";
   var APK = "https://github.com/" + REPO + "/releases/latest/download/ruta-con-historia.apk";
@@ -14,7 +19,6 @@
   var st = load("rch.update", {}) || {};
   var latest = null;
 
-  $("appSec").hidden = false;
   $("appVer").textContent = mine ? "Compilación " + mine : "Compilación de prueba";
 
   function check(manual) {

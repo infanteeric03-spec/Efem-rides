@@ -63,7 +63,7 @@ Además de la web, el repositorio genera una **app Android** (carpeta `app/`, he
 
 ### Instalarla
 
-1. En el móvil, abre la página de **Releases** del repositorio y descarga `ruta-con-historia.apk` de la última versión (o directamente: `https://github.com/infanteeric03-spec/efem-rides/releases/latest/download/ruta-con-historia.apk`).
+1. En la web, **Ajustes, App, Descargar APK**. O bien, en el móvil, abre la página de **Releases** del repositorio y descarga `ruta-con-historia.apk` de la última versión (o directamente: `https://github.com/infanteeric03-spec/efem-rides/releases/latest/download/ruta-con-historia.apk`).
 2. Ábrelo. Android pedirá permitir **instalar apps de origen desconocido** para el navegador o el gestor de archivos: acéptalo solo para esto.
 3. Al abrir la app y pulsar Empezar viaje, concede **ubicación** y **notificaciones**.
 
