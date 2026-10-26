@@ -182,6 +182,18 @@
     $("todayPrev").disabled = $("todayNext").disabled = items.length < 2;
   }
   function step(n) { idx += n; renderCard(loc ? loc.prov : ""); }
+
+  /* Efeméride para el inicio del viaje: va rotando por la lista de la tarjeta y lo recuerda entre viajes.
+     La tarjeta pasa a mostrar la que se acaba de contar. */
+  A.nextHomeEfem = function () {
+    if (!items.length) return "";
+    var r = load("rch.efemRot", {}) || {}, n = (+r.n || 0) % items.length, it = items[n];
+    r.n = n + 1; save("rch.efemRot", r);
+    idx = n; renderCard(loc ? loc.prov : "");
+    var t = it.text;
+    if (!/^Hoy/.test(it.head)) t = (/de \d{3,4}$/.test(it.head) ? "Una efeméride de " + (loc && loc.prov ? loc.prov : "la zona") + ": " : "") + t;
+    return t;
+  };
   $("todayPrev").addEventListener("click", function () { step(-1); });
   $("todayNext").addEventListener("click", function () { step(1); });
   /* También se puede deslizar el dedo sobre la tarjeta. */

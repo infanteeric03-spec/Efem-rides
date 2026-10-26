@@ -207,9 +207,13 @@
     var d = new Date(), key = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
     if (T.dayMsg === key) return;
     T.dayMsg = key;
-    var r = C.today(d, E), txt = "";
-    if (r.exact.length) txt = r.exact[0].t;
-    else if (r.month.length) txt = "Una efeméride de este mes. " + r.month[0].t;
+    /* Primero la lista de la tarjeta de inicio (de tu provincia), una distinta en cada viaje. */
+    var txt = App.nextHomeEfem ? App.nextHomeEfem() : "";
+    if (!txt) {
+      var r = C.today(d, E);
+      if (r.exact.length) txt = r.exact[0].t;
+      else if (r.month.length) txt = "Una efeméride de este mes. " + r.month[0].t;
+    }
     if (txt) speak("Hoy es " + C.dateEs(d) + ". " + txt, false);
   }
 
