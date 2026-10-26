@@ -46,7 +46,8 @@ Para viajar fuera de los lugares que trae la app (por ejemplo, Oviedo–León):
 
 1. En la pestaña **Lugares**, debajo del buscador, pulsa **+ Viaje a un nuevo destino**, escribe el destino (y el origen si no sales de donde estás) y pulsa **Preparar viaje**. Hazlo con cobertura, mejor con wifi.
 2. La app calcula la ruta con OSRM (sobre OpenStreetMap), busca en Wikipedia los pueblos y lugares a menos de unos 4 km de la carretera, se queda con los más relevantes (uno cada 3 km como mucho) y guarda su resumen en el móvil. En el coche funciona sin conexión.
-3. Para probarla antes de salir: **Ajustes, Probar sin salir de casa**, elige **Ruta preparada**.
+3. Indica también la **fecha de salida**. La app busca efemérides de ese día (en Wikipedia y en sus datos propios) que mencionen los pueblos del camino y las muestra en el resumen. Si viajas ese día, al entrar en cada uno de esos pueblos te cuenta primero su efeméride ("Un día como hoy…"). Las efemérides propias con fecha (por ejemplo, Severo Ochoa en Luarca el 24 de septiembre) se cuentan siempre que pases por el lugar ese día, prepares ruta o no.
+4. Para probarla antes de salir: **Ajustes, Probar sin salir de casa**, elige **Ruta preparada**.
 
 Además, con **Buscar lugares sobre la marcha** activado y cobertura, la app consulta Wikipedia unos 7 km por delante cuando no tiene lugares guardados en esa dirección.
 

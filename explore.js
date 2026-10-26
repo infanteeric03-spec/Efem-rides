@@ -212,6 +212,50 @@
 
   /* ---------- Preparar viaje ---------- */
   var preparing = false;
+  /* ---------- Efemérides del día de salida en los pueblos del camino ---------- */
+  function isoToday() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function dayKey(d) { return (d.getMonth() + 1) + "-" + d.getDate(); }
+  function parseIso(s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ""); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(); }
+  function lowerFirst(t) { return /^(En|El|La|Los|Las|Un|Una)\b/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
+  /* Pueblos del camino: los de Wikipedia guardados y los propios a menos de 4 km de la carretera. */
+  function placesOnRoute(line, places) {
+    return places.concat(builtIn().filter(function (p) { return distToLine(p.lat, p.lon, line) <= 4; }));
+  }
+  function findDayEfem(date, line, places) {
+    var H = A.Home, E = window.EFEMERIDES || [], m = date.getMonth() + 1, d = date.getDate(), items = [];
+    var onRoute = placesOnRoute(line, places);
+    function nm(s) { return H ? H.norm(s) : String(s).toLowerCase(); }
+    E.forEach(function (e) {
+      if (e.m !== m || e.d !== d) return;
+      onRoute.forEach(function (p) { if (H && H.mentions(e.t, [nm(p.n)])) items.push({ id: p.id, n: p.n, text: e.t, src: "propia" }); });
+    });
+    if (!H) return Promise.resolve(items);
+    return H.wikiDay(date).then(function (list) {
+      list.forEach(function (x) {
+        onRoute.forEach(function (p) {
+          if (nm(p.n).length < 4 || !H.mentions(x.text, [nm(p.n)])) return;
+          var verb = x.sec === "nac" ? "nace " : x.sec === "fal" ? "muere " : "";
+          items.push({ id: p.id, n: p.n, text: "En " + x.y + ", " + verb + lowerFirst(x.text), src: "wikipedia" });
+        });
+      });
+      var seen = {};
+      return items.filter(function (i) { var k = i.id + "|" + i.text; if (seen[k]) return false; seen[k] = 1; return true; });
+    });
+  }
+  /* Lo usa el motor al entrar en un lugar: si hoy es el día de una efeméride de ese lugar, la cuenta primero. */
+  A.dayFact = function (p) {
+    var now = new Date(), key = dayKey(now), H = A.Home, out = null;
+    if (R && R.dayEfem && R.dayEfem.date === key) {
+      var hit = R.dayEfem.items.filter(function (x) { return x.id === p.id; })[0];
+      if (hit) out = hit.src === "wikipedia" ? "Un día como hoy, " + lowerFirst(hit.text) : "Hoy es un día señalado aquí. " + hit.text;
+    }
+    if (!out && H) {
+      var e = (window.EFEMERIDES || []).filter(function (x) { return x.m === now.getMonth() + 1 && x.d === now.getDate() && H.mentions(x.t, [H.norm(p.n)]); })[0];
+      if (e) out = "Hoy es un día señalado aquí. " + e.t;
+    }
+    return out;
+  };
+
   function prepare(fromText, toText) {
     if (preparing) return;
     if (!toText) { status("Escribe a dónde vas.", "warn"); return; }
@@ -253,12 +297,21 @@
       });
       var places = pick(cands, builtIn(), 3, Math.ceil(route.km / 3) + 5);
       fillRegions(places, String(dest.full).split(",")[1] ? String(dest.full).split(",")[1].trim() : dest.name);
-      R = { from: origin.name, to: dest.name, km: route.km, min: route.min, created: Date.now(), pts: thin(route.pts, 0.3), places: places, live: (R && R.live) || [] };
+      var date = parseIso($("pDate").value);
+      R = { from: origin.name, to: dest.name, km: route.km, min: route.min, created: Date.now(), pts: thin(route.pts, 0.3), places: places, live: (R && R.live) || [],
+        date: $("pDate").value || isoToday(), dayEfem: { date: dayKey(date), items: [] } };
       install(); persist(); A.emit("places");
+      status("Buscando efemérides del " + C.dateEs(date) + " en los pueblos del camino…");
+      return findDayEfem(date, res.line, places).then(function (items) {
+        R.dayEfem.items = items; persist();
+        return places;
+      }, function () { return places; });
+    }).then(function (places) {
       progress(1);
       status("");
       renderPrep();
-      A.emit("toast", "Viaje a " + dest.name + " preparado: " + places.length + " lugares guardados.");
+      var ne = R.dayEfem ? R.dayEfem.items.length : 0;
+      A.emit("toast", "Viaje a " + dest.name + " preparado: " + places.length + " lugares" + (ne ? " y " + ne + (ne === 1 ? " efeméride" : " efemérides") + " del día" : "") + ".");
       A.emit("trip");
     }).catch(function (e) {
       var msg = e && e.message;
@@ -309,6 +362,21 @@
         (R.live && R.live.length ? " (+" + R.live.length + " encontrados por el camino)" : "") +
         ". Preparado el " + d.toLocaleDateString("es-ES", { day: "numeric", month: "long" }) + ".";
     }
+    var box = $("pEfem"), ef = has && R.dayEfem ? R.dayEfem.items : [];
+    box.textContent = "";
+    if (has && R.date) {
+      var dd = parseIso(R.date), head = document.createElement("p");
+      head.className = "prep-efem-head";
+      head.textContent = ef.length ? "Efemérides del " + C.dateEs(dd) + " en el camino. Te las contaré al pasar por cada lugar si viajas ese día:" : "No he encontrado efemérides del " + C.dateEs(dd) + " en los pueblos del camino.";
+      box.appendChild(head);
+      ef.slice(0, 8).forEach(function (x) {
+        var li = document.createElement("p"); li.className = "prep-efem-item";
+        var b = document.createElement("strong"); b.textContent = x.n + ": ";
+        li.appendChild(b); li.appendChild(document.createTextNode(x.text));
+        box.appendChild(li);
+      });
+    }
+    box.hidden = !(has && R.date);
     var mini = $("pMini");
     mini.hidden = !has;
     if (has) mini.textContent = "Ruta preparada: " + R.from + " → " + R.to + " · " + R.places.length + " lugares";
@@ -335,6 +403,7 @@
     clearTimeout(armT); delete b.dataset.armed; b.textContent = "Borrar ruta";
     R = null; install(); persist(); A.emit("places"); renderPrep(); A.emit("toast", "Ruta borrada.");
   });
+  var pd = $("pDate"); pd.value = isoToday(); pd.min = isoToday();
   var sl = $("s_live"); sl.checked = !!S.live;
   sl.addEventListener("change", function () { A.setS("live", sl.checked); });
 

@@ -200,6 +200,6 @@
     if (key !== lastKey) { lastKey = key; build(); }
   }
 
-  A.Home = { _parseDay: parseDay, _clean: cleanWiki, refresh: refresh, locate: locate };
+  A.Home = { _parseDay: parseDay, _clean: cleanWiki, refresh: refresh, locate: locate, wikiDay: wikiDay, mentions: mentions, norm: norm };
   build(); renderLabel(); locate(false);
 })();

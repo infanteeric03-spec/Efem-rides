@@ -483,3 +483,8 @@ body.driving .d-btn.d-wide { font-size: clamp(24px, min(9vw, 4.8vh), 42px); lett
 .today-nav { display: flex; gap: 8px; margin-top: 4px; }
 .today-nav .btn { flex: 1 1 0; }
 #signReg.tap { text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+.prep-efem { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.prep-efem-head { font-size: 14px; color: var(--muted); }
+.prep-efem-item { font-size: 15px; line-height: 1.4; }
+.prep-fields input[type="date"] { color-scheme: inherit; }

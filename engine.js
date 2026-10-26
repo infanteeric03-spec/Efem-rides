@@ -149,12 +149,20 @@
     v.t = Date.now();
     var text = f.text;
     if (text.toLowerCase().indexOf(p.n.toLowerCase().split(" ")[0]) < 0) text = p.n + ". " + text;
+    /* Si hoy es el día de una efeméride de este lugar, se cuenta antes que el dato (una vez por viaje). */
+    var day = mode === "enter" && App.dayFact ? App.dayFact(p) : null, dayTold = T.dayTold || (T.dayTold = {});
+    if (day && !dayTold[p.id]) {
+      dayTold[p.id] = 1;
+      T.log.push({ t: Date.now(), id: p.id, n: p.n, reg: p.reg, text: day });
+      mode = "afterDay";
+    } else day = null;
     run.lastFact = { id: p.id, f: f, text: text };
     if (mode !== "repeat") {
       T.log.push({ t: Date.now(), id: p.id, n: p.n, reg: p.reg, text: f.text });
       if (T.log.length > 300) T.log.shift();
     }
-    speak(text, mode !== "auto");
+    /* La efeméride y el dato van en la misma frase para que se oigan en ese orden. */
+    speak(day ? p.n + ". " + day + " " + text : text, mode !== "auto");
     emit("fact", { p: p, f: f, text: text });
     persist(true);
   }
