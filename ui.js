@@ -291,6 +291,44 @@
     });
   });
   $("btnTest").addEventListener("click", A.testVoice);
+
+  /* Tu localidad: lista de lugares propios, con "usar mi ubicación" para elegir el más cercano. */
+  function fillHome() {
+    var sel = $("s_home"); sel.textContent = "";
+    var none = el("option", null, "Ninguna"); none.value = ""; sel.appendChild(none);
+    var here = el("option", null, "Usar mi ubicación actual"); here.value = "__here"; sel.appendChild(here);
+    L.filter(function (p) { return !p.src; }).sort(function (a, b) { return a.n.localeCompare(b.n, "es"); }).forEach(function (p) {
+      var o = el("option", null, p.n + " (" + C.regName(p.reg) + ")"); o.value = p.id; sel.appendChild(o);
+    });
+    sel.value = S.homeId || "";
+    $("homeFreqRow").hidden = !S.homeId;
+  }
+  fillHome();
+  $("s_homeFreq").value = S.homeFreq || "nunca";
+  $("s_homeFreq").addEventListener("change", function () { A.setS("homeFreq", this.value); });
+  $("s_home").addEventListener("change", function () {
+    var v = this.value, sel = this;
+    if (v !== "__here") { A.setS("homeId", v); fillHome(); return; }
+    function pickNear(lat, lon) {
+      var best = null, bd = 25;
+      L.forEach(function (p) { if (p.src) return; var d = C.dist(lat, lon, p.lat, p.lon); if (d < bd) { bd = d; best = p; } });
+      if (best) { A.setS("homeId", best.id); toast("Tu localidad: " + best.n + "."); }
+      else toast("No tengo ningún lugar propio cerca de donde estás.");
+      fillHome();
+    }
+    if (run.cur) { pickNear(run.cur.lat, run.cur.lon); return; }
+    if (!navigator.geolocation) { toast("No puedo usar la ubicación en este navegador."); fillHome(); return; }
+    navigator.geolocation.getCurrentPosition(function (pos) { pickNear(pos.coords.latitude, pos.coords.longitude); },
+      function () { toast("No tengo permiso para usar tu ubicación."); fillHome(); }, { timeout: 15000, maximumAge: 600000 });
+    sel.value = S.homeId || "";
+  });
+  var resetArm;
+  $("btnToldReset").addEventListener("click", function () {
+    var b = this;
+    if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "¿Seguro?"; resetArm = setTimeout(function () { delete b.dataset.armed; b.textContent = "Empezar de cero"; }, 3000); return; }
+    clearTimeout(resetArm); delete b.dataset.armed; b.textContent = "Empezar de cero";
+    A.resetTold(); toast("Volveré a contarte los datos desde el principio.");
+  });
   $("btnSim").addEventListener("click", function () { A.startSim(); showTab("ruta"); renderButtons(); });
 
   /* ---------- Instalar ---------- */

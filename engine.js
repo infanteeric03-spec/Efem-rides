@@ -13,7 +13,7 @@
   function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento */ } }
 
-  var DEF = { voice: "", rate: 1, vol: 1, auto: true, maxFacts: 3, approach: true, today: true,
+  var DEF = { homeId: "", homeFreq: "nunca", voice: "", rate: 1, vol: 1, auto: true, maxFacts: 3, approach: true, today: true,
     zone: 1, ahorro: "0", wake: true, dim: false, theme: "dark", sim: "0", simSpeed: "10" };
   var S = App.S = Object.assign({}, DEF, load("rch.settings", {}));
   App.setS = function (k, v) { S[k] = v; save("rch.settings", S); emit("settings", k); };
@@ -25,6 +25,20 @@
     { n: "Ribadesella a Santander", ids: ["ribadesella", "llanes", "colombres", "san-vicente", "comillas", "santillana", "santander"] },
     { n: "Santander a Potes", ids: ["santander", "torrelavega", "santillana", "comillas", "san-vicente", "potes"] }
   ];
+
+  /* ---------- Memoria entre viajes y localidad de casa ---------- */
+  var told = load("rch.told", {}) || {};
+  /* Datos de la localidad de casa: "nunca" no los cuenta; "semana" cuenta uno como mucho cada 7 días. */
+  function homeSkip(p) {
+    if (!S.homeId || p.id !== S.homeId) return false;
+    if (S.homeFreq === "semana") {
+      var last = +load("rch.homeLast", 0) || 0;
+      return Date.now() - last < 7 * 86400000;
+    }
+    return true;
+  }
+  App.isHome = function (p) { return !!S.homeId && p && p.id === S.homeId; };
+  App.resetTold = function () { told = {}; save("rch.told", told); };
 
   /* ---------- Viaje ---------- */
   function newTrip() { return { id: Date.now(), start: Date.now(), last: Date.now(), pts: [], log: [], told: {}, visited: {}, dayMsg: "" }; }
@@ -145,7 +159,14 @@
   function tell(p, mode) {
     var T = App.trip(), v = T.visited[p.id] || (T.visited[p.id] = { t: Date.now(), n: 0 }), f;
     if (mode === "repeat" && run.lastFact && run.lastFact.id === p.id) f = run.lastFact.f;
-    else { f = C.pickFact(p, T.told[p.id] || 0); T.told[p.id] = (T.told[p.id] || 0) + 1; v.n++; }
+    else {
+      /* La cuenta de datos ya contados se guarda entre viajes: cada viaje sigue por el siguiente dato. */
+      var mem = run.sim ? T.told : told;
+      f = C.pickFact(p, mem[p.id] || 0);
+      mem[p.id] = (mem[p.id] || 0) + 1;
+      T.told[p.id] = (T.told[p.id] || 0) + 1; v.n++;
+      if (!run.sim) save("rch.told", told);
+    }
     v.t = Date.now();
     var text = f.text;
     if (text.toLowerCase().indexOf(p.n.toLowerCase().split(" ")[0]) < 0) text = p.n + ". " + text;
@@ -240,7 +261,14 @@
       if (run.here !== hit.p.id) {
         run.here = hit.p.id; run.hereN = 0;
         var vis = T.visited[hit.p.id];
-        if (!vis || now - vis.t > 20 * 60000) { run.hereN = 1; tell(hit.p, "enter"); }
+        if (homeSkip(hit.p)) {
+          /* En casa: se muestra el lugar pero no se cuenta nada ni se sigue contando. */
+          run.hereN = 99;
+          if (!T.visited[hit.p.id]) T.visited[hit.p.id] = { t: now, n: 0 };
+        } else if (!vis || now - vis.t > 20 * 60000) {
+          run.hereN = 1; tell(hit.p, "enter");
+          if (App.isHome(hit.p) && !run.sim) { save("rch.homeLast", now); run.hereN = 99; }
+        }
         emit("here", hit.p);
       } else if (S.auto && run.hereN < +S.maxFacts && !busy() && now - run.lastEnd > 18000) {
         run.hereN++; tell(hit.p, "auto");
@@ -254,7 +282,7 @@
     var cand = null, best = 1e9;
     for (var i = 0; i < L.length; i++) {
       var p = L[i];
-      if (T.visited[p.id] || p.id === run.here) continue;
+      if (T.visited[p.id] || p.id === run.here || App.isHome(p)) continue;
       var d = C.dist(lat, lon, p.lat, p.lon);
       if (d > 30 || d >= best) continue;
       if (kmh > 8 && run.heading != null) {
