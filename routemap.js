@@ -24,7 +24,7 @@
     return t === "dark" || (t === "auto" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
   }
   function tiles(Lf) {
-    return Lf.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/" + (dark() ? "dark_all" : "voyager") + "/{z}/{x}/{y}{r}.png", {
+    return Lf.tileLayer("https://{s}.basemaps.cartocdn.com/" + (dark() ? "dark_all" : "rastertiles/voyager") + "/{z}/{x}/{y}{r}.png", {
       subdomains: "abcd", maxZoom: 19,
       attribution: "© <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">OpenStreetMap</a> · © <a href=\"https://carto.com/attributions\" target=\"_blank\" rel=\"noopener\">CARTO</a>"
     });
