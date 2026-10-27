@@ -42,6 +42,16 @@ En Ajustes, bajo **Probar sin salir de casa**, hay cuatro rutas simuladas (por e
 - Modo ahorro en Ajustes: atiende una posición cada 3 o 5 segundos (por defecto, todas, que suele ser una por segundo). Reduce el trabajo del móvil, pero el GPS sigue encendido, así que la batería mejora poco. Lo que más gasta es la pantalla.
 - Guarda el recorrido, calcula distancia y velocidades, y lo exporta como GPX.
 
+## Editar los lugares
+
+En la pestaña **Lugares**:
+
+- Abre un lugar y pulsa **Editar** para corregir sus datos, borrarlos, cambiarlos de orden (↑ ↓) o añadir otros. **Ocultar este lugar** hace que no se cuente en los viajes, y **Restaurar el original** deshace tus cambios.
+- **+ Nuevo lugar** crea uno tuyo: nombre, provincia, posición (tu ubicación actual o tocando en el mapa), tamaño de la zona y sus datos.
+- **Exportar cambios** guarda tus cambios en un archivo (en la app Android, se copian al portapapeles para pegarlos en una nota o un mensaje) e **Importar cambios** los recupera en este u otro móvil.
+
+Los cambios se guardan solo en ese móvil. Para incorporarlos a la app para todos, basta con enviar el archivo exportado.
+
 ## Destinos nuevos
 
 Para viajar fuera de los lugares que trae la app (por ejemplo, Oviedo–León):
@@ -49,7 +59,8 @@ Para viajar fuera de los lugares que trae la app (por ejemplo, Oviedo–León):
 1. En la pestaña **Lugares**, debajo del buscador, pulsa **+ Viaje a un nuevo destino**, escribe el destino (y el origen si no sales de donde estás) y pulsa **Preparar viaje**. Hazlo con cobertura, mejor con wifi.
 2. La app calcula la ruta con OSRM (sobre OpenStreetMap), busca en Wikipedia los pueblos y lugares a menos de unos 4 km de la carretera, se queda con los más relevantes (uno cada 3 km como mucho) y guarda su resumen en el móvil. En el coche funciona sin conexión.
 3. Indica también la **fecha de salida**. La app busca efemérides de ese día (en Wikipedia y en sus datos propios) que mencionen los pueblos del camino y las muestra en el resumen. Si viajas ese día, al entrar en cada uno de esos pueblos te cuenta primero su efeméride ("Un día como hoy…"). Las efemérides propias con fecha (por ejemplo, Severo Ochoa en Luarca el 24 de septiembre) se cuentan siempre que pases por el lugar ese día, prepares ruta o no.
-4. Para probarla antes de salir: **Ajustes, Probar sin salir de casa**, elige **Ruta preparada**.
+4. Debajo del resumen aparece un **mapa de la ruta** con los lugares de los que te hablaré: marrones los de la app, amarillos los de Wikipedia y naranjas los que tienen efeméride ese día. Al tocar uno puedes escucharlo, **quitarlo de este viaje** o editarlo. El mapa necesita conexión para dibujar las calles.
+5. Para probarla antes de salir: **Ajustes, Probar sin salir de casa**, elige **Ruta preparada**.
 
 Además, con **Buscar lugares sobre la marcha** activado y cobertura, la app consulta Wikipedia unos 7 km por delante cuando no tiene lugares guardados en esa dirección.
 

@@ -40,6 +40,7 @@
   /* En un mismo viaje no se repite ningún dato por su cuenta: si un lugar tiene un solo dato, se cuenta una vez.
      (Otro dato sí puede volver a empezar, porque lo pide la persona.) */
   function untold(p, T) { return (T.told[p.id] || 0) < (p.h ? p.h.length : 0); }
+  App.placeOn = function (p) { return !p.hidden && !(App.routeSkip && App.routeSkip(p.id)); };
   App.isHome = function (p) { return !!S.homeId && p && p.id === S.homeId; };
   App.resetTold = function () { told = {}; save("rch.told", told); };
 
@@ -263,7 +264,8 @@
     } else if (reg) { run.regCand = null; run.regN = 0; }
 
     /* Lugar en el que estás. */
-    var hit = C.inside(lat, lon, L, +S.zone), now = Date.now();
+    /* Los lugares ocultos (editados) o quitados de la ruta preparada no se cuentan. */
+    var LV = L.filter(App.placeOn), hit = C.inside(lat, lon, LV, +S.zone), now = Date.now();
     if (hit) {
       if (run.here !== hit.p.id) {
         run.here = hit.p.id; run.hereN = 0;
@@ -289,7 +291,7 @@
     var cand = null, best = 1e9;
     for (var i = 0; i < L.length; i++) {
       var p = L[i];
-      if (T.visited[p.id] || p.id === run.here || App.isHome(p)) continue;
+      if (T.visited[p.id] || p.id === run.here || App.isHome(p) || !App.placeOn(p)) continue;
       var d = C.dist(lat, lon, p.lat, p.lon);
       if (d > 30 || d >= best) continue;
       if (kmh > 8 && run.heading != null) {

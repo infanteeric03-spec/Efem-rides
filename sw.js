@@ -1,8 +1,8 @@
 /* Service worker: guarda la app para que abra sin cobertura. */
-var CACHE = "ruta-historia-v32";
+var CACHE = "ruta-historia-v33";
 var ARCHIVOS = [
-  "./", "./index.html", "./style.css?v=32", "./engine.js?v=32", "./ui.js?v=32", "./drive.js?v=32", "./radio.js?v=32", "./explore.js?v=32", "./home.js?v=32", "./update.js?v=32", "./core.js?v=32",
-  "./data-asturias.js?v=32", "./data-cantabria.js?v=32", "./data-dias.js?v=32",
+  "./", "./index.html", "./style.css?v=33", "./engine.js?v=33", "./ui.js?v=33", "./drive.js?v=33", "./radio.js?v=33", "./explore.js?v=33", "./home.js?v=33", "./update.js?v=33", "./edits.js?v=33", "./routemap.js?v=33", "./vendor/leaflet/leaflet.js", "./vendor/leaflet/leaflet.css", "./core.js?v=33",
+  "./data-asturias.js?v=33", "./data-cantabria.js?v=33", "./data-dias.js?v=33",
   "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"
 ];
 

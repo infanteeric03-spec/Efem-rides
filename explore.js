@@ -207,6 +207,23 @@
     if (!R) { try { localStorage.removeItem("rch.route"); } catch (e) { /* nada */ } return; }
     if (!save("rch.route", R) && R.live && R.live.length > 50) { R.live = R.live.slice(-50); save("rch.route", R); }
   }
+  /* Lugares quitados de la ruta preparada desde el mapa (no se cuentan en ese viaje). */
+  A.routeSkip = function (id) { return !!(R && R.skip && R.skip.indexOf(id) >= 0); };
+  A.toggleRouteSkip = function (id) {
+    if (!R) return false;
+    R.skip = R.skip || [];
+    var i = R.skip.indexOf(id);
+    if (i >= 0) R.skip.splice(i, 1); else R.skip.push(id);
+    persist(); A.emit("places");
+    return i < 0;
+  };
+  /* Para el mapa: la línea de la ruta, sus lugares (de Wikipedia y propios cerca de la carretera) y las efemérides del día. */
+  A.routeInfo = function () {
+    if (!R || !R.pts || !R.places) return null;
+    var line = R.pts, efem = {};
+    (R.dayEfem && R.dayEfem.items || []).forEach(function (x) { efem[x.id] = x.text; });
+    return { line: line, from: R.from, to: R.to, km: R.km, places: placesOnRoute(line, (R.places || []).map(function (p) { return A.byId[p.id] || p; })), efem: efem };
+  };
   A.routeLabel = function () { return R && R.to ? "Ruta a " + R.to : "Lugares de Wikipedia"; };
   A.routePath = function (stepKm) { return R && R.pts && R.pts.length > 1 ? resample(R.pts, stepKm) : null; };
 
@@ -377,6 +394,7 @@
       });
     }
     box.hidden = !(has && R.date);
+    if (A.Map && A.Map.refresh) A.Map.refresh();
     var mini = $("pMini");
     mini.hidden = !has;
     if (has) mini.textContent = "Ruta preparada: " + R.from + " → " + R.to + " · " + R.places.length + " lugares";

@@ -145,16 +145,21 @@
         head.type = "button";
         head.setAttribute("aria-expanded", open[p.id] ? "true" : "false");
         var tag = el("span", "tag");
-        if (T && T.visited[p.id]) { tag.textContent = "Visitado"; tag.className = "tag vis"; }
+        if (p.hidden) { tag.textContent = "Oculto"; tag.className = "tag off"; }
+        else if (A.routeSkip && A.routeSkip(p.id)) { tag.textContent = "Quitado del viaje"; tag.className = "tag off"; }
+        else if (T && T.visited[p.id]) { tag.textContent = "Visitado"; tag.className = "tag vis"; }
         else if (run.cur) tag.textContent = C.fmtKm(C.dist(run.cur.lat, run.cur.lon, p.lat, p.lon));
-        head.appendChild(el("span", "nm", p.n)); head.appendChild(tag);
+        head.appendChild(el("span", "nm", p.n + (p.edited || p.custom ? " ✎" : ""))); head.appendChild(tag);
         card.appendChild(head);
         var body = el("div", "body");
         body.hidden = !open[p.id];
         p.h.forEach(function (t) { body.appendChild(el("p", null, t)); });
+        var acts = el("div", "row place-acts");
         var play = el("button", "btn small", "Escuchar"); play.type = "button";
         play.addEventListener("click", function () { A.speakPlace(p); });
-        body.appendChild(play);
+        acts.appendChild(play);
+        if (A.Edits) { var ed = el("button", "btn ghost small", "Editar"); ed.type = "button"; ed.addEventListener("click", function () { A.Edits.open(p); }); acts.appendChild(ed); }
+        body.appendChild(acts);
         if (p.url) { var src = el("a", "src-link", "Texto de Wikipedia (CC BY-SA)"); src.href = p.url; src.target = "_blank"; src.rel = "noopener"; body.appendChild(src); }
         card.appendChild(body);
         head.addEventListener("click", function () {
@@ -168,6 +173,7 @@
   }
   $("q").addEventListener("input", renderPlaces);
   A.on("places", function () { if (current === "lugares") renderPlaces(); });
+  A.renderPlaces = function () { if (current === "lugares") renderPlaces(); };
 
   /* ---------- Viaje ---------- */
   function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }

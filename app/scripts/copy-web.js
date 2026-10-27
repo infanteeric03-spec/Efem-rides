@@ -8,6 +8,7 @@ for (const f of fs.readdirSync(root)) {
   if (skip.has(f) || f.startsWith(".")) continue;
   const src = path.join(root, f);
   if (fs.statSync(src).isFile()) fs.copyFileSync(src, path.join(out, f));
+  else fs.cpSync(src, path.join(out, f), { recursive: true });   // p. ej. vendor/leaflet
 }
 /* En la app se carga el puente de Capacitor antes que el resto de scripts. */
 fs.copyFileSync(path.resolve(__dirname, "..", "node_modules", "@capacitor", "core", "dist", "capacitor.js"), path.join(out, "capacitor.js"));
