@@ -37,6 +37,9 @@
     }
     return true;
   }
+  /* En un mismo viaje no se repite ningún dato por su cuenta: si un lugar tiene un solo dato, se cuenta una vez.
+     (Otro dato sí puede volver a empezar, porque lo pide la persona.) */
+  function untold(p, T) { return (T.told[p.id] || 0) < (p.h ? p.h.length : 0); }
   App.isHome = function (p) { return !!S.homeId && p && p.id === S.homeId; };
   App.resetTold = function () { told = {}; save("rch.told", told); };
 
@@ -269,12 +272,12 @@
           /* En casa: se muestra el lugar pero no se cuenta nada ni se sigue contando. */
           run.hereN = 99;
           if (!T.visited[hit.p.id]) T.visited[hit.p.id] = { t: now, n: 0 };
-        } else if (!vis || now - vis.t > 20 * 60000) {
+        } else if ((!vis || now - vis.t > 20 * 60000) && untold(hit.p, T)) {
           run.hereN = 1; tell(hit.p, "enter");
           if (App.isHome(hit.p) && !run.sim) { save("rch.homeLast", now); run.hereN = 99; }
         }
         emit("here", hit.p);
-      } else if (S.auto && run.hereN < +S.maxFacts && !busy() && now - run.lastEnd > 18000) {
+      } else if (S.auto && run.hereN < +S.maxFacts && untold(hit.p, T) && !busy() && now - run.lastEnd > 18000) {
         run.hereN++; tell(hit.p, "auto");
       }
     } else if (run.here) {
