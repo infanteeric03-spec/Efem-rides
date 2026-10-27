@@ -129,45 +129,114 @@
 
   /* ---------- Lugares ---------- */
   var open = {};
+  var gOpen = (function () { try { return JSON.parse(localStorage.getItem("rch.plOpen")) || {}; } catch (e) { return {}; } })();
+  var pFilter = "all";
+  function saveG() { try { localStorage.setItem("rch.plOpen", JSON.stringify(gOpen)); } catch (e) { /* nada */ } }
+  function placeCard(p, T) {
+    var card = el("div", "place"), head = el("button", "head");
+    head.type = "button";
+    head.setAttribute("aria-expanded", open[p.id] ? "true" : "false");
+    var tag = el("span", "tag");
+    if (p.hidden) { tag.textContent = "Oculto"; tag.className = "tag off"; }
+    else if (A.routeSkip && A.routeSkip(p.id)) { tag.textContent = "Quitado del viaje"; tag.className = "tag off"; }
+    else if (T && T.visited[p.id]) { tag.textContent = "Visitado"; tag.className = "tag vis"; }
+    else if (run.cur) tag.textContent = C.fmtKm(C.dist(run.cur.lat, run.cur.lon, p.lat, p.lon));
+    head.appendChild(el("span", "nm", p.n + (p.edited || p.custom ? " ✎" : ""))); head.appendChild(tag);
+    card.appendChild(head);
+    var body = el("div", "body");
+    body.hidden = !open[p.id];
+    p.h.forEach(function (t) { body.appendChild(el("p", null, t)); });
+    var acts = el("div", "row place-acts");
+    var play = el("button", "btn small", "Escuchar"); play.type = "button";
+    play.addEventListener("click", function () { A.speakPlace(p); });
+    acts.appendChild(play);
+    if (A.Edits) { var ed = el("button", "btn ghost small", "Editar"); ed.type = "button"; ed.addEventListener("click", function () { A.Edits.open(p); }); acts.appendChild(ed); }
+    body.appendChild(acts);
+    if (p.url) { var src = el("a", "src-link", "Texto de Wikipedia (CC BY-SA)"); src.href = p.url; src.target = "_blank"; src.rel = "noopener"; body.appendChild(src); }
+    card.appendChild(body);
+    head.addEventListener("click", function () {
+      open[p.id] = !open[p.id]; body.hidden = !open[p.id];
+      head.setAttribute("aria-expanded", open[p.id] ? "true" : "false");
+    });
+    return card;
+  }
+  /* Botón que pide una segunda pulsación antes de actuar. */
+  function twice(label, again, fn) {
+    var b = el("button", "btn ghost small", label), t; b.type = "button";
+    b.addEventListener("click", function () {
+      if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = again; t = setTimeout(function () { delete b.dataset.armed; b.textContent = label; }, 3500); return; }
+      clearTimeout(t); fn();
+    });
+    return b;
+  }
+  function renderFilters(kinds) {
+    var bar = $("plFilter"); bar.textContent = "";
+    var opts = [["all", "Todo"]].concat(kinds);
+    if (!opts.some(function (o) { return o[0] === pFilter; })) pFilter = "all";
+    bar.hidden = opts.length < 3;
+    opts.forEach(function (o) {
+      var b = el("button", "chip" + (pFilter === o[0] ? " on" : ""), o[1]); b.type = "button";
+      b.setAttribute("aria-pressed", pFilter === o[0] ? "true" : "false");
+      b.addEventListener("click", function () { pFilter = o[0]; renderPlaces(); });
+      bar.appendChild(b);
+    });
+  }
   function renderPlaces() {
     var q = norm($("q").value.trim()), box = $("placesList"), T = A.trip();
     box.textContent = "";
-    var groups = [];
-    L.forEach(function (p) { var g = p.src ? "ruta" : p.reg; if (groups.indexOf(g) < 0) groups.push(g); });
-    groups.forEach(function (reg) {
-      var items = L.filter(function (p) { return (p.src ? "ruta" : p.reg) === reg && (!q || norm(p.n).indexOf(q) >= 0); });
-      if (!items.length) return;
+    function match(p) { return p && (!q || norm(p.n).indexOf(q) >= 0); }
+    function sortL(items) {
       if (run.cur) items.sort(function (a, b) { return C.dist(run.cur.lat, run.cur.lon, a.lat, a.lon) - C.dist(run.cur.lat, run.cur.lon, b.lat, b.lon); });
       else items.sort(function (a, b) { return a.n.localeCompare(b.n, "es"); });
-      box.appendChild(el("h2", "group", reg === "ruta" ? (A.routeLabel ? A.routeLabel() : "Ruta preparada") : C.regName(reg)));
-      items.forEach(function (p) {
-        var card = el("div", "place"), head = el("button", "head");
-        head.type = "button";
-        head.setAttribute("aria-expanded", open[p.id] ? "true" : "false");
-        var tag = el("span", "tag");
-        if (p.hidden) { tag.textContent = "Oculto"; tag.className = "tag off"; }
-        else if (A.routeSkip && A.routeSkip(p.id)) { tag.textContent = "Quitado del viaje"; tag.className = "tag off"; }
-        else if (T && T.visited[p.id]) { tag.textContent = "Visitado"; tag.className = "tag vis"; }
-        else if (run.cur) tag.textContent = C.fmtKm(C.dist(run.cur.lat, run.cur.lon, p.lat, p.lon));
-        head.appendChild(el("span", "nm", p.n + (p.edited || p.custom ? " ✎" : ""))); head.appendChild(tag);
-        card.appendChild(head);
-        var body = el("div", "body");
-        body.hidden = !open[p.id];
-        p.h.forEach(function (t) { body.appendChild(el("p", null, t)); });
-        var acts = el("div", "row place-acts");
-        var play = el("button", "btn small", "Escuchar"); play.type = "button";
-        play.addEventListener("click", function () { A.speakPlace(p); });
-        acts.appendChild(play);
-        if (A.Edits) { var ed = el("button", "btn ghost small", "Editar"); ed.type = "button"; ed.addEventListener("click", function () { A.Edits.open(p); }); acts.appendChild(ed); }
+      return items;
+    }
+    /* Grupos: provincias (lugares de la app y tuyos), cada ruta guardada y los encontrados por el camino. */
+    var groups = [], regs = [];
+    L.forEach(function (p) { if (!p.src && regs.indexOf(p.reg) < 0) regs.push(p.reg); });
+    regs.forEach(function (r) { groups.push({ key: "reg:" + r, kind: "reg:" + r, title: C.regName(r), items: L.filter(function (p) { return !p.src && p.reg === r; }) }); });
+    (A.routes ? A.routes() : []).forEach(function (r) {
+      groups.push({ key: "route:" + r.id, kind: "rutas", route: r, title: r.label, sub: (r.active ? "Ruta activa · " : "") + C.fmtKm(r.km) + " · " + new Date(r.created).toLocaleDateString("es-ES", { day: "numeric", month: "short" }),
+        items: r.ids.map(function (id) { return A.byId[id]; }).filter(Boolean) });
+    });
+    var live = (A.liveIds ? A.liveIds() : []).map(function (id) { return A.byId[id]; }).filter(Boolean);
+    if (live.length) groups.push({ key: "live", kind: "rutas", live: true, title: "Encontrados por el camino", items: live });
+    var kinds = regs.map(function (r) { return ["reg:" + r, C.regName(r)]; });
+    if (groups.some(function (g) { return g.kind === "rutas"; })) kinds.push(["rutas", "Rutas"]);
+    renderFilters(kinds);
+
+    groups.forEach(function (g) {
+      if (pFilter !== "all" && g.kind !== pFilter) return;
+      var items = sortL(g.items.filter(match));
+      if (!items.length && (q || !(g.route || g.live))) return;
+      var isOpen = q ? true : pFilter !== "all" && pFilter !== "rutas" ? true : !!gOpen[g.key];
+      var sec = el("section", "pgroup" + (g.route && g.route.active ? " active" : ""));
+      var head = el("button", "group-head"); head.type = "button";
+      head.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      var tt = el("span", "gtitle"); tt.appendChild(el("span", "gname", g.title));
+      if (g.sub) tt.appendChild(el("span", "gsub", g.sub));
+      head.appendChild(tt);
+      head.appendChild(el("span", "gcount", String(items.length)));
+      head.appendChild(el("span", "gchev", "›"));
+      sec.appendChild(head);
+      var body = el("div", "group-body"); body.hidden = !isOpen;
+      if (g.route || g.live) {
+        var acts = el("div", "row group-acts");
+        if (g.route && !g.route.active && !run.on) {
+          var use = el("button", "btn small", "Usar esta ruta"); use.type = "button";
+          use.addEventListener("click", function () { A.useRoute(g.route.id); });
+          acts.appendChild(use);
+        }
+        if (g.route) acts.appendChild(twice("Eliminar ruta", "Pulsa otra vez para eliminar", function () { delete gOpen[g.key]; saveG(); A.deleteRoute(g.route.id); }));
+        else acts.appendChild(twice("Borrar estos lugares", "Pulsa otra vez para borrar", function () { A.clearLive(); }));
         body.appendChild(acts);
-        if (p.url) { var src = el("a", "src-link", "Texto de Wikipedia (CC BY-SA)"); src.href = p.url; src.target = "_blank"; src.rel = "noopener"; body.appendChild(src); }
-        card.appendChild(body);
-        head.addEventListener("click", function () {
-          open[p.id] = !open[p.id]; body.hidden = !open[p.id];
-          head.setAttribute("aria-expanded", open[p.id] ? "true" : "false");
-        });
-        box.appendChild(card);
+      }
+      items.forEach(function (p) { body.appendChild(placeCard(p, T)); });
+      sec.appendChild(body);
+      head.addEventListener("click", function () {
+        var o = body.hidden; body.hidden = !o; head.setAttribute("aria-expanded", o ? "true" : "false");
+        if (!q) { gOpen[g.key] = o; saveG(); }
       });
+      box.appendChild(sec);
     });
     if (!box.firstChild) box.appendChild(el("p", "empty", "No hay ningún lugar con ese nombre."));
   }

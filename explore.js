@@ -11,7 +11,19 @@
   var WIKI = "https://es.wikipedia.org/w/api.php";
   var NOMI = "https://nominatim.openstreetmap.org/search";
   var OSRM = "https://router.project-osrm.org/route/v1/driving/";
-  var R = load("rch.route", null);
+  /* Rutas preparadas: se guardan varias (la más reciente primero). R es la activa, la que usan el mapa, la simulación y "Quitar de este viaje".
+     LIVE son los lugares encontrados sobre la marcha, sin ruta. */
+  var ROUTES = load("rch.routes", null), LIVE = load("rch.live", null), R = null;
+  (function migrate() {
+    var old = load("rch.route", null);
+    if (!ROUTES) ROUTES = old && old.places && old.places.length ? [old] : [];
+    if (!LIVE) LIVE = (old && old.live) || [];
+    ROUTES.forEach(function (r) { if (!r.id) r.id = "r" + (r.created || Date.now()); delete r.live; });
+    var act = load("rch.routeActive", null);
+    R = ROUTES.filter(function (r) { return r.id === act; })[0] || ROUTES[0] || null;
+    if (old) { persist(); try { localStorage.removeItem("rch.route"); } catch (e) { /* nada */ } }
+  })();
+  var MAXR = 10;
 
   /* ---------- Red ---------- */
   function getJSON(url, ms) {
@@ -203,13 +215,41 @@
   function builtIn() { return L.filter(function (p) { return !p.src; }); }
   function install() {
     for (var i = L.length - 1; i >= 0; i--) if (L[i].src) { delete A.byId[L[i].id]; L.splice(i, 1); }
-    if (!R) return;
-    (R.places || []).concat(R.live || []).forEach(function (p) { if (!A.byId[p.id]) { L.push(p); A.byId[p.id] = p; } });
+    var list = R ? [R].concat(ROUTES.filter(function (r) { return r !== R; })) : ROUTES;
+    list.forEach(function (r) { (r.places || []).forEach(add); });
+    LIVE.forEach(add);
+    function add(p) { if (!A.byId[p.id]) { L.push(p); A.byId[p.id] = p; } }
   }
   function persist() {
-    if (!R) { try { localStorage.removeItem("rch.route"); } catch (e) { /* nada */ } return; }
-    if (!save("rch.route", R) && R.live && R.live.length > 50) { R.live = R.live.slice(-50); save("rch.route", R); }
+    save("rch.routeActive", R ? R.id : null);
+    if (!save("rch.live", LIVE) && LIVE.length > 50) { LIVE = LIVE.slice(-50); save("rch.live", LIVE); }
+    /* Si no cabe todo en el móvil, se descartan las rutas más antiguas (nunca la activa). */
+    while (!save("rch.routes", ROUTES)) {
+      var i = ROUTES.length - 1; while (i >= 0 && ROUTES[i] === R) i--;
+      if (i < 0) break;
+      ROUTES.splice(i, 1);
+    }
   }
+  /* Para la lista de lugares: cada ruta guardada con sus lugares, y los encontrados por el camino. */
+  A.routes = function () {
+    return ROUTES.map(function (r) {
+      return { id: r.id, label: r.from + " → " + r.to, km: r.km, created: r.created, active: r === R, ids: (r.places || []).map(function (p) { return p.id; }) };
+    });
+  };
+  A.liveIds = function () { return LIVE.map(function (p) { return p.id; }); };
+  A.useRoute = function (id) {
+    var r = ROUTES.filter(function (x) { return x.id === id; })[0]; if (!r || run.on) return;
+    R = r; install(); persist(); A.emit("places"); renderPrep();
+    A.emit("toast", "Ruta activa: " + r.from + " → " + r.to + ".");
+  };
+  A.deleteRoute = function (id) {
+    var i = -1; ROUTES.forEach(function (x, k) { if (x.id === id) i = k; }); if (i < 0) return;
+    var r = ROUTES.splice(i, 1)[0];
+    if (r === R) R = ROUTES[0] || null;
+    install(); persist(); A.emit("places"); renderPrep();
+    A.emit("toast", "Ruta " + r.from + " → " + r.to + " eliminada.");
+  };
+  A.clearLive = function () { LIVE = []; install(); persist(); A.emit("places"); renderPrep(); A.emit("toast", "Lugares encontrados por el camino borrados."); };
   /* Lugares quitados de la ruta preparada desde el mapa (no se cuentan en ese viaje). */
   A.routeSkip = function (id) { return !!(R && R.skip && R.skip.indexOf(id) >= 0); };
   A.toggleRouteSkip = function (id) {
@@ -319,8 +359,10 @@
       var places = pick(cands, builtIn(), 3, Math.ceil(route.km / 3) + 5);
       fillRegions(places, String(dest.full).split(",")[1] ? String(dest.full).split(",")[1].trim() : dest.name);
       var date = parseIso($("pDate").value);
-      R = { from: origin.name, to: dest.name, km: route.km, min: route.min, created: Date.now(), pts: thin(route.pts, 0.3), places: places, live: (R && R.live) || [],
+      R = { from: origin.name, to: dest.name, km: route.km, min: route.min, created: Date.now(), pts: thin(route.pts, 0.3), places: places, id: "r" + Date.now(),
         date: $("pDate").value || isoToday(), dayEfem: { date: dayKey(date), items: [] } };
+      ROUTES = ROUTES.filter(function (x) { return !(x.from === R.from && x.to === R.to); });
+      ROUTES.unshift(R); if (ROUTES.length > MAXR) ROUTES.length = MAXR;
       mine = R; install(); persist(); A.emit("places");
       status("Buscando efemérides del " + C.dateEs(date) + " en los pueblos del camino…");
       return findDayEfem(date, res.line, places).then(function (items) {
@@ -337,7 +379,7 @@
     }).catch(function (e) {
       var msg = e && e.message;
       if (my !== job || msg === "cancel") {
-        if (mine && R === mine) { R = prevR; install(); persist(); A.emit("places"); renderPrep(); }
+        if (mine) { ROUTES = ROUTES.filter(function (x) { return x !== mine; }); if (prevR && ROUTES.indexOf(prevR) < 0) ROUTES.unshift(prevR); if (R === mine) R = prevR; install(); persist(); A.emit("places"); renderPrep(); }
         if (my === job) status("Preparación cancelada.");
         return;
       }
@@ -386,8 +428,7 @@
       var add = pick(cands, L, 3, 3);
       if (!add.length) return;
       fillRegions(add, run.region);
-      if (!R) R = { live: [] };
-      R.live = (R.live || []).concat(add).slice(-300);
+      LIVE = LIVE.concat(add).slice(-300);
       install(); persist(); A.emit("places");
     }).catch(function () { /* sin cobertura: se intentará más adelante */ }).then(function () { busyQ = false; });
   });
@@ -401,7 +442,7 @@
     if (has) {
       var d = new Date(R.created);
       $("pSum").textContent = R.from + " → " + R.to + " · " + C.fmtKm(R.km) + " · " + R.places.length + " lugares guardados" +
-        (R.live && R.live.length ? " (+" + R.live.length + " encontrados por el camino)" : "") +
+        (ROUTES.length > 1 ? " · " + ROUTES.length + " rutas guardadas" : "") +
         ". Preparado el " + d.toLocaleDateString("es-ES", { day: "numeric", month: "long" }) + ".";
     }
     var box = $("pEfem"), ef = has && R.dayEfem ? R.dayEfem.items : [];
@@ -422,7 +463,7 @@
     if (A.Map && A.Map.refresh) A.Map.refresh();
     var mini = $("pMini");
     mini.hidden = !has;
-    if (has) mini.textContent = "Ruta preparada: " + R.from + " → " + R.to + " · " + R.places.length + " lugares";
+    if (has) mini.textContent = "Ruta preparada: " + R.from + " → " + R.to + " · " + R.places.length + (R.places.length === 1 ? " lugar" : " lugares");
     var sel = $("s_sim"), opt = sel.querySelector('option[value="ruta"]');
     if (has && !opt) { opt = document.createElement("option"); opt.value = "ruta"; sel.insertBefore(opt, sel.firstChild); }
     if (opt) { if (has) opt.textContent = "Ruta preparada: " + R.from + " → " + R.to; else opt.remove(); }
@@ -445,12 +486,12 @@
     var b = $("pClear");
     if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Pulsa otra vez para borrar"; armT = setTimeout(function () { delete b.dataset.armed; b.textContent = "Borrar ruta"; }, 3500); return; }
     clearTimeout(armT); delete b.dataset.armed; b.textContent = "Borrar ruta";
-    R = null; install(); persist(); A.emit("places"); renderPrep(); A.emit("toast", "Ruta borrada.");
+    if (R) A.deleteRoute(R.id);
   });
   var pd = $("pDate"); pd.value = isoToday(); pd.min = isoToday();
   var sl = $("s_live"); sl.checked = !!S.live;
   sl.addEventListener("change", function () { A.setS("live", sl.checked); });
 
   install(); renderPrep(); status(""); progress(null);
-  A.Explore = { prepare: prepare, _candidate: candidate, _kindOf: kindOf, _regionOf: regionOf, _clean: clean, _toFacts: toFacts, route: function () { return R; } };
+  A.Explore = { prepare: prepare, _candidate: candidate, _kindOf: kindOf, _regionOf: regionOf, _clean: clean, _toFacts: toFacts, route: function () { return R; }, routesData: function () { return ROUTES; } };
 })();
