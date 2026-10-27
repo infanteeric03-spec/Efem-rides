@@ -1,4 +1,4 @@
-/* Mapa real (Leaflet + mapa de CARTO sobre OpenStreetMap) de la ruta preparada con los lugares de los que se hablará,
+/* Mapa real (Leaflet + mapa de OpenStreetMap) de la ruta preparada con los lugares de los que se hablará,
    y selector de posición para los lugares nuevos. */
 (function () {
   "use strict";
@@ -24,9 +24,10 @@
     return t === "dark" || (t === "auto" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
   }
   function tiles(Lf) {
-    return Lf.tileLayer("https://{s}.basemaps.cartocdn.com/" + (dark() ? "dark_all" : "rastertiles/voyager") + "/{z}/{x}/{y}{r}.png", {
-      subdomains: "abcd", maxZoom: 19,
-      attribution: "© <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">OpenStreetMap</a> · © <a href=\"https://carto.com/attributions\" target=\"_blank\" rel=\"noopener\">CARTO</a>"
+    /* Mapa estándar de OpenStreetMap (CARTO pasó a pedir clave). En tema oscuro se oscurece con un filtro. */
+    return Lf.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19, className: dark() ? "tiles-dark" : "",
+      attribution: "© <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">OpenStreetMap</a>"
     });
   }
 
@@ -74,7 +75,7 @@
       var off = p.hidden || (A.routeSkip && A.routeSkip(p.id));
       var kind = off ? "off" : info.efem[p.id] ? "efem" : p.src === "wikipedia" ? "wiki" : "own";
       var m = Lf.circleMarker([p.lat, p.lon], {
-        radius: kind === "efem" ? 11 : 9, color: kind === "wiki" ? "#1b1303" : "#ffffff", weight: 2.5,
+        radius: kind === "efem" ? 11 : kind === "wiki" ? 6 : 9, color: kind === "wiki" ? "#1b1303" : "#ffffff", weight: 2.5,
         fillColor: COL[kind], fillOpacity: off ? .45 : 1
       }).addTo(layer);
       m.bindTooltip(p.n, { direction: "top", offset: [0, -8] });

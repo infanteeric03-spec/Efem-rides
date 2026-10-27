@@ -560,3 +560,4 @@ body.modal-open { overflow: hidden; }
 .leaflet-container { font-family: var(--font-body); }
 .sheet-head .btn { flex: 0 0 auto; }
 .sheet-head h2 { min-width: 0; overflow-wrap: anywhere; }
+.leaflet-tile.tiles-dark, .tiles-dark .leaflet-tile { filter: invert(1) hue-rotate(180deg) brightness(.9) contrast(.9) saturate(.6); }

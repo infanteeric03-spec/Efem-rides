@@ -250,7 +250,7 @@
     return H.wikiDay(date).then(function (list) {
       list.forEach(function (x) {
         onRoute.forEach(function (p) {
-          if (nm(p.n).length < 4 || !H.mentions(x.text, [nm(p.n)])) return;
+          if (nm(p.n).length < 4 || !H.mentions(x.text, [nm(p.n)]) || (H.namedIn && !H.namedIn(x.text, p.n))) return;
           var verb = x.sec === "nac" ? "nace " : x.sec === "fal" ? "muere " : "";
           items.push({ id: p.id, n: p.n, text: "En " + x.y + ", " + verb + lowerFirst(x.text), src: "wikipedia" });
         });

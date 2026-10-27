@@ -131,6 +131,12 @@
     var n = " " + norm(text) + " ";
     return words.some(function (w) { return w && new RegExp("[^a-z]" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "[^a-z]").test(n); });
   }
+  /* El nombre tiene que aparecer escrito como nombre propio (con mayúscula), para que "Mayor" o "Vega" no casen con palabras corrientes. */
+  function namedIn(text, name) {
+    var t = String(text), n = String(name).trim(); if (n.length < 3) return false;
+    var esc = n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp("(^|[^A-Za-zÀ-ÿ])" + esc + "(?![A-Za-zÀ-ÿ])").test(t);
+  }
   function wikiItems(list, words, now, label) {
     return list.filter(function (x) { return mentions(x.text, words); }).map(function (x) {
       var verb = x.sec === "nac" ? "nace " : x.sec === "fal" ? "muere " : "";
@@ -212,6 +218,6 @@
     if (key !== lastKey) { lastKey = key; build(); }
   }
 
-  A.Home = { _parseDay: parseDay, _clean: cleanWiki, refresh: refresh, locate: locate, wikiDay: wikiDay, mentions: mentions, norm: norm };
+  A.Home = { _parseDay: parseDay, _clean: cleanWiki, refresh: refresh, locate: locate, wikiDay: wikiDay, mentions: mentions, namedIn: namedIn, norm: norm };
   build(); renderLabel(); locate(false);
 })();
