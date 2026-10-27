@@ -17,12 +17,15 @@
   function getJSON(url, ms) {
     var ctl = window.AbortController ? new AbortController() : null;
     var to = setTimeout(function () { if (ctl) ctl.abort(); }, ms || 12000);
+    if (ctl) inflight.push(ctl);
+    function drop() { var i = inflight.indexOf(ctl); if (i >= 0) inflight.splice(i, 1); }
     return fetch(url, { signal: ctl ? ctl.signal : undefined, headers: { "Accept": "application/json" } }).then(function (r) {
-      clearTimeout(to);
+      clearTimeout(to); drop();
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
-    }, function (e) { clearTimeout(to); throw e; });
+    }, function (e) { clearTimeout(to); drop(); throw e; });
   }
+  var inflight = [];
   function geocode(q) {
     return getJSON(NOMI + "?format=jsonv2&limit=5&countrycodes=es,pt,fr,ad&accept-language=es&q=" + encodeURIComponent(q)).then(function (list) {
       if (!list || !list.length) throw new Error("nogeo");
@@ -278,21 +281,22 @@
     if (!toText) { status("Escribe a dónde vas.", "warn"); return; }
     if (!navigator.onLine) { status("Necesitas conexión para preparar el viaje.", "warn"); return; }
     preparing = true; $("pGo").disabled = true;
-    var origin, dest, route;
+    var my = ++job, prevR = R, mine = null, origin, dest, route;
+    function alive(x) { if (my !== job) throw new Error("cancel"); return x; }
     status("Buscando " + toText + "…");
     progress(0.02);
-    Promise.all([fromText ? geocode(fromText) : myPosition(), geocode(toText)]).then(function (r) {
+    Promise.all([fromText ? geocode(fromText) : myPosition(), geocode(toText)]).then(alive).then(function (r) {
       origin = r[0]; dest = r[1];
       status("Calculando la ruta de " + origin.name + " a " + dest.name + "…");
       progress(0.06);
       return routeBetween(origin, dest);
-    }).then(function (rt) {
+    }).then(alive).then(function (rt) {
       route = rt;
       var line = thin(rt.pts, 0.15), samples = resample(line, 4), pages = {}, done = 0;
       status("Ruta de " + C.fmtKm(rt.km) + ". Buscando los pueblos del camino…");
       var queue = samples.slice(), workers = [];
       function work() {
-        var s = queue.shift(); if (!s) return Promise.resolve();
+        var s = my === job && queue.shift(); if (!s) return Promise.resolve();
         return wikiAround(s[0], s[1], 5000).then(function (list) {
           list.forEach(function (p) { if (p && p.pageid && !pages[p.pageid]) pages[p.pageid] = p; });
         }, function () { /* un punto sin respuesta no detiene el resto */ }).then(function () {
@@ -303,7 +307,7 @@
       }
       for (var w = 0; w < 3; w++) workers.push(work());
       return Promise.all(workers).then(function () { return { line: line, pages: pages }; });
-    }).then(function (res) {
+    }).then(alive).then(function (res) {
       var cands = [];
       Object.keys(res.pages).forEach(function (id) {
         var p = res.pages[id];
@@ -317,13 +321,13 @@
       var date = parseIso($("pDate").value);
       R = { from: origin.name, to: dest.name, km: route.km, min: route.min, created: Date.now(), pts: thin(route.pts, 0.3), places: places, live: (R && R.live) || [],
         date: $("pDate").value || isoToday(), dayEfem: { date: dayKey(date), items: [] } };
-      install(); persist(); A.emit("places");
+      mine = R; install(); persist(); A.emit("places");
       status("Buscando efemérides del " + C.dateEs(date) + " en los pueblos del camino…");
       return findDayEfem(date, res.line, places).then(function (items) {
         R.dayEfem.items = items; persist();
         return places;
       }, function () { return places; });
-    }).then(function (places) {
+    }).then(alive).then(function (places) {
       progress(1);
       status("");
       renderPrep();
@@ -332,11 +336,32 @@
       A.emit("trip");
     }).catch(function (e) {
       var msg = e && e.message;
+      if (my !== job || msg === "cancel") {
+        if (mine && R === mine) { R = prevR; install(); persist(); A.emit("places"); renderPrep(); }
+        if (my === job) status("Preparación cancelada.");
+        return;
+      }
       status(msg === "nogeo" ? "No encuentro ese lugar. Prueba con un nombre más completo, por ejemplo \"León, España\"." :
         msg === "nogps" ? "No tengo tu ubicación. Escribe también desde dónde sales." :
         msg === "noroute" ? "No he podido calcular la ruta entre esos dos puntos." :
         "No he podido preparar el viaje. Comprueba la conexión e inténtalo otra vez.", "warn");
-    }).then(function () { preparing = false; $("pGo").disabled = false; setTimeout(function () { progress(null); }, 600); });
+    }).then(function () {
+      if (my !== job) return;
+      preparing = false; $("pGo").disabled = false;
+      setTimeout(function () { if (!preparing) progress(null); }, 600);
+    });
+  }
+  var job = 0;
+  /* Cancelar: si está preparando, lo detiene y deja la ruta anterior; si no, cierra el panel. */
+  function cancelPrep() {
+    if (preparing) {
+      job++;
+      inflight.slice().forEach(function (c) { try { c.abort(); } catch (e) { /* nada */ } });
+      preparing = false; $("pGo").disabled = false;
+      progress(null); status(R ? "Preparación cancelada. Se mantiene la ruta que tenías." : "Preparación cancelada.");
+      return;
+    }
+    status(""); setOpen(false);
   }
 
   /* ---------- Sobre la marcha ---------- */
@@ -413,6 +438,7 @@
   }
   $("pToggle").addEventListener("click", function () { setOpen($("pPanel").hidden); });
   $("pGo").addEventListener("click", function () { prepare($("pFrom").value.trim(), $("pTo").value.trim()); });
+  $("pCancel").addEventListener("click", cancelPrep);
   $("pTo").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); $("pGo").click(); } });
   var armT;
   $("pClear").addEventListener("click", function () {

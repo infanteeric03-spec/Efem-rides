@@ -1,5 +1,5 @@
 /* Service worker: guarda la app para que abra sin cobertura. */
-var CACHE = "ruta-historia-v35";
+var CACHE = "ruta-historia-v36";
 var ARCHIVOS = [
   "./", "./index.html", "./style.css?v=33", "./engine.js?v=33", "./ui.js?v=33", "./drive.js?v=33", "./radio.js?v=33", "./explore.js?v=33", "./home.js?v=33", "./update.js?v=33", "./edits.js?v=33", "./routemap.js?v=33", "./vendor/leaflet/leaflet.js", "./vendor/leaflet/leaflet.css", "./core.js?v=33",
   "./data-asturias.js?v=33", "./data-cantabria.js?v=33", "./data-dias.js?v=33",
