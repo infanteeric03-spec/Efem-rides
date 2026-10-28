@@ -1,7 +1,7 @@
 # Compila la app Android a partir de la web y la publica como descarga en "Releases".
 name: App Android
 
-# Solo se compila a petición (pestaña Actions, "Run workflow"), no con cada cambio.
+# Se compila a petición (pestaña Actions, "Run workflow") o la lanza cada noche "Comprobación nocturna del APK" si hay cambios.
 on:
   workflow_dispatch:
 

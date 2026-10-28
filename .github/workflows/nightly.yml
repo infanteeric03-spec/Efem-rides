@@ -1,0 +1,59 @@
+# Cada noche a las 00:00 (hora de Madrid) comprueba si hay cambios de la web que aún no están en el APK publicado.
+# Si los hay, lanza la compilación ("App Android"). Si no, no hace nada.
+name: Comprobación nocturna del APK
+
+on:
+  schedule:
+    # GitHub usa hora UTC: las 22:00 UTC son las 00:00 en verano y las 23:00 UTC en invierno.
+    # Se lanza a las dos horas y solo sigue la que cae a medianoche en Madrid.
+    - cron: "0 22 * * *"
+    - cron: "0 23 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: ¿Es medianoche en Madrid?
+        id: hour
+        run: |
+          h=$(TZ=Europe/Madrid date +%H)
+          echo "Hora en Madrid: $h"
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$h" != "00" ]; then echo "go=false" >> "$GITHUB_OUTPUT"; else echo "go=true" >> "$GITHUB_OUTPUT"; fi
+
+      - uses: actions/checkout@v5
+        if: steps.hour.outputs.go == 'true'
+        with:
+          fetch-depth: 0
+
+      - name: ¿Hay cambios sin compilar?
+        id: diff
+        if: steps.hour.outputs.go == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh api "repos/${{ github.repository }}/releases/latest" --jq .tag_name 2>/dev/null || true)
+          echo "Último APK publicado: ${tag:-ninguno}"
+          if [ -z "$tag" ] || ! git fetch -q origin "refs/tags/$tag:refs/tags/$tag"; then
+            echo "build=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          changed=$(git diff --name-only "$tag" HEAD -- . ':(exclude)README.md' ':(exclude)LEEME*' ':(exclude).github' | wc -l)
+          echo "Archivos cambiados desde $tag: $changed"
+          git diff --name-only "$tag" HEAD -- . ':(exclude)README.md' ':(exclude)LEEME*' ':(exclude).github' | head -30
+          if [ "$changed" -gt 0 ]; then echo "build=true" >> "$GITHUB_OUTPUT"; else echo "build=false" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Lanzar la compilación del APK
+        if: steps.diff.outputs.build == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run android.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"
+          echo "::notice::Hay cambios nuevos: se ha lanzado la compilación del APK."
+
+      - name: Nada que compilar
+        if: steps.diff.outputs.build == 'false'
+        run: echo "::notice::El APK publicado ya tiene la última versión. No se compila."

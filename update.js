@@ -17,7 +17,8 @@
   var mine = +window.APP_BUILD || 0;
   var plugin = window.Capacitor.registerPlugin("SpeechDuck");
   var st = load("rch.update", {}) || {};
-  var latest = null;
+  var latest = null, dismissed = 0;
+  delete st.dismissed;
 
   $("appVer").textContent = mine ? "Compilación " + mine : "Compilación de prueba";
 
@@ -32,7 +33,7 @@
       st.last = Date.now(); save("rch.update", st);
       latest = { n: n, url: APK };
       (rel.assets || []).forEach(function (a) { if (/\.apk$/i.test(a.name)) latest.url = a.browser_download_url; });
-      if (n > mine && (manual || st.dismissed !== n)) show();
+      if (n > mine && (manual || dismissed !== n)) show();
       else if (manual) A.emit("toast", "Tienes la última versión (compilación " + mine + ").");
     }).catch(function () {
       if (manual) A.emit("toast", "No he podido consultar GitHub. Inténtalo más tarde.");
@@ -50,10 +51,15 @@
   });
   $("updLater").addEventListener("click", function () {
     $("updBar").hidden = true;
-    if (latest) { st.dismissed = latest.n; save("rch.update", st); }
+    /* "Ahora no" solo vale hasta que se vuelva a abrir la app: en el siguiente inicio se vuelve a proponer. */
+    if (latest) dismissed = latest.n;
   });
   $("btnUpd").addEventListener("click", function () { check(true); });
 
-  /* Comprobación automática: como mucho una vez al día, unos segundos después de abrir. */
-  if (!st.last || Date.now() - st.last > 20 * 3600000) setTimeout(function () { check(false); }, 4000);
+  /* Comprobación automática: en cada inicio de la app, unos segundos después de abrir,
+     y al volver a ella si lleva más de 6 horas en segundo plano sin comprobar. */
+  setTimeout(function () { check(false); }, 4000);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible" && (!st.last || Date.now() - st.last > 6 * 3600000)) check(false);
+  });
 })();
