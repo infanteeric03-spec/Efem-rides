@@ -113,3 +113,9 @@ Las efemérides con fecha están en `data-dias.js`. Escribe las cifras en letra 
 ## Aviso sobre los datos
 
 Los datos son una selección propia. En octubre de 2026 se revisaron las fechas y cifras con más riesgo de error contrastándolas con fuentes web (Turismo de Asturias y de Cantabria, Wikipedia, RAE, prensa regional) y se corrigieron las que no cuadraban. Hay fechas que la tradición discute, como la batalla de Covadonga (718 o 722) o el lugar de nacimiento de Juan de la Cosa, y así se indica en la propia app. Antes de citar alguna cifra en público, compruébala.
+
+## Guía de uso
+
+La primera vez que se abre cada pestaña aparece una guía corta: la pantalla se oscurece, se ilumina el botón que se explica y una mano dibujada hace el gesto (tocar, tocar dos veces o deslizar). La guía de la pestaña Ruta enseña también la vista de conducción. Nunca aparece con el viaje en marcha y se puede saltar en cualquier momento. Para verla de nuevo: **Ajustes, Ayuda, Ver la guía**.
+
+La letra manuscrita es Caveat (licencia SIL Open Font License, incluida en `vendor/caveat/OFL.txt`).

@@ -41,6 +41,8 @@
     syncDriveBtn();
     if (on) { window.scrollTo(0, 0); render(); layout(); }
   }
+  /* Para la guía de uso: enseña la vista de conducción sin viaje en marcha. */
+  A.drivePreview = function (on) { if (run.on) return; show(!!on); };
   function syncDriveBtn() {
     $("btnDrive").hidden = shown || !run.on;
     if (A.syncStartRow) A.syncStartRow();
