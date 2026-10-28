@@ -148,4 +148,12 @@
     "Colombres, en Ribadedeva, el último pueblo de Asturias antes de Cantabria. Aquí está el Archivo de Indianos, en la Quinta Guadalupe, un edificio indiano.",
     "El río Deva marca el límite entre Asturias y Cantabria. Nace en Fuente Dé, atraviesa el desfiladero de La Hermida y desemboca en la ría de Tina Mayor, junto al puente de Unquera."
   ]);
+
+  /* Añadido por el usuario desde la app (28 de octubre de 2026). */
+  add("lugones", "Lugones", 43.4153, -5.7996, 2, [
+    "Lugones, en asturiano Llugones, es la localidad más poblada del concejo de Siero, con más habitantes que la propia capital, la Pola. Su nombre viene de los luggones, una antigua tribu astur de raíz céltica vinculada al dios solar Lug.",
+    "Conserva el Puente Viejo, de origen romano y reformado después. Formaba parte de la calzada que unía Astorga con Lugo de Llanera.",
+    "Está a solo 5 kilómetros de Oviedo, en el corazón del área central de Asturias. Su gran parque es La Acebera: hasta 1982 fue terreno de la Sociedad Santa Bárbara, que probaba y almacenaba allí los explosivos de sus fábricas.",
+    "Tiene una intensa vida social y sidrera, con la calle peatonal como eje. Es además un nudo de comunicaciones, con autovías y estación de tren."
+  ]);
 })(typeof window !== "undefined" ? window : globalThis);

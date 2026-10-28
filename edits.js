@@ -13,6 +13,16 @@
   if (!ED.places) ED.places = {};
   if (!ED.custom) ED.custom = [];
   function persist() { if (!save("rch.edits", ED)) toast("No he podido guardar los cambios en este móvil."); }
+  /* Lugares tuyos que ya se han incorporado al proyecto: si hay uno de la app con el mismo nombre a menos de 3 km,
+     se quita de tus cambios para que no salga repetido. */
+  (function dedupe() {
+    function nm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim(); }
+    var before = ED.custom.length;
+    ED.custom = ED.custom.filter(function (c) {
+      return !L.some(function (p) { return !p.src && !p.custom && nm(p.n) === nm(c.n) && C.dist(p.lat, p.lon, c.lat, c.lon) < 3; });
+    });
+    if (ED.custom.length !== before) persist();
+  })();
 
   /* Aplica los cambios a la lista de lugares. Se repite cuando se instala una ruta nueva. */
   function apply() {
