@@ -18,6 +18,12 @@
     enter: function () { if (A.drivePreview) A.drivePreview(true); },
     leave: function () { if (A.drivePreview) A.drivePreview(false); }
   };
+  /* En la vista previa no hay viaje: se rellena con un ejemplo para que se vea el próximo lugar y los km. */
+  function demoNext() {
+    $("dNextName").textContent = "Próximo: Lugones";
+    $("dDist").textContent = "4,2"; $("dDistU").textContent = "km";
+    $("dDistBox").style.visibility = "visible";
+  }
   function inDrive(step) { step.enter = drivePrev.enter; step.drive = true; return step; }
   var GUIDES = {
     ruta: [
@@ -28,7 +34,8 @@
       inDrive({ t: "#dMore", g: "tap", text: "Durante el viaje verás esta pantalla, con botones grandes. Otro dato: te cuento algo más." }),
       inDrive({ t: ["#dRepeat", "#dMute", "#dRadio", "#dStation"], text: "Repetir, silenciar la voz, encender la radio y cambiar de emisora." }),
       inDrive({ t: "#dFactToggle", need: function () { return !!A.S.driveText; }, show: function () { $("dFactToggle").style.visibility = "visible"; }, g: "double", text: "Para leer el dato, toca dos veces. Así se evitan toques sin querer." }),
-      inDrive({ t: ["#dNextName", "#dDistBox"], text: "Debajo de la señal, el próximo lugar. En la esquina, los km que faltan." }),
+      inDrive({ t: "#dNextName", show: demoNext, text: "Debajo de la señal verás el próximo lugar del que te hablaré." }),
+      inDrive({ t: "#dDistBox", show: demoNext, g: "point", text: "Y aquí, en la esquina de la señal, los km que faltan para llegar a él." }),
       inDrive({ t: "#dStop", g: "tap", text: "Cuando llegues, para el viaje. La radio también se para." })
     ],
     lugares: [
@@ -169,6 +176,8 @@
     var cx = (hl + hr) / 2, cy = (ht + hb) / 2, HAND_H = 118;
     if (hb - ht > 160) cy = ht + Math.min(90, (hb - ht) / 2);
     var hasHand = !!s.g, below = maxY - cy > HAND_H + 6, mirror = cx > W - 90;
+    /* "Señalar": la mano apunta al borde, sin tapar lo que se explica. */
+    if (s.g === "point") { below = maxY - hb > HAND_H + 6; cy = below ? hb + 2 : ht - 2; }
     handW.style.left = cx + "px"; handW.style.top = cy + "px";
     handW.style.transform = (below ? "" : "rotate(180deg) ") + (mirror !== !below ? "scaleX(-1)" : "");
     rings.style.left = cx + "px"; rings.style.top = cy + "px";
