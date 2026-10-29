@@ -1,4 +1,4 @@
-# Cada noche a las 00:00 (hora de Madrid) comprueba si hay cambios de la web que aún no están en el APK publicado.
+# Cada noche, pasada la medianoche (hora de Madrid), comprueba si hay cambios de la web que aún no están en el APK publicado.
 # Si los hay, lanza la compilación ("App Android"). Si no, no hace nada.
 name: Comprobación nocturna del APK
 
@@ -18,12 +18,22 @@ jobs:
   check:
     runs-on: ubuntu-24.04
     steps:
-      - name: ¿Es medianoche en Madrid?
+      # GitHub suele lanzar las tareas programadas con retraso (a veces más de 2 horas),
+      # así que no se exige la hora exacta: vale cualquier hora entre las 00:00 y las 08:59 de Madrid.
+      # La de las 23:00 en invierno queda fuera para no compilar antes de medianoche.
+      - name: ¿Ya es pasada la medianoche en Madrid?
         id: hour
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           h=$(TZ=Europe/Madrid date +%H)
           echo "Hora en Madrid: $h"
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "$h" != "00" ]; then echo "go=false" >> "$GITHUB_OUTPUT"; else echo "go=true" >> "$GITHUB_OUTPUT"; fi
+          go=true
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$((10#$h))" -gt 8 ]; then go=false; fi
+          # Si ya hay una compilación en marcha (la lanzó la otra comprobación de esta noche), no se lanza otra.
+          busy=$(gh run list --repo "${{ github.repository }}" --workflow android.yml --json status --jq '[.[] | select(.status != "completed")] | length')
+          if [ "$busy" != "0" ]; then echo "Ya hay una compilación en marcha."; go=false; fi
+          echo "go=$go" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v5
         if: steps.hour.outputs.go == 'true'
