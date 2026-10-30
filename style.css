@@ -310,7 +310,7 @@ body.driving main, body.driving .dock { display: none !important; }
 /* Preparar viaje */
 .prep { display: flex; flex-direction: column; gap: 8px; }
 .prep-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-.prep-fields { display: grid; grid-template-columns: auto 1fr; gap: 8px 10px; align-items: center; }
+.prep-fields { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 10px; align-items: center; }
 .prep-fields label { font: 600 13px/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .prep-fields .search { min-width: 0; }
 .prep-card .btn:not(.small) { min-height: 52px; }
@@ -642,3 +642,13 @@ body.guiding { overflow: hidden; }
 @keyframes gPress2 { 0%, 25%, 100% { transform: translateY(14px); } 35% { transform: translateY(0) scale(.96); } 45% { transform: translateY(8px); } 55% { transform: translateY(0) scale(.96); } 70% { transform: translateY(8px); } }
 @keyframes gRing { 0%, 40% { transform: scale(.35); opacity: 0; } 48% { opacity: .95; } 100% { transform: scale(1.7); opacity: 0; } }
 @keyframes gSwipe { 0%, 100% { transform: translateX(-46px); } 50% { transform: translateX(46px); } }
+/* Fecha en iPhone (Safari): sin esto el campo se sale de la columna, centra el texto y cambia de alto. */
+input[type="date"].search {
+  -webkit-appearance: none; appearance: none; display: block;
+  width: 100%; min-width: 0; max-width: 100%; height: 48px; min-height: 48px; line-height: 48px;
+  color: var(--fg); text-align: left;
+}
+input[type="date"].search::-webkit-date-and-time-value { text-align: left; margin: 0; }
+input[type="date"].search::-webkit-calendar-picker-indicator { filter: invert(.8); }
+:root[data-theme="light"] input[type="date"].search::-webkit-calendar-picker-indicator { filter: none; }
+.prep-fields > input { min-width: 0; }
