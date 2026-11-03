@@ -10,12 +10,15 @@
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento */ } }
 
   /* Emisoras de partida. Se buscan en el directorio la primera vez; así siempre se usa el enlace vigente. */
+  /* direct: enlaces oficiales que se prueban antes que el directorio (comprobados con la tarea "Comprobar emisoras").
+     Europa FM solo emite en HLS (.m3u8) y únicamente para España. */
+  var STW = "https://playerservices.streamtheworld.com/api/livestream-redirect/";
   var PRESETS = [
-    { n: "Europa FM", q: "Europa FM", prefer: ["europa fm", "europafm", "europa fm espana", "europa fm madrid"], avoid: ["gipuzkoa", "goierri", "tolosa", "navarra", "dance", "cantabria", "rioja"] },
-    { n: "COPE", q: "COPE", prefer: ["cope", "cadena cope", "cope nacional", "cope espana", "cope madrid"], avoid: ["mas", "+", "rock", "deportes", "tiempo de juego"] },
-    { n: "Cadena SER", q: "SER", prefer: ["cadena ser", "ser", "cadena ser madrid", "radio madrid cadena ser"], avoid: ["catalunya", "euskadi", "galicia", "andalucia", "valencia", "+"] },
-    { n: "LOS40", q: "LOS40", prefer: ["los40", "los 40", "los40 principales", "los 40 principales", "los40 espana"], avoid: ["classic", "clasic", "dance", "urban", "pop", "chill"] },
-    { n: "LOS40 Classic", q: "LOS40 Classic", prefer: ["los40 classic", "los 40 classic", "los40classic"], avoid: [] }
+    { n: "Europa FM", q: "Europa FM", direct: ["https://atres-live.europafm.com/live/europafm/master.m3u8"], prefer: ["europa fm", "europafm", "europa fm espana", "europa fm madrid"], avoid: ["gipuzkoa", "guipuzcoa", "goierri", "tolosa", "navarra", "dance", "cantabria", "rioja"] },
+    { n: "COPE", q: "COPE", direct: ["https://flucast31-h-cloud.flumotion.com/cope/net1.mp3"], prefer: ["cope", "cadena cope", "cope nacional", "cope espana", "cope madrid"], avoid: ["mas", "+", "rock", "deportes", "tiempo de juego"] },
+    { n: "Cadena SER", q: "SER", direct: [STW + "CADENASER.mp3", STW + "CADENASERAAC.aac"], prefer: ["cadena ser", "ser", "cadena ser madrid", "radio madrid cadena ser"], avoid: ["catalunya", "euskadi", "galicia", "andalucia", "valencia", "+"] },
+    { n: "LOS40", q: "LOS40", direct: [STW + "LOS40.mp3", STW + "LOS40AAC.aac"], prefer: ["los40", "los 40", "los40 principales", "los 40 principales", "los40 espana"], avoid: ["classic", "clasic", "dance", "urban", "pop", "chill"] },
+    { n: "LOS40 Classic", q: "LOS40 Classic", direct: [STW + "LOS40_CLASSIC.mp3", STW + "LOS40_CLASSICAAC.aac"], prefer: ["los40 classic", "los 40 classic", "los40classic"], avoid: [] }
   ];
   var SERVERS = ["https://de1.api.radio-browser.info", "https://de2.api.radio-browser.info", "https://fi1.api.radio-browser.info", "https://all.api.radio-browser.info"];
 
@@ -24,6 +27,9 @@
   if (st.vol == null) st.vol = 0.8;
   if (!st.duck) st.duck = "bajar";
   if (st.cur == null) st.cur = 0;
+  /* Revisión de enlaces (noviembre de 2026): las emisoras de partida olvidan el enlace que encontraron
+     en el directorio (algunas eran emisoras locales, como COPE Coruña o Europa FM Guipúzcoa) y usan los oficiales. */
+  if ((st.rv || 0) < 2) { st.favs.forEach(function (f) { if (f.preset) { f.url = null; f.uuid = null; } }); st.rv = 2; save("rch.radio", st); }
   function persist() { save("rch.radio", st); }
 
   var audio = new Audio();
@@ -62,6 +68,8 @@
       });
     });
   }
+  /* Los enlaces HLS (.m3u8) solo se prueban si el navegador los reproduce (Android e iPhone sí; algunos ordenadores no). */
+  function canPlay(u) { return !/\.m3u8(\?|$)/i.test(u) || !!audio.canPlayType("application/vnd.apple.mpegurl"); }
   function rankForPreset(list, p) {
     function score(s) {
       var n = norm(s.n), sc = s.clicks / 1e6;
@@ -128,24 +136,26 @@
   function resolveAndPlay() {
     var f = st.favs[st.cur];
     cands = []; candI = 0;
-    if (f.url) cands.push({ n: f.n, uuid: f.uuid, url: f.url, favicon: f.favicon });
     var p = PRESETS.filter(function (x) { return x.n === f.preset; })[0];
+    if (p && p.direct) p.direct.forEach(function (u) { if (canPlay(u)) cands.push({ n: f.n, uuid: null, url: u, favicon: f.favicon }); });
+    if (f.url && !cands.some(function (c) { return c.url === f.url; })) cands.push({ n: f.n, uuid: f.uuid, url: f.url, favicon: f.favicon });
     if (!p && f.url) { tryCandidate(); return; }
     var tok = ++playTok;
     status("load", "Buscando " + f.n + "…");
     searching = true; waitSearch = false;
-    if (f.url) { tryCandidate(); }
+    var started = cands.length > 0;
+    if (started) tryCandidate();
     var q = p ? p.q : f.n;
     searchStations(q, "ES").then(function (list) {
       if (tok !== playTok) return;
       searching = false;
       var ranked = p ? rankForPreset(list, p) : list.filter(function (s) { return s.uuid === f.uuid; });
       ranked.slice(0, 8).forEach(function (s) { if (!cands.some(function (c) { return c.url === s.url; })) cands.push(s); });
-      if (!f.url || waitSearch) { waitSearch = false; tryCandidate(); }
+      if (!started || waitSearch) { waitSearch = false; tryCandidate(); }
     }).catch(function () {
       if (tok !== playTok) return;
       searching = false;
-      if (!f.url || waitSearch) { waitSearch = false; candI = cands.length; status("error", "Sin conexión con el directorio de emisoras. Reintento en unos segundos."); scheduleRetry(); }
+      if (!started || waitSearch) { waitSearch = false; candI = cands.length; status("error", "Sin conexión con el directorio de emisoras. Reintento en unos segundos."); scheduleRetry(); }
     });
   }
 

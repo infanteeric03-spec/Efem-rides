@@ -1,8 +1,8 @@
 /* Service worker: guarda la app para que abra sin cobertura. */
-var CACHE = "ruta-historia-v42";
+var CACHE = "ruta-historia-v43";
 var ARCHIVOS = [
-  "./", "./index.html", "./style.css?v=42", "./engine.js?v=42", "./ui.js?v=42", "./drive.js?v=42", "./radio.js?v=42", "./explore.js?v=42", "./home.js?v=42", "./update.js?v=42", "./edits.js?v=42", "./routemap.js?v=42", "./guide.js?v=42", "./vendor/caveat/caveat-latin-700-normal.woff2", "./vendor/leaflet/leaflet.js", "./vendor/leaflet/leaflet.css", "./core.js?v=42",
-  "./data-asturias.js?v=42", "./data-cantabria.js?v=42", "./data-dias.js?v=42",
+  "./", "./index.html", "./style.css?v=43", "./engine.js?v=43", "./ui.js?v=43", "./drive.js?v=43", "./radio.js?v=43", "./explore.js?v=43", "./home.js?v=43", "./update.js?v=43", "./edits.js?v=43", "./routemap.js?v=43", "./guide.js?v=43", "./vendor/caveat/caveat-latin-700-normal.woff2", "./vendor/leaflet/leaflet.js", "./vendor/leaflet/leaflet.css", "./core.js?v=43",
+  "./data-asturias.js?v=43", "./data-cantabria.js?v=43", "./data-dias.js?v=43",
   "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"
 ];
 

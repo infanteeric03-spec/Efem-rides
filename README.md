@@ -119,3 +119,7 @@ Los datos son una selección propia. En octubre de 2026 se revisaron las fechas 
 La primera vez que se abre cada pestaña aparece una guía corta: la pantalla se oscurece, se ilumina el botón que se explica y una mano dibujada hace el gesto (tocar, tocar dos veces o deslizar). La guía de la pestaña Ruta enseña también la vista de conducción. Nunca aparece con el viaje en marcha y se puede saltar en cualquier momento. Para verla de nuevo: **Ajustes, Ayuda, Ver la guía**.
 
 La letra manuscrita es Caveat (licencia SIL Open Font License, incluida en `vendor/caveat/OFL.txt`).
+
+## Emisoras de partida
+
+Europa FM, COPE, Cadena SER, LOS40 y LOS40 Classic usan primero sus enlaces oficiales y, si fallan, buscan en el directorio Radio Browser. La tarea **Comprobar emisoras** (pestaña Actions) prueba todos los enlaces cada lunes y a petición.
