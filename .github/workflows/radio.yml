@@ -1,0 +1,25 @@
+# Revisa que las emisoras guardadas de partida tengan enlaces que funcionen (a petición y cada lunes).
+name: Comprobar emisoras
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  radio:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Probar enlaces
+        run: node scripts/check-radio.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: informe-emisoras
+          path: radio-report.md
