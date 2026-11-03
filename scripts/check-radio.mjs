@@ -4,6 +4,7 @@ import fs from "node:fs";
 const src = fs.readFileSync(new URL("../radio.js", import.meta.url), "utf8");
 const PRESETS = eval(src.match(/var PRESETS = (\[[\s\S]*?\]);/)[1]);
 const SERVERS = ["https://de1.api.radio-browser.info", "https://de2.api.radio-browser.info", "https://fi1.api.radio-browser.info", "https://all.api.radio-browser.info"];
+const EXTRA = (process.env.EXTRA || "").split(/\s+/).filter(Boolean);
 const OFFICIAL = {
   "Cadena SER": ["https://playerservices.streamtheworld.com/api/livestream-redirect/CADENASER.mp3", "https://playerservices.streamtheworld.com/api/livestream-redirect/CADENASERAAC.aac"],
   "LOS40": ["https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3", "https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40AAC.aac"],
@@ -46,6 +47,7 @@ for (const p of PRESETS) {
   try {
     const list = await api(`/json/stations/search?hidebroken=true&order=clickcount&reverse=true&limit=40&countrycode=ES&name=${encodeURIComponent(p.q)}`);
     const top = rank(list, p).slice(0, 8);
+    if (process.env.LISTAR) console.log(`::notice title=${p.n} · todas las encontradas::` + list.slice(0, 40).map(s => `${s.name} | ${s.state} | ${s.clickcount} | ${s.url_resolved || s.url}`).join("%0A").replace(/::/g, ":"));
     if (!top.length) lines.push("SIN CANDIDATOS en Radio Browser");
     for (const s of top) {
       const u = https(s.url_resolved || s.url), r = await probe(u);
@@ -59,6 +61,7 @@ for (const p of PRESETS) {
   md += "\n";
   notes.push({ n: p.n, okN, lines });
 }
+if (EXTRA.length) { const l = []; for (const u of EXTRA) { const r = await probe(u); l.push(`${r.ok ? "OK " : "MAL"} ${u} (${r.why})`); } console.log("::notice title=Enlaces extra::" + l.join("%0A")); }
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);
 fs.writeFileSync("radio-report.md", md);
 for (const x of notes) console.log(`::notice title=${x.n} (${x.okN} de Radio Browser funcionan)::` + x.lines.join("%0A").replace(/::/g, ":"));
