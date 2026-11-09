@@ -10,8 +10,8 @@ const OFFICIAL = {
   "Cadena SER": ["https://playerservices.streamtheworld.com/api/livestream-redirect/CADENASER.mp3", "https://playerservices.streamtheworld.com/api/livestream-redirect/CADENASERAAC.aac"],
   "LOS40": ["https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3", "https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40AAC.aac"],
   "LOS40 Classic": ["https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_CLASSIC.mp3", "https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_CLASSICAAC.aac"],
-  "COPE": ["https://flucast-b02-04.flumotion.com/cope/net1.mp3", "https://wecast-b02-03.flumotion.com/copesedes/net1.mp3", "https://flucast-m04-06.flumotion.com/cope/net1.mp3"],
-  "Europa FM": ["https://livefastly-webs.europafm.com/europafm/audio/master.m3u8", "https://atres-live.europafm.com/live/europafm/bitrate_1.m3u8", "https://livefastly-webs.europafm.com/europafm/audio/bitrate_1.m3u8"]
+  "COPE": ["https://flucast31-h-cloud.flumotion.com/cope/net1.mp3"],
+  "Europa FM": ["https://atres-live.europafm.com/live/europafm/master.m3u8"]
 };
 const norm = t => String(t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ").trim();
 async function api(path) {
