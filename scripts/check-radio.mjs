@@ -2,6 +2,7 @@
 // prueba cada enlace por https (la app solo reproduce https) y algunos enlaces oficiales conocidos.
 import fs from "node:fs";
 const src = fs.readFileSync(new URL("../radio.js", import.meta.url), "utf8");
+const STW = (src.match(/var STW = "([^"]+)"/) || [])[1]; // usado dentro de PRESETS
 const PRESETS = eval(src.match(/var PRESETS = (\[[\s\S]*?\]);/)[1]);
 const SERVERS = ["https://de1.api.radio-browser.info", "https://de2.api.radio-browser.info", "https://fi1.api.radio-browser.info", "https://all.api.radio-browser.info"];
 const EXTRA = (process.env.EXTRA || "").split(/\s+/).filter(Boolean);
