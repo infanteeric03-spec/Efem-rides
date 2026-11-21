@@ -1,0 +1,28 @@
+# Pruebas automáticas de la web: en cada cambio y como paso previo a la compilación nocturna del APK.
+name: Pruebas
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Instalar Playwright y Chromium
+        run: |
+          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm i playwright@1.49.1 --silent
+          npx playwright install --with-deps chromium
+          ln -sfn /tmp/pw/node_modules "$GITHUB_WORKSPACE/node_modules"
+      - name: Probar la web
+        run: node scripts/test-web.mjs

@@ -1,0 +1,147 @@
+// Pruebas automáticas de la web. Se ejecutan antes de compilar el APK y en cada cambio.
+// Uso: node scripts/test-web.mjs   (necesita "playwright" con Chromium instalado)
+import fs from "node:fs";
+import http from "node:http";
+import path from "node:path";
+import { chromium } from "playwright";
+
+const ROOT = path.resolve(new URL("..", import.meta.url).pathname);
+const fails = [], oks = [];
+const ok = (n) => { oks.push(n); console.log("  ✔ " + n); };
+const fail = (n, why) => { fails.push(n + ": " + why); console.log("  ✘ " + n + " — " + why); };
+const check = (cond, n, why) => (cond ? ok(n) : fail(n, why || "no se cumple"));
+
+/* ---------- Servidor local ---------- */
+const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webmanifest": "application/manifest+json", ".png": "image/png", ".woff2": "font/woff2" };
+const server = http.createServer((req, res) => {
+  let f = path.join(ROOT, decodeURIComponent(req.url.split("?")[0]));
+  if (f.endsWith("/")) f += "index.html";
+  if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
+  res.writeHead(200, { "Content-Type": TYPES[path.extname(f)] || "application/octet-stream" });
+  fs.createReadStream(f).pipe(res);
+});
+await new Promise((r) => server.listen(0, "127.0.0.1", r));
+const BASE = "http://127.0.0.1:" + server.address().port + "/";
+
+/* ---------- 1. Archivos y versión ---------- */
+console.log("\nArchivos y versión");
+const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+const sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
+const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
+check(scripts.length >= 10, "index.html carga los scripts", "faltan scripts");
+const missing = scripts.filter((s) => !fs.existsSync(path.join(ROOT, s.split("?")[0])));
+check(!missing.length, "todos los scripts existen", missing.join(", "));
+const ver = (html.match(/Versión (\d+)\./) || [])[1];
+const tags = new Set([...html.matchAll(/\?v=(\d+)/g)].map((m) => m[1]));
+check(tags.size === 1 && tags.has(ver), "la versión del texto coincide con los ?v= (" + ver + ")", "versiones: " + [...tags].join(",") + " / texto " + ver);
+check(sw.includes("ruta-historia-v" + ver), "la caché del service worker es la versión " + ver, "sw.js no coincide");
+const notCached = scripts.filter((s) => !sw.includes(s.split("?")[0]));
+check(!notCached.length, "el service worker guarda todos los scripts", notCached.join(", "));
+for (const f of fs.readdirSync(ROOT).filter((x) => x.endsWith(".js"))) {
+  try { new Function(fs.readFileSync(path.join(ROOT, f), "utf8")); } catch (e) { fail("sintaxis de " + f, e.message); }
+}
+ok("sintaxis de los .js");
+
+/* ---------- 2. Datos ---------- */
+console.log("\nDatos de lugares y efemérides");
+const b = await chromium.launch();
+const mk = async (opts = {}) => {
+  const ctx = await b.newContext({ viewport: { width: 400, height: 860 }, permissions: ["geolocation"], geolocation: { latitude: 43.36, longitude: -5.85 }, ...opts });
+  const page = await ctx.newPage();
+  const errs = [];
+  page.on("pageerror", (e) => errs.push("pageerror: " + e.message));
+  page.on("console", (m) => { if (m.type() === "error" && !/Failed to load resource|net::ERR|ERR_FAILED/.test(m.text())) errs.push("console: " + m.text()); });
+  await page.route((u) => !u.href.startsWith(BASE), (r) => r.abort());
+  await page.addInitScript(() => { if (!sessionStorage.__t) { sessionStorage.__t = 1; localStorage.clear(); localStorage.setItem("rch.guide", JSON.stringify({ ruta: 1, lugares: 1, prep: 1, map: 1, viaje: 1, radio: 1, ajustes: 1 })); } });
+  return { ctx, page, errs };
+};
+{
+  const { ctx, page, errs } = await mk();
+  await page.goto(BASE + "index.html");
+  await page.waitForTimeout(1200);
+  const d = await page.evaluate(() => {
+    const L = window.App.L, out = { n: L.length, bad: [], dup: [], efBad: [] }, seen = {};
+    L.forEach((p) => {
+      if (seen[p.id]) out.dup.push(p.id); seen[p.id] = 1;
+      if (!p.id || !p.n || !isFinite(p.lat) || !isFinite(p.lon) || !(p.rad > 0) || !p.h || !p.h.length || p.h.some((t) => !t || t.length < 20) || !["AST", "CAN"].includes(p.reg)) out.bad.push(p.id || p.n);
+      if (p.lat < 42.5 || p.lat > 43.8 || p.lon < -7.3 || p.lon > -3.0) out.bad.push(p.id + " (fuera de zona)");
+    });
+    (window.EFEMERIDES || []).forEach((e, i) => { if (!(e.m >= 1 && e.m <= 12) || !(e.d === null || (e.d >= 1 && e.d <= 31)) || !e.t || e.t.length < 30) out.efBad.push(i); });
+    out.ef = (window.EFEMERIDES || []).length;
+    return out;
+  });
+  check(d.n >= 40, "hay " + d.n + " lugares", "muy pocos");
+  check(!d.dup.length, "ids de lugares únicos", d.dup.join(", "));
+  check(!d.bad.length, "todos los lugares tienen nombre, posición, radio y datos válidos", d.bad.join(", "));
+  check(!d.efBad.length && d.ef > 10, "efemérides válidas (" + d.ef + ")", d.efBad.join(", "));
+  /* Nombres repetidos a menos de 800 m: se contarían dos veces. */
+  const twins = await page.evaluate(() => {
+    const L = window.App.L, C = window.App.C, out = [];
+    for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) if (C.dist(L[i].lat, L[i].lon, L[j].lat, L[j].lon) < 0.8) out.push(L[i].id + "/" + L[j].id);
+    return out;
+  });
+  check(!twins.length, "no hay lugares duplicados a menos de 800 m", twins.join(", "));
+
+  /* ---------- 3. Pantallas y guía ---------- */
+  console.log("\nPantallas y guía");
+  for (const t of ["lugares", "viaje", "radio", "ajustes", "ruta"]) { await page.click("#t-" + t); await page.waitForTimeout(150); }
+  ok("se abren todas las pestañas");
+  await page.evaluate(() => window.App.Guide.reset());
+  await page.click("#t-ajustes"); await page.click("#btnGuide"); await page.waitForTimeout(700);
+  let steps = 0;
+  for (let i = 0; i < 20; i++) {
+    const open = await page.$eval("#guide", (e) => !e.hidden).catch(() => false);
+    if (!open) break;
+    const r = await page.evaluate(() => { const h = document.querySelector(".g-hole").getBoundingClientRect(); return h.width > 4 && h.height > 4; });
+    if (!r) fail("guía: paso " + i, "el foco no tiene tamaño");
+    steps++; await page.click(".g-next"); await page.waitForTimeout(120);
+  }
+  check(steps >= 5, "la guía recorre " + steps + " pasos", "solo " + steps);
+
+  /* ---------- 4. Radio ---------- */
+  console.log("\nRadio");
+  const radio = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("rch.radio") || "{}").favs || []; return f.map((x) => x.n); });
+  check(radio.length === 0 || radio.length >= 5, "emisoras guardadas de partida", radio.join(","));
+  const rs = fs.readFileSync(path.join(ROOT, "radio.js"), "utf8");
+  const nDirect = (rs.match(/direct: \[/g) || []).length;
+  check(nDirect >= 5, "cada emisora de partida tiene enlaces oficiales (" + nDirect + ")", "faltan");
+  check(!/http:\/\/[^"']+\.(mp3|aac|m3u8)/.test(rs.split("var SERVERS")[0]), "los enlaces oficiales son https");
+  check(!errs.length, "sin errores de JavaScript en las pantallas", errs.slice(0, 3).join(" | "));
+  await ctx.close();
+}
+
+/* ---------- 5. Viaje simulado sin repeticiones ---------- */
+console.log("\nViaje simulado");
+async function trip(page, ctx, route) {
+  await page.evaluate(() => { window.__f = []; window.App.start("new"); });
+  for (const [lat, lon] of route) { await ctx.setGeolocation({ latitude: lat, longitude: lon, accuracy: 8 }); await page.waitForTimeout(90); }
+  await page.evaluate(() => window.App.stop());
+  return page.evaluate(() => window.__f);
+}
+{
+  const { ctx, page, errs } = await mk();
+  /* Un lugar de Wikipedia con el mismo nombre y casi la misma posición que otro de la app, en el recorrido. */
+  await page.addInitScript(() => { if (!localStorage.getItem("rch.live")) localStorage.setItem("rch.live", JSON.stringify([{ id: "wp777", n: "Lugones", h: ["Dato wiki de Lugones, de prueba, distinto."], lat: 43.4125, lon: -5.8, src: "wikipedia", reg: "AST", rad: 1.5 }])); });
+  await page.goto(BASE + "index.html"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.App.on("fact", (e) => window.__f.push({ id: e.p.id, text: e.text })));
+  const route = []; for (let i = 0; i <= 40; i++) route.push([43.30 + i * 0.004, -5.84 + i * 0.001]); for (let i = 40; i >= 0; i--) route.push([43.30 + i * 0.004, -5.84 + i * 0.001]);
+  const f1 = await trip(page, ctx, route);
+  check(f1.length > 0, "el viaje cuenta datos (" + f1.length + ")", "no contó nada");
+  const dupTxt = f1.map((x) => x.text).filter((t, i, a) => a.indexOf(t) !== i);
+  check(!dupTxt.length, "ningún dato se repite dentro del viaje", dupTxt[0]);
+  const lug = f1.filter((x) => /lugones|wp777/i.test(x.id));
+  check(lug.length <= 1, "un mismo sitio de dos fuentes se cuenta una sola vez (" + lug.length + ")", "contó " + lug.length);
+  const f2 = await trip(page, ctx, route);
+  const rep = f2.filter((x) => f1.some((y) => y.text === x.text));
+  check(!rep.length, "el segundo viaje no repite datos del primero", rep.length + " repetidos: " + (rep[0] && rep[0].text.slice(0, 40)));
+  check(!errs.length, "sin errores de JavaScript durante el viaje", errs.slice(0, 3).join(" | "));
+  await ctx.close();
+}
+
+await b.close(); server.close();
+console.log("\n" + oks.length + " comprobaciones correctas, " + fails.length + " fallos");
+if (fails.length) {
+  fails.forEach((f) => console.log("::error::" + f));
+  if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, "## Fallos en las pruebas\n\n" + fails.map((f) => "- " + f).join("\n") + "\n");
+  process.exit(1);
+}

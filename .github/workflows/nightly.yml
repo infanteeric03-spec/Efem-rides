@@ -15,7 +15,12 @@ permissions:
   actions: write
 
 jobs:
+  # Si las pruebas fallan, no se compila ningún APK y GitHub te avisa por correo del fallo.
+  test:
+    uses: ./.github/workflows/test.yml
+
   check:
+    needs: test
     runs-on: ubuntu-24.04
     steps:
       # GitHub suele lanzar las tareas programadas con retraso (a veces más de 2 horas),
