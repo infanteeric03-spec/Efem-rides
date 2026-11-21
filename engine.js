@@ -317,6 +317,23 @@
 
   /* ---------- Empezar y parar ---------- */
   /* mode: "continue" sigue el viaje guardado; cualquier otro valor empieza uno nuevo. */
+  /* Saludo al empezar el viaje: cambia cada vez y no repite el de la última vez. */
+  var GREET = [
+    "Viaje iniciado. Buen viaje.",
+    "Viaje iniciado. Disfruta del camino.",
+    "Empezamos. Te iré contando la historia de los lugares por los que pases.",
+    "En marcha. Que sea un buen viaje.",
+    "Arrancamos. Atento al paisaje, que tiene mucho que contar.",
+    "Viaje iniciado. Conduce con calma, de la historia me encargo yo.",
+    "En ruta. Cada pueblo tiene su historia y te la iré contando.",
+    "Empezamos el viaje. Disfruta de la carretera."
+  ];
+  function greeting() {
+    var last = load("rch.greet", -1), i;
+    do { i = Math.floor(Math.random() * GREET.length); } while (i === last && GREET.length > 1);
+    save("rch.greet", i);
+    return GREET[i];
+  }
   function begin(sim, mode) {
     run.sim = !!sim;
     if (sim) run.simTrip = newTrip();
@@ -327,7 +344,7 @@
     wakeOn();
     /* Se calla lo anterior y el saludo entra el primero en la cola: saludo, efeméride del día y luego los datos. */
     if (NS) NS.stop(); else if (synth) synth.cancel();
-    speak(sim ? "Empieza la ruta de prueba." : "Viaje iniciado. Buenas carreteras.", false);
+    speak(sim ? "Empieza la ruta de prueba." : greeting(), false);
     if (S.today) todayMsg(App.trip());
     emit("trip"); emit("status", App.status);
   }
