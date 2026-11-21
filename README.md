@@ -49,6 +49,7 @@ En la pestaña **Lugares**:
 - Abre un lugar y pulsa **Editar** para corregir sus datos, borrarlos, cambiarlos de orden (↑ ↓) o añadir otros. **Ocultar este lugar** hace que no se cuente en los viajes, y **Restaurar el original** deshace tus cambios.
 - **+ Nuevo lugar** crea uno tuyo: nombre, provincia, posición (tu ubicación actual o tocando en el mapa), tamaño de la zona y sus datos.
 - **Bluetooth del coche** (solo app Android): en Ajustes → Coche eliges tu coche entre los dispositivos emparejados; el viaje empieza al conectarse y se para 20 s después de desconectarse.
+- **Android Auto** (solo app Android): la app aparece en la pantalla del coche como app de medios con el lugar y el dato actuales y los botones Otro dato, Repetir y Silencio. Una app instalada fuera de Google Play exige activar «Fuentes desconocidas» en los ajustes de desarrollador de Android Auto (tocar diez veces en la versión de Android Auto).
 - **Resumen del viaje**: al parar un viaje aparece un resumen (km, tiempo, lugares y datos escuchados) que se puede compartir como texto.
 - **Este dato está mal**: botón bajo el dato en pantalla; lo anota y sale en «Exportar cambios» para revisarlo.
 - **Exportar cambios** guarda tus cambios en un archivo (en la app Android, se copian al portapapeles para pegarlos en una nota o un mensaje) e **Importar cambios** los recupera en este u otro móvil.

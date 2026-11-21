@@ -12,6 +12,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(SpeechDuckPlugin.class);
         registerPlugin(CarBluetoothPlugin.class);
+        registerPlugin(CarAutoPlugin.class);
         super.onCreate(savedInstanceState);
         /* Android 13+: permiso para la notificación que mantiene el GPS con la pantalla apagada. */
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {

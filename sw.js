@@ -1,8 +1,8 @@
 /* Service worker: guarda la app para que abra sin cobertura. */
-var CACHE = "ruta-historia-v48";
+var CACHE = "ruta-historia-v49";
 var ARCHIVOS = [
-  "./", "./index.html", "./style.css?v=48", "./engine.js?v=48", "./ui.js?v=48", "./drive.js?v=48", "./radio.js?v=48", "./explore.js?v=48", "./home.js?v=48", "./update.js?v=48", "./edits.js?v=48", "./summary.js?v=48", "./bt.js?v=48", "./routemap.js?v=48", "./guide.js?v=48", "./vendor/caveat/caveat-latin-700-normal.woff2", "./vendor/leaflet/leaflet.js", "./vendor/leaflet/leaflet.css", "./core.js?v=48",
-  "./data-asturias.js?v=48", "./data-cantabria.js?v=48", "./data-dias.js?v=48",
+  "./", "./index.html", "./style.css?v=49", "./engine.js?v=49", "./ui.js?v=49", "./drive.js?v=49", "./radio.js?v=49", "./explore.js?v=49", "./home.js?v=49", "./update.js?v=49", "./edits.js?v=49", "./summary.js?v=49", "./bt.js?v=49", "./auto.js?v=49", "./routemap.js?v=49", "./guide.js?v=49", "./vendor/caveat/caveat-latin-700-normal.woff2", "./vendor/leaflet/leaflet.js", "./vendor/leaflet/leaflet.css", "./core.js?v=49",
+  "./data-asturias.js?v=49", "./data-cantabria.js?v=49", "./data-dias.js?v=49",
   "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"
 ];
 
