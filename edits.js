@@ -12,6 +12,7 @@
   var ED = load("rch.edits", null) || {};
   if (!ED.places) ED.places = {};
   if (!ED.custom) ED.custom = [];
+  if (!ED.flags) ED.flags = [];
   function persist() { if (!save("rch.edits", ED)) toast("No he podido guardar los cambios en este móvil."); }
   /* Lugares tuyos que ya se han incorporado al proyecto: si hay uno de la app con el mismo nombre a menos de 3 km,
      se quita de tus cambios para que no salga repetido. */
@@ -179,7 +180,7 @@
   /* ---------- Exportar e importar ---------- */
   function exportData() {
     var data = JSON.stringify({ app: "ruta-con-historia", tipo: "cambios-de-lugares", version: 1, fecha: new Date().toISOString(), cambios: ED }, null, 2);
-    var n = Object.keys(ED.places).length + ED.custom.length;
+    var n = Object.keys(ED.places).length + ED.custom.length + ED.flags.length;
     if (!n) { toast("Todavía no has hecho cambios que exportar."); return; }
     if (A.native) {
       /* En la app Android se copian al portapapeles: se pueden pegar en una nota, un correo o WhatsApp. */
@@ -206,8 +207,8 @@
     var d;
     try { d = JSON.parse(txt); } catch (e) { toast("Ese archivo no es un archivo de cambios válido."); return; }
     var c = d && (d.cambios || d.edits);
-    if (!c || typeof c !== "object" || (!c.places && !c.custom)) { toast("Ese archivo no tiene cambios de lugares."); return; }
-    ED = { places: c.places || {}, custom: (c.custom || []).filter(function (x) { return x && x.id && x.n && isFinite(x.lat) && isFinite(x.lon) && Array.isArray(x.h); }) };
+    if (!c || typeof c !== "object" || (!c.places && !c.custom && !c.flags)) { toast("Ese archivo no tiene cambios de lugares."); return; }
+    ED = { places: c.places || {}, custom: (c.custom || []).filter(function (x) { return x && x.id && x.n && isFinite(x.lat) && isFinite(x.lon) && Array.isArray(x.h); }), flags: Array.isArray(c.flags) ? c.flags.filter(function (x) { return x && x.id && x.text; }) : [] };
     changed();
     toast("Cambios importados: " + (Object.keys(ED.places).length + ED.custom.length) + " lugares.");
   }
@@ -235,7 +236,15 @@
   $("btnExport").addEventListener("click", exportData);
   $("btnImport").addEventListener("click", importDialog);
 
-  A.Edits = { open: open, apply: apply, data: function () { return ED; } };
+  /* Marca un dato como incorrecto: queda guardado y sale en "Exportar cambios" para revisarlo. */
+  function flag(id, name, text) {
+    if (!text) return false;
+    if (ED.flags.some(function (f) { return f.id === id && f.text === text; })) return false;
+    ED.flags.push({ id: id, n: name, text: text, t: new Date().toISOString() });
+    persist(); return true;
+  }
+
+  A.Edits = { flag: flag, open: open, apply: apply, data: function () { return ED; } };
   apply();
   A.renderPlaces && A.renderPlaces();
 })();

@@ -131,6 +131,14 @@ async function trip(page, ctx, route) {
   check(!dupTxt.length, "ningún dato se repite dentro del viaje", dupTxt[0]);
   const lug = f1.filter((x) => /lugones|wp777/i.test(x.id));
   check(lug.length <= 1, "un mismo sitio de dos fuentes se cuenta una sola vez (" + lug.length + ")", "contó " + lug.length);
+  /* El viaje simulado va a mucha velocidad: se espacian las horas de los puntos para que sean realistas. */
+  await page.evaluate(() => { const T = window.App.trip(); T.pts.forEach((q, i) => (q[2] = T.start + i * 60000)); T.last = Date.now(); window.App.emit("stopped"); });
+  await page.waitForTimeout(700);
+  const sum = await page.evaluate(() => { const m = [...document.querySelectorAll(".modal")].find((x) => !x.hidden && /Resumen del viaje/.test(x.textContent)); return m ? m.textContent : null; });
+  check(!!sum && /km/.test(sum), "al parar el viaje sale el resumen", "no apareció");
+  await page.evaluate(() => { document.querySelectorAll(".modal").forEach((m) => (m.hidden = true)); document.body.classList.remove("modal-open"); });
+  const fl = await page.evaluate(() => { window.App.run.lastFact = window.App.run.lastFact || { id: "oviedo", text: "Dato de prueba" }; document.getElementById("btnWrong").disabled = false; document.getElementById("btnWrong").click(); return JSON.parse(localStorage.getItem("rch.edits") || "{}").flags || []; });
+  check(fl.length === 1, "«Este dato está mal» anota el dato", "flags: " + fl.length);
   const f2 = await trip(page, ctx, route);
   const rep = f2.filter((x) => f1.some((y) => y.text === x.text));
   check(!rep.length, "el segundo viaje no repite datos del primero", rep.length + " repetidos: " + (rep[0] && rep[0].text.slice(0, 40)));

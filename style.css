@@ -652,3 +652,9 @@ input[type="date"].search::-webkit-date-and-time-value { text-align: left; margi
 input[type="date"].search::-webkit-calendar-picker-indicator { filter: invert(.8); }
 :root[data-theme="light"] input[type="date"].search::-webkit-calendar-picker-indicator { filter: none; }
 .prep-fields > input { min-width: 0; }
+
+.btn.wrong { margin-top: 8px; width: 100%; opacity: .85; }
+.sum-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.sum-cell { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 2px; }
+.sum-cell b { font: 700 28px/1.1 var(--font-display); }
+.sum-cell span { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
