@@ -151,9 +151,60 @@
 
   /* Añadido por el usuario desde la app (28 de octubre de 2026). */
   add("lugones", "Lugones", 43.4153, -5.7996, 2, [
-    "Lugones, en asturiano Llugones, es la localidad más poblada del concejo de Siero, con más habitantes que la propia capital, la Pola. Su nombre viene de los luggones, una antigua tribu astur de raíz céltica vinculada al dios solar Lug.",
+    "Lugones, en asturiano Llugones, es una de las localidades más pobladas del concejo de Siero, a la par de la propia capital, la Pola. Su nombre viene de los luggones, una antigua tribu astur de raíz céltica vinculada al dios solar Lug.",
     "Conserva el Puente Viejo, de origen romano y reformado después. Formaba parte de la calzada que unía Astorga con Lugo de Llanera.",
     "Está a solo 5 kilómetros de Oviedo, en el corazón del área central de Asturias. Su gran parque es La Acebera: hasta 1982 fue terreno de la Sociedad Santa Bárbara, que probaba y almacenaba allí los explosivos de sus fábricas.",
     "Tiene una intensa vida social y sidrera, con la calle peatonal como eje. Es además un nudo de comunicaciones, con autovías y estación de tren."
+  ]);
+  add("luanco", "Luanco", 43.6175, -5.7939, 2, [
+    "Luanco es la capital del concejo de Gozón y un antiguo puerto pesquero y ballenero. Su símbolo es la Torre del Reloj, y junto al puerto está el Palacio de Menéndez Pola.",
+    "Tiene un museo marítimo y dos playas urbanas, Santa María y La Ribera. En la arena de la playa se celebra incluso un torneo de tenis playa.",
+  ]);
+  add("tazones", "Tazones", 43.5530, -5.3850, 1.5, [
+    "Tazones es un pueblo marinero de casas colgadas sobre el mar. Su conjunto histórico-artístico fue declarado el 17 de junio de 1991.",
+    "Aquí desembarcó el emperador Carlos I en 1517, cuando llegó por primera vez a España. Se conserva la Casa de las Conchas, ligada a esa historia.",
+    "Cerca hay huellas de dinosaurio y un faro de 1864.",
+  ]);
+  add("grado", "Grado", 43.3875, -6.0725, 2, [
+    "Grado, en asturiano Grau, tiene mercado desde 1256, otorgado por Alfonso X: se sigue celebrando los miércoles y los domingos.",
+    "Conserva el Puente de Peñaflor, de origen medieval, del siglo doce. En sus dulces destacan el tocinillo de cielo y el pan de escanda.",
+    "En las fiestas de Santana se celebra el desfile del agua, y el 28 de octubre la feria de San Simón.",
+  ]);
+  add("pola-siero", "La Pola Siero", 43.3897, -5.6611, 2, [
+    "La Pola Siero es la capital del concejo de Siero. Alfonso X le dio su carta puebla en 1270, aunque antes ya existía un hospital de peregrinos.",
+    "Cada martes se celebra el mercado semanal en la plaza Les Campes. Con unos doce mil ochocientos habitantes, es de los mayores núcleos del concejo.",
+  ]);
+  add("sama", "Sama de Langreo", 43.3000, -5.6900, 2, [
+    "Sama es el corazón del valle de Langreo. El ferrocarril llegó en 1856 con la locomotora Villa de Gijón, del Ferrocarril de Langreo, uno de los primeros de España.",
+    "Conserva el Parque Dorado, el Puente de los Ingleses, de 1895, y el Teatro Vital Aza. Por las fiestas de Santiago se celebra el Certamen de Entibadores Mineros.",
+  ]);
+  add("infiesto", "Infiesto", 43.3520, -5.3580, 2, [
+    "Infiesto es la capital del concejo de Piloña y un paso natural entre Asturias y León. Tiene unos dos mil trescientos habitantes.",
+    "Destacan el edificio de La Benéfica, de 1926, y el Palacio de Cobián, del siglo dieciocho. En octubre se celebra el Festival de l'Ablana, dedicado a la avellana, y el 13 de junio, San Antonio.",
+  ]);
+  add("tineo", "Tineo", 43.3358, -6.4147, 3, [
+    "Tineo es el segundo concejo más extenso de Asturias, con 540 kilómetros cuadrados y 44 parroquias. Ya aparece como Tinegio en un diploma de Alfonso Tercero del año 899.",
+    "Aquí nació el conde de Campomanes, en Sorriba, en 1723, y el general Riego, en Tuña, en 1784. Conserva el Palacio de Meras, de 1525.",
+    "El último domingo de julio se celebra la Vaqueirada, y en agosto, San Roque con el bollo preñao. Su embutido típico es el chosco.",
+  ]);
+  add("navia", "Navia", 43.5400, -6.7240, 2.5, [
+    "Navia es la capital de su concejo, con 14 kilómetros de costa. Alfonso X le otorgó la carta puebla en 1270.",
+    "En agosto celebra la Virgen de la Barca, con procesión por la ría, y el Descenso a nado de la ría. En el concejo está Puerto de Vega, donde murió Jovellanos.",
+  ]);
+  add("tapia", "Tapia de Casariego", 43.5670, -6.9450, 2, [
+    "Tapia de Casariego debe su nombre al marqués de Casariego. Su concejo se creó en 1863.",
+    "Tiene varias playas, como Penarronda, Santa Gadea, Serantes, Los Campos y Porcía.",
+  ]);
+  add("salinas", "Salinas", 43.5760, -5.9560, 2, [
+    "Salinas, en Castrillón, tiene una playa de más de dos kilómetros y medio, con un paseo marítimo de unos dos kilómetros.",
+    "Alberga el Museo de Anclas Philippe Cousteau y es cita del surf, con el Salinas Longboard Festival. El Túnel Festival se celebra en el túnel de Arnao.",
+  ]);
+  add("cabanaquinta", "Cabañaquinta", 43.1620, -5.6100, 2, [
+    "Cabañaquinta es la capital del concejo de Aller desde marzo de 1869, cuando sustituyó a Collanzo.",
+    "Su iglesia se construyó entre 1899 y 1902, y su estación ferroviaria data de 1935.",
+  ]);
+  add("san-esteban-pravia", "San Esteban de Pravia", 43.5500, -6.1000, 2, [
+    "San Esteban de Pravia es la capital de Muros de Nalón, municipio creado el 14 de abril de 1847. Desde aquí se ve la desembocadura del Nalón.",
+    "Tiene el Mirador del Espíritu Santo y el Palacio de Valdecarzana. En septiembre de 1934 desembarcó aquí el alijo de armas del vapor Turquesa.",
   ]);
 })(typeof window !== "undefined" ? window : globalThis);

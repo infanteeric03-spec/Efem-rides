@@ -122,4 +122,40 @@
     "Carmona, un pueblo de casonas montañesas de los siglos diecisiete y dieciocho, con balcones de madera, en el valle de Cabuérniga y dentro del Parque Natural Saja-Besaya.",
     "A Carmona la llaman la flor de los albarqueros, por sus albarcas, el calzado tradicional de madera. El último sábado de septiembre celebra La Pasá, la bajada del ganado tudanco de los puertos."
   ]);
+  add("noja", "Noja", 43.4814, -3.5186, 2, [
+    "Noja es un municipio costero de la comarca de Trasmiera, famoso por sus playas de Trengandín y de Ris.",
+  ]);
+  add("suances", "Suances", 43.4330, -4.0500, 2, [
+    "Suances se asienta en la ría de San Martín de la Arena. Sus playas son La Tablía, Los Locos, La Concha, La Ribera y La Riberuca, y Los Locos es muy popular entre los surfistas.",
+    "Cerca está la cueva de Las Brujas, con pinturas de manos del Paleolítico, y en Hinojedo la Mota de Tres Palacios.",
+  ]);
+  add("cabezon-sal", "Cabezón de la Sal", 43.3040, -4.2270, 2.5, [
+    "Cabezón de la Sal, a 44 kilómetros de Santander, se levanta sobre un diapiro de sal. En 1544 se resolvió aquí el Pleito de los Nueve Valles.",
+    "Tuvo luz eléctrica en 1898, la segunda de Cantabria. Cada año celebra el Día de la Montaña, desde 1967, Fiesta de Interés Turístico Regional desde 1972.",
+  ]);
+  add("barcena-mayor", "Bárcena Mayor", 43.1550, -4.2720, 1.5, [
+    "Bárcena Mayor es el único pueblo habitado dentro de la Reserva del Saja. Fue declarado conjunto histórico-artístico el 7 de diciembre de 1979.",
+    "Sus casas de piedra tienen balcones de madera, y solo pueden entrar en coche los vecinos. Es tierra del cocido montañés.",
+  ]);
+  add("santo-toribio", "Santo Toribio de Liébana", 43.1480, -4.6560, 2, [
+    "En el monasterio de Santo Toribio de Liébana se guarda el Lignum Crucis, el mayor fragmento conocido de la cruz de Cristo, en una capilla barroca proyectada en 1705.",
+    "Aquí se escribió en el siglo ocho el Comentario al Apocalipsis, del Beato de Liébana. Por una bula de Julio Segundo, del 23 de septiembre de 1512, hay año jubilar cuando el 16 de abril cae en domingo: el próximo, 2028.",
+    "El Camino de Liébana es Patrimonio de la Humanidad de la Unesco desde 2015.",
+  ]);
+  add("colindres", "Colindres", 43.3950, -3.4500, 2, [
+    "Colindres, a 43 kilómetros de Santander, aparece ya en un documento del año 805. Sus astilleros de Falgote se hicieron Reales en 1618.",
+    "El Puente de Treto, de 172 metros, se construyó entre 1897 y 1905 según proyecto de Eduardo Miera. Es el tercer puerto pesquero de Cantabria.",
+  ]);
+  add("polanco", "Polanco", 43.3830, -4.0200, 2, [
+    "Polanco es el pueblo natal de José María de Pereda, nacido en 1833. Su casa natal, de 1766, está en La Cochera.",
+    "En 1872 Pereda construyó otra casa en Trascolina, donde recibió a Benito Pérez Galdós.",
+  ]);
+  add("corrales-buelna", "Los Corrales de Buelna", 43.2600, -4.0700, 2.5, [
+    "Los Corrales de Buelna tiene el Parque de las Estelas, con dos estelas cántabras declaradas Bien de Interés Cultural, y el Santuario de Las Caldas.",
+    "El último fin de semana de agosto celebra las Guerras Cántabras, fiesta de Interés Turístico Nacional desde 2008 e Internacional desde 2019.",
+  ]);
+  add("cobreces", "Cóbreces", 43.3900, -4.2000, 2, [
+    "En Cóbreces está la abadía cisterciense de Viaceli, de monjes trapenses, construida entre 1906 y 1910 en estilo neogótico y con hormigón armado, algo pionero en España.",
+    "Los monjes elaboran un queso muy conocido. Cerca está la playa de Luaña, que da nombre al festival Luaña Rock, a finales de agosto.",
+  ]);
 })(typeof window !== "undefined" ? window : globalThis);
