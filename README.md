@@ -30,7 +30,7 @@ En Ajustes, bajo **Probar sin salir de casa**, hay cuatro rutas simuladas (por e
 
 ## Qué hace
 
-- **Memoria entre viajes**: la app recuerda qué datos de cada lugar te ha contado y en el siguiente viaje sigue por el siguiente; al acabarlos vuelve a empezar. En **Ajustes, Durante el viaje, Datos ya contados** puedes empezar de cero.
+- **Memoria entre viajes**: la app recuerda qué datos de cada lugar te ha contado y en el siguiente viaje sigue por el siguiente. Cuando ha contado todos los de un lugar, no los repite por su cuenta hasta pasados 30 días (con Otro dato sí). Si un mismo sitio aparece dos veces (lugar de la app y de Wikipedia, o en dos rutas), solo se cuenta una vez por viaje. En **Ajustes, Durante el viaje, Datos ya contados** puedes empezar de cero.
 - **Tu localidad**: en Ajustes puedes indicar dónde vives (o usar tu ubicación actual). Al salir o llegar a casa no te cuenta nada de ella, o solo un dato por semana si lo prefieres. Tampoco te avisa de que "se acerca" tu localidad.
 - En la pantalla de inicio, la señal muestra la **provincia y la localidad** donde está el móvil (por GPS y OpenStreetMap; sin conexión, el lugar conocido más cercano). La tarjeta de efemérides muestra varias de esa provincia, con **Anterior** y **Siguiente** o deslizando el dedo: primero las de hoy en Wikipedia que mencionan la provincia o la localidad, después las propias de Asturias y Cantabria más cercanas en el calendario y, si hacen falta, las de hoy en España.
 - Al abrir la app con un viaje sin terminar (de menos de 12 horas), elige **Continuar** para seguirlo o **Nuevo viaje** para empezar de cero. Mientras no hay viaje en marcha, los contadores de la pestaña Ruta están a cero; el viaje guardado se ve en la pestaña Viaje.

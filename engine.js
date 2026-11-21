@@ -39,10 +39,35 @@
   }
   /* En un mismo viaje no se repite ningún dato por su cuenta: si un lugar tiene un solo dato, se cuenta una vez.
      (Otro dato sí puede volver a empezar, porque lo pide la persona.) */
-  function untold(p, T) { return (T.told[p.id] || 0) < (p.h ? p.h.length : 0); }
+  function untold(p, T) {
+    if ((T.told[p.id] || 0) >= (p.h ? p.h.length : 0)) return false;
+    if (run.sim) return true;
+    return !twinTold(p, T) && !recentRepeat(p);
+  }
+  /* El mismo sitio puede venir de dos fuentes (lugar de la app y Wikipedia, o de dos rutas): si ya se habló
+     de un lugar con el mismo nombre o a menos de 800 m en este viaje, no se cuenta otra vez. */
+  function nm(t) { return String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s*\(.*?\)\s*/g, " ").trim(); }
+  function twinTold(p, T) {
+    var n = nm(p.n);
+    for (var id in T.told) {
+      if (id === p.id || !T.told[id]) continue;
+      var q = App.byId[id];
+      if (q && (nm(q.n) === n || C.dist(p.lat, p.lon, q.lat, q.lon) < 0.8)) return true;
+    }
+    return false;
+  }
+  /* Entre viajes: cuando ya se han contado todos los datos de un lugar, no se vuelven a contar solos
+     hasta pasados 30 días desde la última vez (con Otro dato sí, porque lo pides tú). */
+  var REPEAT_DAYS = 30;
+  var toldAt = load("rch.toldAt", null);
+  if (!toldAt) { toldAt = {}; var now0 = Date.now(); for (var k in told) toldAt[k] = now0; save("rch.toldAt", toldAt); }
+  function recentRepeat(p) {
+    var n = p.h ? p.h.length : 0;
+    return n > 0 && (told[p.id] || 0) >= n && Date.now() - (toldAt[p.id] || 0) < REPEAT_DAYS * 86400000;
+  }
   App.placeOn = function (p) { return !p.hidden && !(App.routeSkip && App.routeSkip(p.id)); };
   App.isHome = function (p) { return !!S.homeId && p && p.id === S.homeId; };
-  App.resetTold = function () { told = {}; save("rch.told", told); };
+  App.resetTold = function () { told = {}; save("rch.told", told); toldAt = {}; save("rch.toldAt", toldAt); };
 
   /* ---------- Viaje ---------- */
   function newTrip() { return { id: Date.now(), start: Date.now(), last: Date.now(), pts: [], log: [], told: {}, visited: {}, dayMsg: "" }; }
@@ -169,7 +194,7 @@
       f = C.pickFact(p, mem[p.id] || 0);
       mem[p.id] = (mem[p.id] || 0) + 1;
       T.told[p.id] = (T.told[p.id] || 0) + 1; v.n++;
-      if (!run.sim) save("rch.told", told);
+      if (!run.sim) { save("rch.told", told); toldAt[p.id] = Date.now(); save("rch.toldAt", toldAt); }
     }
     v.t = Date.now();
     var text = f.text;
