@@ -8,7 +8,7 @@
   var cur = { title: "Ruta con Historia", text: "Empieza el viaje en el móvil" };
   /* La sesión de medios solo se activa mientras suena la radio de la app: así los datos hablados no se llevan el control de medios del coche. */
   var radioPlaying = false;
-  function push() { P.update({ title: cur.title, text: cur.text, active: radioPlaying, trip: !!(run.on && !run.sim) }).catch(function () { }); }
+  function push() { P.update({ title: cur.title, text: cur.text, active: radioPlaying, trip: !!(run.on && !run.sim), muted: !!run.mute }).catch(function () { }); }
   /* En la pantalla del coche: el nombre del sitio y, en lugar de la descripción, el próximo lugar. */
   function nextText() {
     if (!run.on) return null;
@@ -21,6 +21,7 @@
     lastText = t; lastAt = Date.now(); cur.text = t; push();
   });
   A.on("trip", push);
+  A.on("mute", push);
   A.on("stopped", function () { cur = { title: "Ruta con Historia", text: "Viaje parado" }; push(); });
   /* Emisoras favoritas en la lista de la pantalla del coche. */
   var lastNames = "";
@@ -43,6 +44,9 @@
       if (run.on && !run.sim) A.stop(); else if (!run.on) A.start(A.savedTrip() ? "continue" : "new");
       return;
     }
+    /* Play y pausa del coche: la radio de la app. */
+    if (a.name === "play") { if (!A.radio.state().want) A.radio.toggle(); return; }
+    if (a.name === "pause") { if (A.radio.state().want) A.radio.stop(); return; }
     if (!run.on) return;
     if (a.name === "more") A.more();
     else if (a.name === "repeat") A.repeat();

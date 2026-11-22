@@ -35,6 +35,8 @@ const ver = (html.match(/Versión (\d+)\./) || [])[1];
 const tags = new Set([...html.matchAll(/\?v=(\d+)/g)].map((m) => m[1]));
 check(tags.size === 1 && tags.has(ver), "la versión del texto coincide con los ?v= (" + ver + ")", "versiones: " + [...tags].join(",") + " / texto " + ver);
 check(sw.includes("ruta-historia-v" + ver), "la caché del service worker es la versión " + ver, "sw.js no coincide");
+const nov = fs.readFileSync(path.join(ROOT, "novedades.js"), "utf8");
+check(new RegExp("v: " + ver + ",").test(nov), "hay novedades escritas para la versión " + ver, "añade una entrada en novedades.js");
 const notCached = scripts.filter((s) => !sw.includes(s.split("?")[0]));
 check(!notCached.length, "el service worker guarda todos los scripts", notCached.join(", "));
 for (const f of ["costa", "montanas", "mapa", "camino", "arcos"]) check(fs.existsSync(path.join(ROOT, "fondos", f + ".png")) && sw.includes("fondos/" + f + ".png"), "fondo de Android Auto " + f + " existe y está en la caché", "falta");
@@ -53,7 +55,7 @@ const mk = async (opts = {}) => {
   page.on("pageerror", (e) => errs.push("pageerror: " + e.message));
   page.on("console", (m) => { if (m.type() === "error" && !/Failed to load resource|net::ERR|ERR_FAILED/.test(m.text())) errs.push("console: " + m.text()); });
   await page.route((u) => !u.href.startsWith(BASE), (r) => r.abort());
-  await page.addInitScript(() => { if (!sessionStorage.__t) { sessionStorage.__t = 1; localStorage.clear(); localStorage.setItem("rch.guide", JSON.stringify({ ruta: 1, lugares: 1, prep: 1, map: 1, viaje: 1, radio: 1, ajustes: 1 })); } });
+  await page.addInitScript(() => { if (!sessionStorage.__t) { sessionStorage.__t = 1; localStorage.clear(); localStorage.setItem("rch.novSeen", "9999"); localStorage.setItem("rch.guide", JSON.stringify({ ruta: 1, lugares: 1, prep: 1, map: 1, viaje: 1, radio: 1, ajustes: 1 })); } });
   return { ctx, page, errs };
 };
 {
@@ -144,6 +146,20 @@ async function trip(page, ctx, route) {
   const rep = f2.filter((x) => f1.some((y) => y.text === x.text));
   check(!rep.length, "el segundo viaje no repite datos del primero", rep.length + " repetidos: " + (rep[0] && rep[0].text.slice(0, 40)));
   check(!errs.length, "sin errores de JavaScript durante el viaje", errs.slice(0, 3).join(" | "));
+  await ctx.close();
+}
+
+/* ---------- Novedades al actualizar ---------- */
+console.log("\nNovedades");
+{
+  const { ctx, page } = await mk();
+  await page.addInitScript(() => { if (!sessionStorage.__n) { sessionStorage.__n = 1; localStorage.removeItem("rch.novSeen"); } });
+  await page.goto(BASE + "index.html"); await page.waitForTimeout(4800);
+  const shown = await page.evaluate(() => [...document.querySelectorAll(".modal")].some((m) => !m.hidden && /Novedades/.test(m.textContent) && m.querySelectorAll("li").length > 0));
+  check(shown, "tras actualizar sale la lista de novedades", "no salió");
+  await page.evaluate(() => [...document.querySelectorAll(".modal:not([hidden]) .btn")].pop().click());
+  const saved = await page.evaluate(() => localStorage.getItem("rch.novSeen"));
+  check(saved && +saved >= 62, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
   await ctx.close();
 }
 

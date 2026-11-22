@@ -664,3 +664,8 @@ input[type="date"].search::-webkit-calendar-picker-indicator { filter: invert(.8
 .bgs button img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
 .bgs button span { padding: 6px 4px; text-align: center; }
 .bgs button[aria-checked="true"] { border-color: var(--accent, #e8b93c); }
+
+.sheet h3 { margin: 14px 0 4px; font: 700 15px/1.2 var(--font-body); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+ul.nov { margin: 0 0 6px; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+ul.nov li { line-height: 1.4; }
+.sheet > .btn { margin-top: 16px; width: 100%; }
