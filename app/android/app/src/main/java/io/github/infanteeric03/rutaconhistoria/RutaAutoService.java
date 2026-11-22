@@ -28,6 +28,7 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
     static String title = "Ruta con Historia";
     static String text = "Empieza el viaje en el móvil";
     static boolean active = false;
+    static boolean tripOn = false;
     static Bitmap background = null;
     static List<String> stations = new ArrayList<>();
 
@@ -80,6 +81,7 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         PlaybackStateCompat state = new PlaybackStateCompat.Builder()
                 .setActions(actions)
                 .setState(active ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED, 0, 1f)
+                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("trip", tripOn ? "Parar ruta" : "Iniciar ruta", tripOn ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play).build())
                 .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("repeat", "Repetir", android.R.drawable.ic_menu_rotate).build())
                 .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("mute", "Silencio", android.R.drawable.ic_lock_silent_mode).build())
                 .build();
@@ -97,6 +99,12 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
         List<MediaBrowserCompat.MediaItem> items = new ArrayList<>();
         if ("ruta_root".equals(parentId)) {
+            MediaDescriptionCompat t = new MediaDescriptionCompat.Builder()
+                    .setMediaId("trip")
+                    .setTitle(tripOn ? "Parar ruta" : "Iniciar ruta")
+                    .setSubtitle("Viaje")
+                    .build();
+            items.add(new MediaBrowserCompat.MediaItem(t, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
             for (int i = 0; i < stations.size(); i++) {
                 MediaDescriptionCompat d = new MediaDescriptionCompat.Builder()
                         .setMediaId("radio:" + i)

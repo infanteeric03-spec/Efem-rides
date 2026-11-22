@@ -36,9 +36,11 @@ public class CarAutoPlugin extends Plugin {
         RutaAutoService.title = call.getString("title", "Ruta con Historia");
         RutaAutoService.text = call.getString("text", "");
         RutaAutoService.active = Boolean.TRUE.equals(call.getBoolean("active", false));
+        final boolean tripChanged = RutaAutoService.tripOn != Boolean.TRUE.equals(call.getBoolean("trip", false));
+        RutaAutoService.tripOn = Boolean.TRUE.equals(call.getBoolean("trip", false));
         new Handler(Looper.getMainLooper()).post(() -> {
             RutaAutoService s = RutaAutoService.instance;
-            if (s != null) s.apply();
+            if (s != null) { s.apply(); if (tripChanged) s.notifyChildrenChanged("ruta_root"); }
         });
         call.resolve();
     }
