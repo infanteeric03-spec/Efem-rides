@@ -414,7 +414,8 @@
     if (lastQ && C.dist(lastQ[0], lastQ[1], e.lat, e.lon) < 4) return;
     lastQ = [e.lat, e.lon];
     var pos = [e.lat, e.lon], ahead = offset(e.lat, e.lon, run.heading, 7), far = offset(e.lat, e.lon, run.heading, 14);
-    var known = L.filter(function (p) { return segDist(p.lat, p.lon, pos, far) < 4; }).length;
+    /* Solo cuentan los lugares de los que aún queda algo por contar: si los de delante ya se han contado (o se ha cambiado de ruta), se busca. */
+    var known = L.filter(function (p) { return A.placeOn(p) && segDist(p.lat, p.lon, pos, far) < 4 && A.isFresh(p); }).length;
     if (known >= 2) return;
     busyQ = true;
     wikiAround(ahead[0], ahead[1], 8000).then(function (pages) {

@@ -65,6 +65,8 @@
     var n = p.h ? p.h.length : 0;
     return n > 0 && (told[p.id] || 0) >= n && Date.now() - (toldAt[p.id] || 0) < REPEAT_DAYS * 86400000;
   }
+  /* Lugar del que todavía queda algo por contar en este viaje (lo usa la búsqueda sobre la marcha). */
+  App.isFresh = function (p) { var T = App.trip(); return !!T && untold(p, T) && !T.visited[p.id]; };
   App.placeOn = function (p) { return !p.hidden && !(App.routeSkip && App.routeSkip(p.id)); };
   App.isHome = function (p) { return !!S.homeId && p && p.id === S.homeId; };
   App.resetTold = function () { told = {}; save("rch.told", told); toldAt = {}; save("rch.toldAt", toldAt); };

@@ -66,7 +66,7 @@ Para viajar fuera de los lugares que trae la app (por ejemplo, Oviedo–León):
 4. Debajo del resumen aparece un **mapa de la ruta** con los lugares de los que te hablaré: marrones los de la app, amarillos los de Wikipedia y naranjas los que tienen efeméride ese día. Al tocar uno puedes escucharlo, **quitarlo de este viaje** o editarlo. El mapa necesita conexión para dibujar las calles.
 5. Para probarla antes de salir: **Ajustes, Probar sin salir de casa**, elige **Ruta preparada**.
 
-Además, con **Buscar lugares sobre la marcha** activado y cobertura, la app consulta Wikipedia unos 7 km por delante cuando no tiene lugares guardados en esa dirección.
+Además, con **Buscar lugares sobre la marcha** activado y cobertura, la app consulta Wikipedia unos 7 km por delante cuando no le quedan lugares por contar en esa dirección (cuenta solo los que aún no ha contado en el viaje, así que si cambias de ruta o ya has pasado por los de delante, busca otros nuevos).
 
 Los lugares propios de Asturias y Cantabria tienen prioridad: no se añade ningún pueblo de Wikipedia a menos de 3 km de uno de ellos. Los textos de Wikipedia se publican con licencia CC BY-SA; cada lugar enlaza a su artículo en la pestaña Lugares.
 
