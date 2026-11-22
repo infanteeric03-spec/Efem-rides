@@ -32,7 +32,7 @@
   }
   A.on("radio", function (e) {
     var was = radioPlaying; radioPlaying = !!e.playing;
-    if (was !== radioPlaying) push();
+    if (was !== radioPlaying) { push(); bgApply(radioPlaying ? "radio" : bgGet()); }
     pushStations();
     if (e.playing && e.fav && !(run.lastFact && run.on)) { cur = { title: e.fav.n, text: "Radio" }; push(); }
   });
@@ -45,6 +45,7 @@
       return;
     }
     /* Play y pausa del coche: la radio de la app. */
+    if (a.name === "radio") { A.radio.toggle(); return; }
     if (a.name === "play") { if (!A.radio.state().want) A.radio.toggle(); return; }
     if (a.name === "pause") { if (A.radio.state().want) A.radio.stop(); return; }
     /* Siguiente y anterior (pantalla y volante): emisora si suena la radio; si no, otro dato. */

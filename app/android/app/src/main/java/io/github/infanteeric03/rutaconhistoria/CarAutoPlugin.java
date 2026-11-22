@@ -38,6 +38,7 @@ public class CarAutoPlugin extends Plugin {
         RutaAutoService.active = Boolean.TRUE.equals(call.getBoolean("active", false));
         final boolean tripChanged = RutaAutoService.tripOn != Boolean.TRUE.equals(call.getBoolean("trip", false));
         RutaAutoService.tripOn = Boolean.TRUE.equals(call.getBoolean("trip", false));
+        RutaAutoService.radioOn = Boolean.TRUE.equals(call.getBoolean("active", false));
         RutaAutoService.muted = Boolean.TRUE.equals(call.getBoolean("muted", false));
         new Handler(Looper.getMainLooper()).post(() -> {
             RutaAutoService s = RutaAutoService.instance;

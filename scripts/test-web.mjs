@@ -39,7 +39,7 @@ const nov = fs.readFileSync(path.join(ROOT, "novedades.js"), "utf8");
 check(new RegExp("v: " + ver + ",").test(nov), "hay novedades escritas para la versión " + ver, "añade una entrada en novedades.js");
 const notCached = scripts.filter((s) => !sw.includes(s.split("?")[0]));
 check(!notCached.length, "el service worker guarda todos los scripts", notCached.join(", "));
-for (const f of ["costa", "montanas", "mapa", "camino", "arcos"]) check(fs.existsSync(path.join(ROOT, "fondos", f + ".png")) && sw.includes("fondos/" + f + ".png"), "fondo de Android Auto " + f + " existe y está en la caché", "falta");
+for (const f of ["costa", "montanas", "mapa", "camino", "arcos", "radio"]) check(fs.existsSync(path.join(ROOT, "fondos", f + ".png")) && sw.includes("fondos/" + f + ".png"), "fondo de Android Auto " + f + " existe y está en la caché", "falta");
 for (const f of fs.readdirSync(ROOT).filter((x) => x.endsWith(".js"))) {
   try { new Function(fs.readFileSync(path.join(ROOT, f), "utf8")); } catch (e) { fail("sintaxis de " + f, e.message); }
 }
@@ -159,7 +159,7 @@ console.log("\nNovedades");
   check(shown, "tras actualizar sale la lista de novedades", "no salió");
   await page.evaluate(() => [...document.querySelectorAll(".modal:not([hidden]) .btn")].pop().click());
   const saved = await page.evaluate(() => localStorage.getItem("rch.novSeen"));
-  check(saved && +saved >= 63, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
+  check(saved && +saved >= 64, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
   await ctx.close();
 }
 

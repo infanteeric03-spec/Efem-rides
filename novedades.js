@@ -1,5 +1,9 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 64, items: [
+    "Android Auto: los botones propios y la lista usan siluetas (radio, bandera, altavoz, flecha circular, globo de texto).",
+    "Nuevo botón Radio para encender y apagar la radio desde el coche, y la silueta de la radio como portada mientras suena."
+  ] },
   { v: 63, items: [
     "Android Auto: siguiente y anterior (en pantalla y en los botones del volante) cambian de emisora mientras suena la radio de la app. Con «Otro dato» como botón propio."
   ] },

@@ -1,6 +1,9 @@
 package io.github.infanteeric03.rutaconhistoria;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import androidx.core.content.ContextCompat;
 import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
@@ -30,6 +33,7 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
     static boolean active = false;
     static boolean tripOn = false;
     static boolean muted = false;
+    static boolean radioOn = false;
     static Bitmap background = null;
     static List<String> stations = new ArrayList<>();
 
@@ -64,6 +68,14 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         if (l != null) l.onAction(name);
     }
 
+    /** Dibuja una silueta (vector) como imagen para la lista. */
+    private Bitmap icon(int res) {
+        Drawable d = ContextCompat.getDrawable(this, res);
+        Bitmap b = Bitmap.createBitmap(96, 96, Bitmap.Config.ARGB_8888);
+        if (d != null) { Canvas c = new Canvas(b); d.setBounds(0, 0, 96, 96); d.draw(c); }
+        return b;
+    }
+
     /** Refleja el estado actual en la sesión de medios. */
     void apply() {
         if (session == null) return;
@@ -84,10 +96,11 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         PlaybackStateCompat state = new PlaybackStateCompat.Builder()
                 .setActions(actions)
                 .setState(active ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED, 0, 1f)
-                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("trip", tripOn ? "Parar ruta" : "Iniciar ruta", tripOn ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play).build())
-                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("more", "Otro dato", android.R.drawable.ic_menu_info_details).build())
-                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("repeat", "Repetir", android.R.drawable.ic_menu_rotate).build())
-                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("mute", muted ? "Activar voz" : "Silencio", muted ? android.R.drawable.ic_lock_silent_mode_off : android.R.drawable.ic_lock_silent_mode).build())
+                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("radio", radioOn ? "Apagar radio" : "Radio", R.drawable.ic_aa_radio).build())
+                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("trip", tripOn ? "Parar ruta" : "Iniciar ruta", tripOn ? R.drawable.ic_aa_parar : R.drawable.ic_aa_iniciar).build())
+                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("more", "Otro dato", R.drawable.ic_aa_dato).build())
+                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("repeat", "Repetir", R.drawable.ic_aa_repetir).build())
+                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("mute", muted ? "Activar voz" : "Silencio", muted ? R.drawable.ic_aa_voz : R.drawable.ic_aa_silencio).build())
                 .build();
         session.setPlaybackState(state);
         session.setActive(active);
@@ -107,6 +120,7 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
                     .setMediaId("trip")
                     .setTitle(tripOn ? "Parar ruta" : "Iniciar ruta")
                     .setSubtitle("Viaje")
+                    .setIconBitmap(icon(tripOn ? R.drawable.ic_aa_parar : R.drawable.ic_aa_iniciar))
                     .build();
             items.add(new MediaBrowserCompat.MediaItem(t, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
             for (int i = 0; i < stations.size(); i++) {
@@ -114,6 +128,7 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
                         .setMediaId("radio:" + i)
                         .setTitle(stations.get(i))
                         .setSubtitle("Radio")
+                        .setIconBitmap(icon(R.drawable.ic_aa_radio))
                         .build();
                 items.add(new MediaBrowserCompat.MediaItem(d, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
             }
