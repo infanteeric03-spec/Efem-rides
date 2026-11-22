@@ -85,7 +85,7 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
                 .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("mute", "Silencio", android.R.drawable.ic_lock_silent_mode).build())
                 .build();
         session.setPlaybackState(state);
-        session.setActive(true);
+        session.setActive(active);
     }
 
     @Nullable

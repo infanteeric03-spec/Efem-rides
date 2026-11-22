@@ -6,7 +6,9 @@
   if (!(CAP && CAP.isNativePlatform && CAP.isNativePlatform())) return;
   var P = CAP.registerPlugin("CarAuto");
   var cur = { title: "Ruta con Historia", text: "Empieza el viaje en el móvil" };
-  function push() { P.update({ title: cur.title, text: cur.text, active: !!(run.on && !run.sim) }).catch(function () { }); }
+  /* La sesión de medios solo se activa mientras suena la radio de la app: así los datos hablados no se llevan el control de medios del coche. */
+  var radioPlaying = false;
+  function push() { P.update({ title: cur.title, text: cur.text, active: radioPlaying }).catch(function () { }); }
   A.on("fact", function (e) { cur = { title: e.p.n, text: e.f.text }; push(); });
   A.on("trip", push);
   A.on("stopped", function () { cur = { title: "Ruta con Historia", text: "Viaje parado" }; push(); });
@@ -18,6 +20,8 @@
     lastNames = key; P.setStations({ names: names }).catch(function () { });
   }
   A.on("radio", function (e) {
+    var was = radioPlaying; radioPlaying = !!e.playing;
+    if (was !== radioPlaying) push();
     pushStations();
     if (e.playing && e.fav && !(run.lastFact && run.on)) { cur = { title: e.fav.n, text: "Radio" }; push(); }
   });
