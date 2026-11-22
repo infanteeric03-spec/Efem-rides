@@ -5,24 +5,40 @@
   var CAP = window.Capacitor;
   if (!(CAP && CAP.isNativePlatform && CAP.isNativePlatform())) return;
   var P = CAP.registerPlugin("CarAuto");
-  var cur = { title: "Ruta con Historia", text: "Empieza el viaje en el móvil" };
   /* La sesión de medios solo se activa mientras suena la radio de la app: así los datos hablados no se llevan el control de medios del coche. */
-  var radioPlaying = false;
-  function push() { P.update({ title: cur.title, text: cur.text, active: radioPlaying, trip: !!(run.on && !run.sim), muted: !!run.mute }).catch(function () { }); }
-  /* En la pantalla del coche: el nombre del sitio y, en lugar de la descripción, el próximo lugar. */
+  var radioPlaying = false, here = null, idle = "Empieza el viaje en el móvil", tick = 0;
   function nextText() {
     if (!run.on) return null;
     return run.next ? "Próximo: " + run.next.p.n + " · " + A.C.fmtKm(run.next.d) : "Buscando el próximo lugar…";
   }
-  var lastText = "", lastAt = 0;
-  A.on("fact", function (e) { cur = { title: e.p.n, text: nextText() || cur.text }; push(); });
-  A.on("fix", function () {
-    var t = nextText(); if (!t || t === lastText || Date.now() - lastAt < 5000) return;
-    lastText = t; lastAt = Date.now(); cur.text = t; push();
-  });
-  A.on("trip", push);
-  A.on("mute", push);
-  A.on("stopped", function () { cur = { title: "Ruta con Historia", text: "Viaje parado" }; push(); });
+  function station() {
+    var s = A.radio.state().st, f = s.favs && s.favs[s.cur];
+    return f ? f.n : "Radio";
+  }
+  /* Dos líneas en la pantalla del coche.
+     Con la radio de la app sonando: arriba alterna «Ahora: sitio» y «Próximo: sitio · km» cada 30 s, y abajo va la emisora.
+     Sin radio: arriba el sitio y abajo el próximo lugar. */
+  function compose() {
+    var next = nextText();
+    if (radioPlaying) {
+      var lines = []; if (here) lines.push("Ahora: " + here); if (next) lines.push(next);
+      return { title: lines.length ? lines[tick % lines.length] : "Ruta con Historia", text: station() };
+    }
+    return { title: here || "Ruta con Historia", text: next || idle };
+  }
+  var sent = "";
+  function push(force) {
+    var c = compose(), key = [c.title, c.text, radioPlaying, !!(run.on && !run.sim), !!run.mute].join("|");
+    if (!force && key === sent) return; sent = key;
+    P.update({ title: c.title, text: c.text, active: radioPlaying, trip: !!(run.on && !run.sim), muted: !!run.mute }).catch(function () { });
+  }
+  A.on("fact", function (e) { here = e.p.n; push(); });
+  A.on("fix", function () { push(); });
+  A.on("trip", function () { idle = "Viaje en marcha"; push(); });
+  A.on("mute", function () { push(); });
+  A.on("stopped", function () { here = null; idle = "Viaje parado"; push(); });
+  /* Cada 30 s alterna el sitio actual y el próximo mientras suena la radio. */
+  setInterval(function () { if (radioPlaying && run.on) { tick++; push(); } }, 30000);
   /* Emisoras favoritas en la lista de la pantalla del coche. */
   var lastNames = "";
   function pushStations() {
@@ -32,9 +48,8 @@
   }
   A.on("radio", function (e) {
     var was = radioPlaying; radioPlaying = !!e.playing;
-    if (was !== radioPlaying) { push(); bgApply(radioPlaying ? "radio" : bgGet()); }
-    pushStations();
-    if (e.playing && e.fav && !(run.lastFact && run.on)) { cur = { title: e.fav.n, text: "Radio" }; push(); }
+    if (was !== radioPlaying) bgApply(radioPlaying ? "radio" : bgGet());
+    pushStations(); push();
   });
   setTimeout(pushStations, 2000);
   document.addEventListener("visibilitychange", function () { if (!document.hidden) pushStations(); });
@@ -82,5 +97,5 @@
     });
   }
   bgRender(); setTimeout(function () { bgApply(bgGet()); }, 1200);
-  push();
+  push(true);
 })();

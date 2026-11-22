@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 67, items: [
+    "Android Auto, con la radio de la app sonando: arriba alterna cada 30 segundos «Ahora: sitio» y «Próximo: sitio · km», y debajo va el nombre de la emisora."
+  ] },
   { v: 66, items: [
     "La aplicación Android muestra un distintivo APP junto al título, para distinguirla de la web."
   ] },
