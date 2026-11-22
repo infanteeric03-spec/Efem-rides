@@ -410,7 +410,7 @@
   var lastQ = null, busyQ = false;
   A.on("fix", function (e) {
     if (!S.live || run.sim || busyQ || !navigator.onLine) return;
-    if (run.heading == null || (run.kmh || 0) < 15) return;
+    if (run.heading == null || (run.kmh || 0) < 15) { around(e); return; }
     if (lastQ && C.dist(lastQ[0], lastQ[1], e.lat, e.lon) < 4) return;
     lastQ = [e.lat, e.lon];
     var pos = [e.lat, e.lon], ahead = offset(e.lat, e.lon, run.heading, 7), far = offset(e.lat, e.lon, run.heading, 14);
@@ -433,6 +433,31 @@
       install(); persist(); A.emit("places");
     }).catch(function () { /* sin cobertura: se intentará más adelante */ }).then(function () { busyQ = false; });
   });
+
+  /* Parado o muy despacio: si no hay nada por contar cerca, se busca en Wikipedia alrededor del sitio donde estás. */
+  var lastH = null, lastHAt = 0;
+  function around(e) {
+    if (Date.now() - lastHAt < 60000) return;
+    if (lastH && C.dist(lastH[0], lastH[1], e.lat, e.lon) < 1.5) return;
+    var pos = [e.lat, e.lon];
+    var known = L.filter(function (p) { return A.placeOn(p) && C.dist(p.lat, p.lon, e.lat, e.lon) < 3 && A.isFresh(p); }).length;
+    if (known >= 1) return;
+    lastH = pos; lastHAt = Date.now(); busyQ = true;
+    wikiAround(e.lat, e.lon, 6000).then(function (pages) {
+      var cands = [];
+      pages.forEach(function (p) {
+        if (!p.coordinates || !p.coordinates.length || A.byId["wp" + p.pageid]) return;
+        var d = C.dist(p.coordinates[0].lat, p.coordinates[0].lon, e.lat, e.lon);
+        if (d > 5) return;
+        var c = candidate(p, d); if (c) cands.push(c);
+      });
+      var add = pick(cands, L, 3, 3);
+      if (!add.length) return;
+      fillRegions(add, run.region);
+      LIVE = LIVE.concat(add).slice(-300);
+      install(); persist(); A.emit("places");
+    }).catch(function () { lastHAt = 0; }).then(function () { busyQ = false; });
+  }
 
   /* ---------- Interfaz ---------- */
   function status(t, kind) { var s = $("pStatus"); s.textContent = t || ""; s.className = "note" + (kind ? " " + kind : ""); s.hidden = !t; }

@@ -147,6 +147,30 @@ async function trip(page, ctx, route) {
   await ctx.close();
 }
 
+/* ---------- 6. Parado en un sitio sin lugares: busca alrededor ---------- */
+console.log("\nBúsqueda alrededor");
+{
+  const first = await mk();
+  await first.page.goto(BASE + "index.html"); await first.page.waitForTimeout(900);
+  const spot = await first.page.evaluate(() => {
+    const L = window.App.L, C = window.App.C;
+    for (let la = 42.9; la < 43.5; la += 0.05) for (let lo = -7.0; lo < -3.4; lo += 0.05) if (L.every((p) => C.dist(p.lat, p.lon, la, lo) > 6)) return [la, lo];
+    return null;
+  });
+  await first.ctx.close();
+  check(!!spot, "hay un punto de prueba lejos de todos los lugares", "no encontrado");
+  if (spot) {
+    const { ctx, page } = await mk({ geolocation: { latitude: spot[0], longitude: spot[1] } });
+    await page.route((u) => /wikipedia\.org/.test(u.href), (r) => r.fulfill({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ query: { pages: [{ pageid: 9001, title: "Ermita de Prueba", description: "ermita", extract: "La ermita de Prueba es una iglesia pequeña situada junto al camino. Fue construida en el siglo XVII y reformada después. Todavía conserva su espadaña original.", coordinates: [{ lat: spot[0] + 0.01, lon: spot[1] }] }] } }) }));
+    await page.goto(BASE + "index.html"); await page.waitForTimeout(900);
+    await page.evaluate(() => window.App.start("new")); await page.waitForTimeout(2500);
+    const found = await page.evaluate(() => !!window.App.byId["wp9001"]);
+    check(found, "parado en un sitio sin lugares, busca en Wikipedia alrededor y lo encuentra", "no apareció el lugar");
+    await page.evaluate(() => window.App.stop());
+    await ctx.close();
+  }
+}
+
 await b.close(); server.close();
 console.log("\n" + oks.length + " comprobaciones correctas, " + fails.length + " fallos");
 if (fails.length) {
