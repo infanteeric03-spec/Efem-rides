@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 66, items: [
+    "La aplicación Android muestra un distintivo APP junto al título, para distinguirla de la web."
+  ] },
   { v: 65, items: [
     "iPhone: la voz y la radio suenan también con el interruptor de silencio puesto, y salen por los altavoces y por CarPlay (iOS 16.4 o superior)."
   ] },

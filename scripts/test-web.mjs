@@ -159,7 +159,7 @@ console.log("\nNovedades");
   check(shown, "tras actualizar sale la lista de novedades", "no salió");
   await page.evaluate(() => [...document.querySelectorAll(".modal:not([hidden]) .btn")].pop().click());
   const saved = await page.evaluate(() => localStorage.getItem("rch.novSeen"));
-  check(saved && +saved >= 65, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
+  check(saved && +saved >= 66, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
   await ctx.close();
 }
 
@@ -175,6 +175,19 @@ console.log("\nSesión de audio (iPhone)");
   const seq = await page.evaluate(() => window.__t.join(","));
   check(seq === "transient,playback,transient,auto", "la sesión de audio del iPhone pasa por " + seq, "secuencia: " + seq);
   await ctx.close();
+}
+
+/* ---------- Distintivo APP ---------- */
+console.log("\nDistintivo");
+{
+  const w = await mk(); await w.page.goto(BASE + "index.html"); await w.page.waitForTimeout(500);
+  check(await w.page.$eval("#vers", (e) => e.hidden || getComputedStyle(e).display === "none"), "la web no muestra el distintivo APP", "se ve en la web");
+  await w.ctx.close();
+  const n = await mk();
+  await n.page.addInitScript(() => { window.Capacitor = { isNativePlatform: () => true, registerPlugin: () => new Proxy({}, { get: () => () => Promise.resolve({}) }) }; });
+  await n.page.goto(BASE + "index.html"); await n.page.waitForTimeout(500);
+  check(await n.page.$eval("#vers", (e) => !e.hidden && getComputedStyle(e).display !== "none" && e.textContent === "APP"), "la aplicación Android muestra el distintivo APP", "no se ve en la app");
+  await n.ctx.close();
 }
 
 /* ---------- 6. Parado en un sitio sin lugares: busca alrededor ---------- */

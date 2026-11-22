@@ -425,3 +425,10 @@
   if (!A.native && "serviceWorker" in navigator && location.protocol.indexOf("http") === 0) navigator.serviceWorker.register("sw.js").catch(function () { /* sin modo sin conexión */ });
   window.RCH_READY = true;
 })();
+
+/* Distintivo APP en la cabecera: solo en la aplicación Android, para distinguirla de la web. */
+(function () {
+  var b = document.getElementById("vers"); if (!b) return;
+  var C = window.Capacitor;
+  b.hidden = !(C && C.isNativePlatform && C.isNativePlatform());
+})();
