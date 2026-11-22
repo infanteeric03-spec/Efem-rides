@@ -37,6 +37,7 @@ check(tags.size === 1 && tags.has(ver), "la versión del texto coincide con los 
 check(sw.includes("ruta-historia-v" + ver), "la caché del service worker es la versión " + ver, "sw.js no coincide");
 const notCached = scripts.filter((s) => !sw.includes(s.split("?")[0]));
 check(!notCached.length, "el service worker guarda todos los scripts", notCached.join(", "));
+for (const f of ["costa", "montanas", "mapa", "camino", "arcos"]) check(fs.existsSync(path.join(ROOT, "fondos", f + ".png")) && sw.includes("fondos/" + f + ".png"), "fondo de Android Auto " + f + " existe y está en la caché", "falta");
 for (const f of fs.readdirSync(ROOT).filter((x) => x.endsWith(".js"))) {
   try { new Function(fs.readFileSync(path.join(ROOT, f), "utf8")); } catch (e) { fail("sintaxis de " + f, e.message); }
 }

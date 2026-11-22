@@ -30,5 +30,28 @@
     else if (a.name === "repeat") A.repeat();
     else if (a.name === "mute") A.setMute(!run.mute);
   });
+  /* Fondo muy tenue para la pantalla del coche. */
+  var BGS = [["costa", "Costa"], ["montanas", "Montañas"], ["mapa", "Mapa"], ["camino", "Camino"], ["arcos", "Arcos"], ["", "Ninguno"]];
+  function bgGet() { try { var v = localStorage.getItem("rch.autobg"); return v == null ? "costa" : v; } catch (e) { return "costa"; } }
+  function bgApply(name) {
+    if (!name) { P.setBackground({ image: "" }).catch(function () { }); return; }
+    fetch("fondos/" + name + ".png").then(function (r) { return r.blob(); }).then(function (b) {
+      var fr = new FileReader();
+      fr.onload = function () { P.setBackground({ image: String(fr.result).split(",")[1] || "" }).catch(function () { }); };
+      fr.readAsDataURL(b);
+    }).catch(function () { });
+  }
+  var box = document.getElementById("autoBgs");
+  function bgRender() {
+    var cur = bgGet(); box.textContent = "";
+    BGS.forEach(function (x) {
+      var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "radio"); b.setAttribute("aria-checked", x[0] === cur ? "true" : "false");
+      if (x[0]) { var im = document.createElement("img"); im.src = "fondos/" + x[0] + ".png"; im.alt = ""; b.appendChild(im); }
+      var sp = document.createElement("span"); sp.textContent = x[1]; b.appendChild(sp);
+      b.addEventListener("click", function () { try { localStorage.setItem("rch.autobg", x[0]); } catch (e) { } bgRender(); bgApply(x[0]); A.emit("toast", "Fondo de Android Auto: " + x[1] + "."); });
+      box.appendChild(b);
+    });
+  }
+  bgRender(); setTimeout(function () { bgApply(bgGet()); }, 1200);
   push();
 })();

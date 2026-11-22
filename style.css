@@ -657,3 +657,10 @@ input[type="date"].search::-webkit-calendar-picker-indicator { filter: invert(.8
 .sum-cell { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 2px; }
 .sum-cell b { font: 700 28px/1.1 var(--font-display); }
 .sum-cell span { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+
+.line.col { flex-direction: column; align-items: stretch; gap: 10px; }
+.bgs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.bgs button { border: 2px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--fg); padding: 0; overflow: hidden; display: flex; flex-direction: column; font: 600 14px/1.2 var(--font-body); min-height: 44px; }
+.bgs button img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.bgs button span { padding: 6px 4px; text-align: center; }
+.bgs button[aria-checked="true"] { border-color: var(--accent, #e8b93c); }

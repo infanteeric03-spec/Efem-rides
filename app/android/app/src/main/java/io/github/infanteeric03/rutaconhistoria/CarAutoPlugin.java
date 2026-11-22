@@ -1,5 +1,7 @@
 package io.github.infanteeric03.rutaconhistoria;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -55,6 +57,25 @@ public class CarAutoPlugin extends Plugin {
         new Handler(Looper.getMainLooper()).post(() -> {
             RutaAutoService s = RutaAutoService.instance;
             if (s != null) s.notifyChildrenChanged("ruta_root");
+        });
+        call.resolve();
+    }
+
+    /** Imagen de fondo (PNG en base64) para la pantalla del coche; vacía quita el fondo. */
+    @PluginMethod
+    public void setBackground(PluginCall call) {
+        String data = call.getString("image", "");
+        Bitmap bmp = null;
+        if (data != null && !data.isEmpty()) {
+            try {
+                byte[] raw = android.util.Base64.decode(data, android.util.Base64.DEFAULT);
+                bmp = BitmapFactory.decodeByteArray(raw, 0, raw.length);
+            } catch (Exception e) { bmp = null; }
+        }
+        RutaAutoService.background = bmp;
+        new Handler(Looper.getMainLooper()).post(() -> {
+            RutaAutoService s = RutaAutoService.instance;
+            if (s != null) s.apply();
         });
         call.resolve();
     }

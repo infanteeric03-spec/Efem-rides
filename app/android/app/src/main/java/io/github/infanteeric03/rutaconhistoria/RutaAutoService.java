@@ -1,5 +1,6 @@
 package io.github.infanteeric03.rutaconhistoria;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
@@ -27,6 +28,7 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
     static String title = "Ruta con Historia";
     static String text = "Empieza el viaje en el móvil";
     static boolean active = false;
+    static Bitmap background = null;
     static List<String> stations = new ArrayList<>();
 
     private MediaSessionCompat session;
@@ -62,12 +64,16 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
     /** Refleja el estado actual en la sesión de medios. */
     void apply() {
         if (session == null) return;
-        MediaMetadataCompat meta = new MediaMetadataCompat.Builder()
+        MediaMetadataCompat.Builder mb = new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, text)
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "Ruta con Historia")
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
-                .build();
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1);
+        if (background != null) {
+            mb.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, background);
+            mb.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, background);
+        }
+        MediaMetadataCompat meta = mb.build();
         session.setMetadata(meta);
         long actions = PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE
                 | PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
