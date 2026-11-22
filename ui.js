@@ -348,6 +348,12 @@
     sel.value = S.voice;
   }
   A.on("voices", fillVoices);
+  (function () {
+    var C0 = window.Capacitor;
+    if (!(C0 && C0.isNativePlatform && C0.isNativePlatform())) return;
+    $("voiceMore").hidden = false;
+    $("btnVoices").addEventListener("click", function () { C0.registerPlugin("SpeechDuck").openSettings().catch(function () { A.emit("toast", "No he podido abrir los ajustes de voz."); }); });
+  })();
 
   var sims = $("s_sim");
   A.SIMS.forEach(function (r, i) { var o = el("option", null, r.n); o.value = String(i); sims.appendChild(o); });

@@ -1,14 +1,17 @@
 package io.github.infanteeric03.rutaconhistoria;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.Voice;
 import android.speech.tts.UtteranceProgressListener;
 
+import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -35,6 +38,7 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
     private AudioFocusRequest focusRequest;
     private boolean hasFocus = false;
     private int pending = 0;
+    private String currentVoice = "";
     private final List<PluginCall> waiting = new ArrayList<>();
     private final AudioManager.OnAudioFocusChangeListener focusListener = change -> { };
 
@@ -114,6 +118,21 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
         float rate = call.getFloat("rate", 1f);
         float volume = call.getFloat("volume", 1f);
         boolean flush = Boolean.TRUE.equals(call.getBoolean("flush", false));
+        String voiceName = call.getString("voice", "");
+        if (voiceName != null && !voiceName.equals(currentVoice)) {
+            try {
+                Voice chosen = null;
+                if (!voiceName.isEmpty() && tts.getVoices() != null) {
+                    for (Voice v : tts.getVoices()) if (voiceName.equals(v.getName())) { chosen = v; break; }
+                }
+                if (chosen != null) tts.setVoice(chosen);
+                else {
+                    int r0 = tts.setLanguage(new Locale("es", "ES"));
+                    if (r0 == TextToSpeech.LANG_MISSING_DATA || r0 == TextToSpeech.LANG_NOT_SUPPORTED) tts.setLanguage(new Locale("es"));
+                }
+                currentVoice = voiceName;
+            } catch (Exception e) { /* se mantiene la voz actual */ }
+        }
         requestFocus();
         tts.setSpeechRate(rate);
         Bundle params = new Bundle();
@@ -122,6 +141,45 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
         pending++;
         int r = tts.speak(text, flush ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, params, UUID.randomUUID().toString());
         if (r != TextToSpeech.SUCCESS) { finished(); call.reject("No se pudo hablar"); return; }
+        call.resolve();
+    }
+
+    /** Voces en español instaladas en el móvil. */
+    @PluginMethod
+    public void voices(PluginCall call) {
+        JSArray list = new JSArray();
+        if (ready && tts != null) {
+            try {
+                for (Voice v : tts.getVoices()) {
+                    if (v.getLocale() == null || !"es".equalsIgnoreCase(v.getLocale().getLanguage())) continue;
+                    JSObject o = new JSObject();
+                    o.put("name", v.getName());
+                    o.put("lang", v.getLocale().toLanguageTag());
+                    o.put("local", !v.isNetworkConnectionRequired());
+                    o.put("quality", v.getQuality());
+                    list.put(o);
+                }
+            } catch (Exception e) { /* sin voces */ }
+        }
+        JSObject res = new JSObject();
+        res.put("voices", list);
+        res.put("ready", ready);
+        call.resolve(res);
+    }
+
+    /** Abre los ajustes de texto a voz de Android, para instalar más voces. */
+    @PluginMethod
+    public void openSettings(PluginCall call) {
+        Intent i = new Intent("com.android.settings.TTS_SETTINGS");
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try { getContext().startActivity(i); }
+        catch (Exception e) {
+            try {
+                Intent j = new Intent(android.provider.Settings.ACTION_SETTINGS);
+                j.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getContext().startActivity(j);
+            } catch (Exception e2) { call.reject("No se pudieron abrir los ajustes"); return; }
+        }
         call.resolve();
     }
 

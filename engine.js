@@ -117,6 +117,21 @@
     refreshVoices();
     if (synth.addEventListener) synth.addEventListener("voiceschanged", refreshVoices); else synth.onvoiceschanged = refreshVoices;
   }
+  /* En la app Android: voces en español que tiene el móvil. Se vuelven a leer al volver a la app, por si se han instalado más. */
+  function loadNativeVoices(tries) {
+    if (!NS) return;
+    NS.voices().then(function (r) {
+      var list = (r.voices || []).map(function (v, i) {
+        return { name: "Voz " + (i + 1) + (v.local ? "" : " · necesita internet"), lang: v.lang, voiceURI: v.name };
+      });
+      if (!r.ready && tries < 6) { setTimeout(function () { loadNativeVoices(tries + 1); }, 1500); return; }
+      voices = list; emit("voices", voices);
+    }).catch(function () { });
+  }
+  if (NS) {
+    loadNativeVoices(0);
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) loadNativeVoices(5); });
+  }
   function pickVoice() {
     if (!voices.length) return null;
     if (S.voice) {
@@ -134,7 +149,7 @@
       emit("voice", true);
       var wait = App.radioOn && App.radioOn() ? 450 : 0;
       setTimeout(function () {
-        NS.speak({ text: text, rate: +S.rate, volume: +S.vol, flush: !!interrupt }).catch(function () { nativeBusy = false; voiceMaybeDone(); });
+        NS.speak({ text: text, rate: +S.rate, volume: +S.vol, flush: !!interrupt, voice: (S.voice && voices.some(function (v) { return v.voiceURI === S.voice; })) ? S.voice : "" }).catch(function () { nativeBusy = false; voiceMaybeDone(); });
       }, wait);
       return true;
     }
