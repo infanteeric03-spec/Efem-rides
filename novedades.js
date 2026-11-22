@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 63, items: [
+    "Android Auto: siguiente y anterior (en pantalla y en los botones del volante) cambian de emisora mientras suena la radio de la app. Con «Otro dato» como botón propio."
+  ] },
   { v: 62, items: [
     "Android Auto: revisados los botones. Play y pausa del coche controlan la radio, Silencio cambia a «Activar voz» y el siguiente cuenta otro dato.",
     "Esta lista de novedades, que sale cada vez que la app se actualiza."

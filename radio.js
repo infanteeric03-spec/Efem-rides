@@ -195,6 +195,7 @@
   }
   function toggle() { if (want) stop(); else play(); }
   function next() { play(st.cur + 1); }
+  function prev() { play(st.cur - 1); }
 
   /* ---------- Mientras habla la app ---------- */
   A.radioOn = function () { return want && !audio.paused && st.duck !== "nada"; };
@@ -233,7 +234,7 @@
 
   /* Al parar el viaje, se para también la radio. */
   A.on("stopped", function () { if (want) stop(); });
-  A.radio = { play: play, stop: stop, toggle: toggle, next: next, audio: audio, state: function () { return { want: want, st: st }; } };
+  A.radio = { play: play, stop: stop, toggle: toggle, next: next, prev: prev, audio: audio, state: function () { return { want: want, st: st }; } };
 
   /* ---------- Interfaz ---------- */
   function renderNow() {

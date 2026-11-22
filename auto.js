@@ -47,6 +47,12 @@
     /* Play y pausa del coche: la radio de la app. */
     if (a.name === "play") { if (!A.radio.state().want) A.radio.toggle(); return; }
     if (a.name === "pause") { if (A.radio.state().want) A.radio.stop(); return; }
+    /* Siguiente y anterior (pantalla y volante): emisora si suena la radio; si no, otro dato. */
+    if (a.name === "next" || a.name === "prev") {
+      if (A.radio.state().want) { if (a.name === "next") A.radio.next(); else A.radio.prev(); }
+      else if (a.name === "next" && run.on) A.more();
+      return;
+    }
     if (!run.on) return;
     if (a.name === "more") A.more();
     else if (a.name === "repeat") A.repeat();

@@ -42,7 +42,8 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         session = new MediaSessionCompat(this, "RutaConHistoria");
         session.setCallback(new MediaSessionCompat.Callback() {
             @Override public void onCustomAction(String action, Bundle extras) { fire(action); }
-            @Override public void onSkipToNext() { fire("more"); }
+            @Override public void onSkipToNext() { fire("next"); }
+            @Override public void onSkipToPrevious() { fire("prev"); }
             @Override public void onPlayFromMediaId(String mediaId, Bundle extras) { fire(mediaId); }
             @Override public void onPlay() { fire("play"); }
             @Override public void onPause() { fire("pause"); }
@@ -78,11 +79,13 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         MediaMetadataCompat meta = mb.build();
         session.setMetadata(meta);
         long actions = PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE
-                | PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
+                | PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
         PlaybackStateCompat state = new PlaybackStateCompat.Builder()
                 .setActions(actions)
                 .setState(active ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED, 0, 1f)
                 .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("trip", tripOn ? "Parar ruta" : "Iniciar ruta", tripOn ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play).build())
+                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("more", "Otro dato", android.R.drawable.ic_menu_info_details).build())
                 .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("repeat", "Repetir", android.R.drawable.ic_menu_rotate).build())
                 .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("mute", muted ? "Activar voz" : "Silencio", muted ? android.R.drawable.ic_lock_silent_mode_off : android.R.drawable.ic_lock_silent_mode).build())
                 .build();
