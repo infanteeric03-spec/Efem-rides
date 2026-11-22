@@ -14,8 +14,10 @@
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento */ } }
 
   var DEF = { homeId: "", homeFreq: "nunca", voice: "", rate: 1, vol: 1, auto: true, maxFacts: 3, approach: true, today: true,
-    zone: 1, ahorro: "0", wake: true, dim: false, theme: "dark", sim: "0", simSpeed: "10" };
+    zone: 1, ahorro: "0", wake: true, dim: false, theme: "auto", sim: "0", simSpeed: "10" };
   var S = App.S = Object.assign({}, DEF, load("rch.settings", {}));
+  /* Una sola vez: el tema pasa a seguir al móvil por defecto (se puede volver a cambiar en Ajustes). */
+  if (!S.themeV) { S.theme = "auto"; S.themeV = 1; save("rch.settings", S); }
   App.setS = function (k, v) { S[k] = v; save("rch.settings", S); emit("settings", k); };
 
   /* Rutas de prueba: líneas rectas entre lugares, solo para comprobar avisos y voz. */

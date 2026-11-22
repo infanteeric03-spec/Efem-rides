@@ -340,7 +340,7 @@
   });
 
   /* ---------- Ajustes ---------- */
-  function applyTheme() { document.documentElement.setAttribute("data-theme", S.theme || "dark"); }
+  function applyTheme() { document.documentElement.setAttribute("data-theme", S.theme || "auto"); }
   function fillVoices() {
     var sel = $("s_voice"); sel.textContent = "";
     var auto = el("option", null, A.hasVoice ? "Automática" : "Tu móvil no tiene voz"); auto.value = ""; sel.appendChild(auto);

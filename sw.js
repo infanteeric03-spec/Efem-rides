@@ -1,8 +1,8 @@
 /* Service worker: guarda la app para que abra sin cobertura. */
-var CACHE = "ruta-historia-v56";
+var CACHE = "ruta-historia-v57";
 var ARCHIVOS = [
-  "./", "./index.html", "./style.css?v=56", "./engine.js?v=56", "./ui.js?v=56", "./drive.js?v=56", "./radio.js?v=56", "./explore.js?v=56", "./home.js?v=56", "./update.js?v=56", "./edits.js?v=56", "./summary.js?v=56", "./bt.js?v=56", "./fondos/costa.png", "./fondos/montanas.png", "./fondos/mapa.png", "./fondos/camino.png", "./fondos/arcos.png", "./auto.js?v=56", "./routemap.js?v=56", "./guide.js?v=56", "./vendor/leaflet/leaflet.js", "./vendor/leaflet/leaflet.css", "./core.js?v=56",
-  "./data-asturias.js?v=56", "./data-cantabria.js?v=56", "./data-dias.js?v=56",
+  "./", "./index.html", "./style.css?v=57", "./engine.js?v=57", "./ui.js?v=57", "./drive.js?v=57", "./radio.js?v=57", "./explore.js?v=57", "./home.js?v=57", "./update.js?v=57", "./edits.js?v=57", "./summary.js?v=57", "./bt.js?v=57", "./fondos/costa.png", "./fondos/montanas.png", "./fondos/mapa.png", "./fondos/camino.png", "./fondos/arcos.png", "./auto.js?v=57", "./routemap.js?v=57", "./guide.js?v=57", "./vendor/leaflet/leaflet.js", "./vendor/leaflet/leaflet.css", "./core.js?v=57",
+  "./data-asturias.js?v=57", "./data-cantabria.js?v=57", "./data-dias.js?v=57",
   "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"
 ];
 
