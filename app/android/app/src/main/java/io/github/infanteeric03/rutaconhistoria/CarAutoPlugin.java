@@ -3,6 +3,7 @@ package io.github.infanteeric03.rutaconhistoria;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -36,6 +37,24 @@ public class CarAutoPlugin extends Plugin {
         new Handler(Looper.getMainLooper()).post(() -> {
             RutaAutoService s = RutaAutoService.instance;
             if (s != null) s.apply();
+        });
+        call.resolve();
+    }
+
+    /** Lista de emisoras de radio que se ofrece en la pantalla del coche. */
+    @PluginMethod
+    public void setStations(PluginCall call) {
+        java.util.List<String> names = new java.util.ArrayList<>();
+        JSArray arr = call.getArray("names");
+        if (arr != null) {
+            for (int i = 0; i < arr.length(); i++) {
+                try { names.add(arr.getString(i)); } catch (Exception e) { /* se ignora */ }
+            }
+        }
+        RutaAutoService.stations = names;
+        new Handler(Looper.getMainLooper()).post(() -> {
+            RutaAutoService s = RutaAutoService.instance;
+            if (s != null) s.notifyChildrenChanged("ruta_root");
         });
         call.resolve();
     }

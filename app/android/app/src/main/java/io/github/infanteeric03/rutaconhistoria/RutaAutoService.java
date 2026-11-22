@@ -2,6 +2,7 @@ package io.github.infanteeric03.rutaconhistoria;
 
 import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -26,6 +27,7 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
     static String title = "Ruta con Historia";
     static String text = "Empieza el viaje en el móvil";
     static boolean active = false;
+    static List<String> stations = new ArrayList<>();
 
     private MediaSessionCompat session;
 
@@ -37,6 +39,7 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         session.setCallback(new MediaSessionCompat.Callback() {
             @Override public void onCustomAction(String action, Bundle extras) { fire(action); }
             @Override public void onSkipToNext() { fire("more"); }
+            @Override public void onPlayFromMediaId(String mediaId, Bundle extras) { fire(mediaId); }
             @Override public void onPlay() { fire("repeat"); }
             @Override public void onPause() { fire("mute"); }
         });
@@ -87,6 +90,17 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
 
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
-        result.sendResult(new ArrayList<>());
+        List<MediaBrowserCompat.MediaItem> items = new ArrayList<>();
+        if ("ruta_root".equals(parentId)) {
+            for (int i = 0; i < stations.size(); i++) {
+                MediaDescriptionCompat d = new MediaDescriptionCompat.Builder()
+                        .setMediaId("radio:" + i)
+                        .setTitle(stations.get(i))
+                        .setSubtitle("Radio")
+                        .build();
+                items.add(new MediaBrowserCompat.MediaItem(d, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
+            }
+        }
+        result.sendResult(items);
     }
 }
