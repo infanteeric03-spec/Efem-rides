@@ -1,8 +1,8 @@
 /* Service worker: guarda la app para que abra sin cobertura. */
-var CACHE = "ruta-historia-v49";
+var CACHE = "ruta-historia-v50";
 var ARCHIVOS = [
-  "./", "./index.html", "./style.css?v=49", "./engine.js?v=49", "./ui.js?v=49", "./drive.js?v=49", "./radio.js?v=49", "./explore.js?v=49", "./home.js?v=49", "./update.js?v=49", "./edits.js?v=49", "./summary.js?v=49", "./bt.js?v=49", "./auto.js?v=49", "./routemap.js?v=49", "./guide.js?v=49", "./vendor/caveat/caveat-latin-700-normal.woff2", "./vendor/leaflet/leaflet.js", "./vendor/leaflet/leaflet.css", "./core.js?v=49",
-  "./data-asturias.js?v=49", "./data-cantabria.js?v=49", "./data-dias.js?v=49",
+  "./", "./index.html", "./style.css?v=50", "./engine.js?v=50", "./ui.js?v=50", "./drive.js?v=50", "./radio.js?v=50", "./explore.js?v=50", "./home.js?v=50", "./update.js?v=50", "./edits.js?v=50", "./summary.js?v=50", "./bt.js?v=50", "./auto.js?v=50", "./routemap.js?v=50", "./guide.js?v=50", "./vendor/caveat/caveat-latin-700-normal.woff2", "./vendor/leaflet/leaflet.js", "./vendor/leaflet/leaflet.css", "./core.js?v=50",
+  "./data-asturias.js?v=50", "./data-cantabria.js?v=50", "./data-dias.js?v=50",
   "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"
 ];
 
