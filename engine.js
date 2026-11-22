@@ -104,6 +104,14 @@
     NS.addListener("end", function () { nativeBusy = false; run.lastEnd = Date.now(); voiceMaybeDone(); });
   }
 
+  /* iPhone (Safari 16.4 o superior): sin esto, el interruptor de silencio apaga la voz y el sonido no sale por los altavoces ni por CarPlay.
+     "transient" suena aunque el interruptor esté en silencio y baja a Spotify mientras habla; con la radio de la app se usa "playback". */
+  var audioSess = navigator.audioSession || null;
+  function sessionType(t) { try { if (audioSess && audioSess.type !== t) audioSess.type = t; } catch (e) { /* no disponible */ } }
+  App.on("trip", function () { sessionType("transient"); });
+  App.on("radio", function (e) { if (run.on) sessionType(e && e.playing ? "playback" : "transient"); });
+  App.on("stopped", function () { sessionType("auto"); });
+
   /* ---------- Voz ---------- */
   var synth = NS ? null : (window.speechSynthesis || null), voices = [];
   App.hasVoice = !!synth || !!NS;

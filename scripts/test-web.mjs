@@ -159,7 +159,21 @@ console.log("\nNovedades");
   check(shown, "tras actualizar sale la lista de novedades", "no salió");
   await page.evaluate(() => [...document.querySelectorAll(".modal:not([hidden]) .btn")].pop().click());
   const saved = await page.evaluate(() => localStorage.getItem("rch.novSeen"));
-  check(saved && +saved >= 64, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
+  check(saved && +saved >= 65, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
+  await ctx.close();
+}
+
+/* ---------- Sesión de audio del iPhone ---------- */
+console.log("\nSesión de audio (iPhone)");
+{
+  const { ctx, page } = await mk();
+  await page.addInitScript(() => { window.__t = []; let v = "auto"; Object.defineProperty(navigator, "audioSession", { value: { get type() { return v; }, set type(x) { v = x; window.__t.push(x); } } }); });
+  await page.goto(BASE + "index.html"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.App.start("new")); await page.waitForTimeout(300);
+  await page.evaluate(() => window.App.emit("radio", { playing: true })); await page.evaluate(() => window.App.emit("radio", { playing: false }));
+  await page.evaluate(() => window.App.stop()); await page.waitForTimeout(300);
+  const seq = await page.evaluate(() => window.__t.join(","));
+  check(seq === "transient,playback,transient,auto", "la sesión de audio del iPhone pasa por " + seq, "secuencia: " + seq);
   await ctx.close();
 }
 

@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 65, items: [
+    "iPhone: la voz y la radio suenan también con el interruptor de silencio puesto, y salen por los altavoces y por CarPlay (iOS 16.4 o superior)."
+  ] },
   { v: 64, items: [
     "Android Auto: los botones propios y la lista usan siluetas (radio, bandera, altavoz, flecha circular, globo de texto).",
     "Nuevo botón Radio para encender y apagar la radio desde el coche, y la silueta de la radio como portada mientras suena."
