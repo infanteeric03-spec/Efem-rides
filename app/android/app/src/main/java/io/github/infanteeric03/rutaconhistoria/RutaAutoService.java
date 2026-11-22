@@ -80,7 +80,6 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         PlaybackStateCompat state = new PlaybackStateCompat.Builder()
                 .setActions(actions)
                 .setState(active ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED, 0, 1f)
-                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("more", "Otro dato", android.R.drawable.ic_media_next).build())
                 .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("repeat", "Repetir", android.R.drawable.ic_menu_rotate).build())
                 .addCustomAction(new PlaybackStateCompat.CustomAction.Builder("mute", "Silencio", android.R.drawable.ic_lock_silent_mode).build())
                 .build();

@@ -9,7 +9,12 @@
   /* La sesión de medios solo se activa mientras suena la radio de la app: así los datos hablados no se llevan el control de medios del coche. */
   var radioPlaying = false;
   function push() { P.update({ title: cur.title, text: cur.text, active: radioPlaying }).catch(function () { }); }
-  A.on("fact", function (e) { cur = { title: e.p.n, text: e.f.text }; push(); });
+  /* En la pantalla del coche el texto es corto: solo la primera frase, con un máximo de unos 90 caracteres. */
+  function short(t) {
+    var s = String(t || "").replace(/\s+/g, " ").trim(), m = /^(.+?[.!?])(\s|$)/.exec(s), f = m ? m[1] : s;
+    return f.length > 90 ? f.slice(0, 88).replace(/\s+\S*$/, "") + "…" : f;
+  }
+  A.on("fact", function (e) { cur = { title: e.p.n, text: short(e.f.text) }; push(); });
   A.on("trip", push);
   A.on("stopped", function () { cur = { title: "Ruta con Historia", text: "Viaje parado" }; push(); });
   /* Emisoras favoritas en la lista de la pantalla del coche. */
