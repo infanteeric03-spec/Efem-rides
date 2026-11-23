@@ -100,6 +100,7 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
                 focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
                         .setAudioAttributes(attrs)
                         .setOnAudioFocusChangeListener(focusListener)
+                        .setWillPauseWhenDucked(true)   // sin esto Android baja el volumen solo y no avisa: la voz seguiría hablando
                         .build();
             }
             res = audio.requestAudioFocus(focusRequest);

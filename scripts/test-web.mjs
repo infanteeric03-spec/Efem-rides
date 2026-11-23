@@ -159,7 +159,7 @@ console.log("\nNovedades");
   check(shown, "tras actualizar sale la lista de novedades", "no salió");
   await page.evaluate(() => [...document.querySelectorAll(".modal:not([hidden]) .btn")].pop().click());
   const saved = await page.evaluate(() => localStorage.getItem("rch.novSeen"));
-  check(saved && +saved >= 69, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
+  check(saved && +saved >= 70, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
   await ctx.close();
 }
 

@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 70, items: [
+    "Corregido: la voz de la app ahora sí se calla cuando el navegador da un aviso, también andando."
+  ] },
   { v: 69, items: [
     "En Android, si el navegador da un aviso mientras la app lee un dato, la app se calla y el navegador se oye solo."
   ] },
