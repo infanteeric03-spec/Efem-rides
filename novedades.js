@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 72, items: [
+    "Nuevo ajuste en Voz (app Android): «Cuando habla el navegador», para que la voz de la app se calle o baje el volumen, y cuánto baja (del 20 al 90 %)."
+  ] },
   { v: 71, items: [
     "Al elegir una voz en Ajustes suena una frase de prueba, para oírla al momento."
   ] },

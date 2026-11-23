@@ -40,17 +40,64 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
     private int pending = 0;
     private String currentVoice = "";
     private final List<PluginCall> waiting = new ArrayList<>();
-    /* Si otra app pide el foco para hablar (el aviso del navegador), esta voz se calla: el navegador manda. */
+    /* Frases pendientes (la que suena y las siguientes), para poder repetirlas con otro volumen. */
+    private static class Item { String id; String text; float base; int off = 0; }
+    private final List<Item> queue = new ArrayList<>();
+    private boolean duckedNow = false;
+    private String navMode = "callar";   // qué hacer cuando habla el navegador: "callar" o "bajar"
+    private float navPct = 0.6f;         // cuánto baja el volumen en modo "bajar" (0..1)
+
+    /* Si otra app pide el foco para hablar (el aviso del navegador), el navegador manda:
+       la voz se calla o baja el volumen, según el ajuste. */
     private final AudioManager.OnAudioFocusChangeListener focusListener = change -> {
-        if (change == AudioManager.AUDIOFOCUS_LOSS
+        if (change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK && "bajar".equals(navMode)) {
+            relaunch(1f - navPct);
+            synchronized (this) { duckedNow = true; }
+        } else if (change == AudioManager.AUDIOFOCUS_GAIN) {
+            boolean was;
+            synchronized (this) { was = duckedNow; duckedNow = false; }
+            if (was) relaunch(1f);
+        } else if (change == AudioManager.AUDIOFOCUS_LOSS
                 || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT
                 || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+            synchronized (this) { queue.clear(); pending = 0; duckedNow = false; }
             if (tts != null) tts.stop();
-            synchronized (this) { pending = 0; }
             hasFocus = false;
             notifyListeners("end", new JSObject());
         }
     };
+
+    /** Vuelve a decir lo que queda por decir con otro volumen, sin repetir lo ya dicho. */
+    private synchronized void relaunch(float factor) {
+        if (tts == null || queue.isEmpty()) return;
+        List<Item> rest = new ArrayList<>();
+        boolean first = true;
+        for (Item it : queue) {
+            String t = it.text;
+            if (first) { t = t.substring(Math.min(Math.max(it.off, 0), t.length())); first = false; }
+            if (t.trim().isEmpty()) continue;
+            Item n = new Item();
+            n.id = UUID.randomUUID().toString(); n.text = t; n.base = it.base;
+            rest.add(n);
+        }
+        queue.clear();
+        queue.addAll(rest);
+        pending = queue.size();
+        tts.stop();
+        boolean flush = true;
+        for (Item n : queue) {
+            Bundle params = new Bundle();
+            params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, Math.max(0.02f, Math.min(1f, n.base * factor)));
+            tts.speak(n.text, flush ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, params, n.id);
+            flush = false;
+        }
+        if (queue.isEmpty()) { abandonFocus(); notifyListeners("end", new JSObject()); }
+    }
+
+    private synchronized boolean take(String id) {
+        for (int i = 0; i < queue.size(); i++) if (queue.get(i).id.equals(id)) { queue.remove(i); return true; }
+        return false;
+    }
 
     @Override
     public void load() {
@@ -72,9 +119,12 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
             tts.setAudioAttributes(attrs);
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override public void onStart(String id) { notifyListeners("start", new JSObject()); }
-                @Override public void onDone(String id) { finished(); }
-                @Override public void onError(String id) { finished(); }
-                @Override public void onStop(String id, boolean interrupted) { finished(); }
+                @Override public void onRangeStart(String id, int start, int end, int frame) {
+                    synchronized (SpeechDuckPlugin.this) { for (Item it : queue) if (it.id.equals(id)) { it.off = start; break; } }
+                }
+                @Override public void onDone(String id) { if (take(id)) finished(); }
+                @Override public void onError(String id) { if (take(id)) finished(); }
+                @Override public void onStop(String id, boolean interrupted) { if (take(id)) finished(); }
             });
         }
         List<PluginCall> calls = new ArrayList<>(waiting);
@@ -130,6 +180,9 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
         float volume = call.getFloat("volume", 1f);
         boolean flush = Boolean.TRUE.equals(call.getBoolean("flush", false));
         String voiceName = call.getString("voice", "");
+        String nav = call.getString("nav", "callar");
+        navMode = "bajar".equals(nav) ? "bajar" : "callar";
+        navPct = Math.max(0.1f, Math.min(0.95f, call.getFloat("duckPct", 60f) / 100f));
         if (voiceName != null && !voiceName.equals(currentVoice)) {
             try {
                 Voice chosen = null;
@@ -146,12 +199,17 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
         }
         requestFocus();
         tts.setSpeechRate(rate);
+        Item it = new Item();
+        it.id = UUID.randomUUID().toString(); it.text = text; it.base = volume;
         Bundle params = new Bundle();
-        params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume);
-        if (flush) pending = 0;
-        pending++;
-        int r = tts.speak(text, flush ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, params, UUID.randomUUID().toString());
-        if (r != TextToSpeech.SUCCESS) { finished(); call.reject("No se pudo hablar"); return; }
+        params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, Math.max(0.02f, Math.min(1f, volume * (duckedNow ? 1f - navPct : 1f))));
+        synchronized (this) {
+            if (flush) { queue.clear(); pending = 0; }
+            queue.add(it);
+            pending++;
+        }
+        int r = tts.speak(text, flush ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, params, it.id);
+        if (r != TextToSpeech.SUCCESS) { take(it.id); finished(); call.reject("No se pudo hablar"); return; }
         call.resolve();
     }
 
@@ -196,8 +254,8 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
 
     @PluginMethod
     public void stop(PluginCall call) {
+        synchronized (this) { queue.clear(); pending = 0; duckedNow = false; }
         if (tts != null) tts.stop();
-        synchronized (this) { pending = 0; }
         abandonFocus();
         notifyListeners("end", new JSObject());
         call.resolve();

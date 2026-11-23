@@ -352,13 +352,19 @@
     var C0 = window.Capacitor;
     if (!(C0 && C0.isNativePlatform && C0.isNativePlatform())) return;
     $("voiceMore").hidden = false;
+    $("navModeRow").hidden = false;
+    function navShow() { $("navPctRow").hidden = S.navMode !== "bajar"; $("navPctTxt").textContent = (+S.navPct || 60) + " %"; }
+    navShow();
+    A.on("settings", navShow);
+    $("s_navPct").addEventListener("input", function () { $("navPctTxt").textContent = $("s_navPct").value + " %"; });
+    $("s_navPct").addEventListener("change", function () { A.testVoice(); });
     $("btnVoices").addEventListener("click", function () { C0.registerPlugin("SpeechDuck").openSettings().catch(function () { A.emit("toast", "No he podido abrir los ajustes de voz."); }); });
   })();
 
   var sims = $("s_sim");
   A.SIMS.forEach(function (r, i) { var o = el("option", null, r.n); o.value = String(i); sims.appendChild(o); });
 
-  [["voice", "s_voice"], ["rate", "s_rate"], ["vol", "s_vol"], ["auto", "s_auto"], ["approach", "s_approach"], ["today", "s_today"],
+  [["voice", "s_voice"], ["navMode", "s_navMode"], ["navPct", "s_navPct"], ["rate", "s_rate"], ["vol", "s_vol"], ["auto", "s_auto"], ["approach", "s_approach"], ["today", "s_today"],
     ["zone", "s_zone"], ["ahorro", "s_ahorro"], ["wake", "s_wake"], ["dim", "s_dim"], ["theme", "s_theme"], ["sim", "s_sim"], ["simSpeed", "s_simSpeed"]
   ].forEach(function (pair) {
     var key = pair[0], inp = $(pair[1]), box = inp.type === "checkbox";
