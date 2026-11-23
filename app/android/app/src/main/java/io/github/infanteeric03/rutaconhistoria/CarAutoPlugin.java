@@ -21,8 +21,9 @@ public class CarAutoPlugin extends Plugin {
         RutaAutoService.listener = name -> {
             JSObject o = new JSObject();
             o.put("name", name);
-            notifyListeners("action", o);
+            notifyListeners("action", o, true);   // se retiene hasta que la web esté escuchando
         };
+        RutaAutoService.flushPending(RutaAutoService.listener);
     }
 
     @Override

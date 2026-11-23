@@ -63,9 +63,32 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         super.onDestroy();
     }
 
+    /* Órdenes del coche que llegan con la app cerrada (la pantalla web no existe aún): se guardan y se ejecutan al abrir la app. */
+    private static final List<String> pendingNames = new ArrayList<>();
+    private static final List<Long> pendingTimes = new ArrayList<>();
+    private static final long PENDING_MAX_MS = 10 * 60 * 1000L;
+
+    private static synchronized void queueAction(String name) {
+        if (!(name.equals("trip") || name.equals("play") || name.startsWith("radio:"))) return;   // solo las que tienen sentido más tarde
+        int i = pendingNames.indexOf(name);
+        if (i >= 0) { pendingNames.remove(i); pendingTimes.remove(i); if (name.equals("trip")) return; }   // dos pulsaciones de «viaje» se anulan
+        pendingNames.add(name); pendingTimes.add(System.currentTimeMillis());
+        while (pendingNames.size() > 3) { pendingNames.remove(0); pendingTimes.remove(0); }
+        text = "Se hará al abrir la app en el móvil";
+        RutaAutoService s = instance;
+        if (s != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(s::apply);
+    }
+
+    /** Entrega las órdenes guardadas (las caducadas se descartan). */
+    static synchronized void flushPending(ActionListener l) {
+        long now = System.currentTimeMillis();
+        for (int i = 0; i < pendingNames.size(); i++) if (now - pendingTimes.get(i) <= PENDING_MAX_MS) l.onAction(pendingNames.get(i));
+        pendingNames.clear(); pendingTimes.clear();
+    }
+
     private static void fire(String name) {
         ActionListener l = listener;
-        if (l != null) l.onAction(name);
+        if (l != null) l.onAction(name); else queueAction(name);
     }
 
     /** Dibuja una silueta (vector) como imagen para la lista. */
