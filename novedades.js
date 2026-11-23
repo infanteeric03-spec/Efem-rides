@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 69, items: [
+    "En Android, si el navegador da un aviso mientras la app lee un dato, la app se calla y el navegador se oye solo."
+  ] },
   { v: 68, items: [
     "El icono de la aplicación Android lleva una pastilla «APP» en la esquina inferior derecha, para distinguirlo de la web instalada desde el navegador."
   ] },

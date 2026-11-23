@@ -40,7 +40,17 @@ public class SpeechDuckPlugin extends Plugin implements TextToSpeech.OnInitListe
     private int pending = 0;
     private String currentVoice = "";
     private final List<PluginCall> waiting = new ArrayList<>();
-    private final AudioManager.OnAudioFocusChangeListener focusListener = change -> { };
+    /* Si otra app pide el foco para hablar (el aviso del navegador), esta voz se calla: el navegador manda. */
+    private final AudioManager.OnAudioFocusChangeListener focusListener = change -> {
+        if (change == AudioManager.AUDIOFOCUS_LOSS
+                || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT
+                || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+            if (tts != null) tts.stop();
+            synchronized (this) { pending = 0; }
+            hasFocus = false;
+            notifyListeners("end", new JSObject());
+        }
+    };
 
     @Override
     public void load() {
