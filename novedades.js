@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 76, items: [
+    "Android Auto, con la app cerrada: cuenta atrás de 10 segundos en la pantalla del coche; si no contestas, se da por un «Sí» y empieza solo. «No» la cancela."
+  ] },
   { v: 75, items: [
     "Android Auto: si la app está cerrada, el coche pregunta «¿Forzar el inicio?» con Sí / No. Con «Sí» intenta abrir la app (sobre la pantalla de bloqueo) y empieza la ruta sin tocar el móvil."
   ] },

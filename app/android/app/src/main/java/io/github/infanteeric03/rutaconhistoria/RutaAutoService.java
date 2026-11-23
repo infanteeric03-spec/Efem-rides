@@ -82,6 +82,31 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         title = "La app está cerrada";
         text = "¿Forzar el inicio? Elígelo en la lista";
         refreshAll();
+        RutaAutoService s = instance;
+        if (s != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(s::startCountdown);
+    }
+
+    /* Cuenta atrás de 10 s: si nadie contesta se asume «Sí» y se intenta abrir la app. «No» o abrir la app a mano la cancelan. */
+    private final android.os.Handler cdH = new android.os.Handler(android.os.Looper.getMainLooper());
+    private boolean cdActive = false;
+    private int cdLeft = 0;
+    private final Runnable cdTick = new Runnable() {
+        @Override public void run() {
+            if (!askForce) { cdActive = false; return; }
+            if (cdLeft <= 0) { cdActive = false; forceLaunch(); return; }
+            StringBuilder bar = new StringBuilder();
+            for (int i = 0; i < 10; i++) bar.append(i < cdLeft ? "█" : "░");
+            title = "La app está cerrada · empezando en " + cdLeft + " s";
+            text = bar + "  Toca «No» para cancelar";
+            apply();
+            cdLeft--;
+            cdH.postDelayed(this, 1000);
+        }
+    };
+    void startCountdown() {
+        if (cdActive || !askForce) return;
+        cdActive = true; cdLeft = 10;
+        cdH.post(cdTick);
     }
 
     /** true mientras el coche ofrece «Sí / No» para abrir la app cerrada. */
@@ -177,7 +202,7 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         List<MediaBrowserCompat.MediaItem> items = new ArrayList<>();
         if ("ruta_root".equals(parentId) && askForce) {
             MediaDescriptionCompat y = new MediaDescriptionCompat.Builder().setMediaId("force:yes")
-                    .setTitle("Sí, abrir la app y empezar").setSubtitle("La app está cerrada")
+                    .setTitle("Sí, abrir la app y empezar").setSubtitle("Opción por defecto")
                     .setIconBitmap(icon(R.drawable.ic_aa_iniciar)).build();
             MediaDescriptionCompat n = new MediaDescriptionCompat.Builder().setMediaId("force:no")
                     .setTitle("No, esperar a abrirla yo").setSubtitle("Se descarta la orden")
