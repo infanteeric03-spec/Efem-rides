@@ -53,7 +53,7 @@ En la pestaña **Lugares**:
 - **Tema**: por defecto sigue al móvil (claro u oscuro); se puede fijar en Ajustes → Tema.
 - **Voces en Android**: Ajustes → Voz lista las voces en español del móvil y permite elegir una; «Instalar más voces» abre los ajustes de texto a voz de Android para descargar otras (Google, Samsung…).
 - **iPhone**: durante el viaje la web pide a Safari la sesión de audio «transient» (con la radio, «playback»), para que suene con el interruptor de silencio y salga por altavoces y CarPlay (iOS 16.4 o superior).
-- **Distintivo APP**: la aplicación Android muestra «APP» junto al título de la cabecera; la web no lo lleva.
+- **Distintivo APP**: la aplicación Android muestra «APP» junto al título de la cabecera y su icono lleva una pastilla «APP» en la esquina inferior derecha; la web no lleva ninguno.
 - **Novedades**: al actualizar, la app muestra una vez la lista de cambios (`novedades.js`; hay que añadir una entrada por versión, y una prueba lo comprueba). También en Ajustes → Ayuda → Novedades.
 - **Resumen del viaje**: al parar un viaje aparece un resumen (km, tiempo, lugares y datos escuchados) que se puede compartir como texto.
 - **Este dato está mal**: botón bajo el dato en pantalla; lo anota y sale en «Exportar cambios» para revisarlo.

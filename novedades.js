@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 68, items: [
+    "El icono de la aplicación Android lleva una pastilla «APP» en la esquina inferior derecha, para distinguirlo de la web instalada desde el navegador."
+  ] },
   { v: 67, items: [
     "Android Auto, con la radio de la app sonando: arriba alterna cada 30 segundos «Ahora: sitio» y «Próximo: sitio · km», y debajo va el nombre de la emisora."
   ] },
