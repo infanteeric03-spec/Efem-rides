@@ -48,7 +48,11 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
             @Override public void onCustomAction(String action, Bundle extras) { fire(action); }
             @Override public void onSkipToNext() { fire("next"); }
             @Override public void onSkipToPrevious() { fire("prev"); }
-            @Override public void onPlayFromMediaId(String mediaId, Bundle extras) { fire(mediaId); }
+            @Override public void onPlayFromMediaId(String mediaId, Bundle extras) {
+                if ("force:yes".equals(mediaId)) forceLaunch();
+                else if ("force:no".equals(mediaId)) forceNo();
+                else fire(mediaId);
+            }
             @Override public void onPlay() { fire("play"); }
             @Override public void onPause() { fire("pause"); }
         });
@@ -74,9 +78,19 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         if (i >= 0) { pendingNames.remove(i); pendingTimes.remove(i); if (name.equals("trip")) return; }   // dos pulsaciones de «viaje» se anulan
         pendingNames.add(name); pendingTimes.add(System.currentTimeMillis());
         while (pendingNames.size() > 3) { pendingNames.remove(0); pendingTimes.remove(0); }
-        text = "Se hará al abrir la app en el móvil";
-        RutaAutoService s = instance;
-        if (s != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(s::apply);
+        askForce = true;
+        title = "La app está cerrada";
+        text = "¿Forzar el inicio? Elígelo en la lista";
+        refreshAll();
+    }
+
+    /** true mientras el coche ofrece «Sí / No» para abrir la app cerrada. */
+    static boolean askForce = false;
+
+    private static void refreshAll() {
+        final RutaAutoService s = instance;
+        if (s == null) return;
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> { s.apply(); s.notifyChildrenChanged("ruta_root"); });
     }
 
     /** Entrega las órdenes guardadas (las caducadas se descartan). */
@@ -84,6 +98,29 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
         long now = System.currentTimeMillis();
         for (int i = 0; i < pendingNames.size(); i++) if (now - pendingTimes.get(i) <= PENDING_MAX_MS) l.onAction(pendingNames.get(i));
         pendingNames.clear(); pendingTimes.clear();
+        if (askForce) { askForce = false; refreshAll(); }
+    }
+
+    /** «Sí»: intenta abrir la app (con el móvil bloqueado se muestra sobre la pantalla de bloqueo). */
+    private void forceLaunch() {
+        title = "Abriendo la app…"; text = "Un momento"; askForce = false; refreshAll();
+        try {
+            android.content.Intent i = new android.content.Intent(this, MainActivity.class);
+            i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            i.putExtra("fromAuto", true);
+            startActivity(i);
+        } catch (Exception e) { /* se avisa más abajo si no llega a abrirse */ }
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            if (listener == null) {
+                title = "No he podido abrir la app"; text = "Ábrela en el móvil y la orden se hará sola"; refreshAll();
+            }
+        }, 8000);
+    }
+
+    /** «No»: se descarta la orden guardada. */
+    private void forceNo() {
+        synchronized (RutaAutoService.class) { pendingNames.clear(); pendingTimes.clear(); }
+        askForce = false; title = "Ruta con Historia"; text = "Empieza el viaje en el móvil"; refreshAll();
     }
 
     private static void fire(String name) {
@@ -138,7 +175,16 @@ public class RutaAutoService extends MediaBrowserServiceCompat {
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
         List<MediaBrowserCompat.MediaItem> items = new ArrayList<>();
-        if ("ruta_root".equals(parentId)) {
+        if ("ruta_root".equals(parentId) && askForce) {
+            MediaDescriptionCompat y = new MediaDescriptionCompat.Builder().setMediaId("force:yes")
+                    .setTitle("Sí, abrir la app y empezar").setSubtitle("La app está cerrada")
+                    .setIconBitmap(icon(R.drawable.ic_aa_iniciar)).build();
+            MediaDescriptionCompat n = new MediaDescriptionCompat.Builder().setMediaId("force:no")
+                    .setTitle("No, esperar a abrirla yo").setSubtitle("Se descarta la orden")
+                    .setIconBitmap(icon(R.drawable.ic_aa_parar)).build();
+            items.add(new MediaBrowserCompat.MediaItem(y, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
+            items.add(new MediaBrowserCompat.MediaItem(n, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
+        } else if ("ruta_root".equals(parentId)) {
             MediaDescriptionCompat t = new MediaDescriptionCompat.Builder()
                     .setMediaId("trip")
                     .setTitle(tripOn ? "Parar ruta" : "Iniciar ruta")

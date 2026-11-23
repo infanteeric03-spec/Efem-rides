@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 75, items: [
+    "Android Auto: si la app está cerrada, el coche pregunta «¿Forzar el inicio?» con Sí / No. Con «Sí» intenta abrir la app (sobre la pantalla de bloqueo) y empieza la ruta sin tocar el móvil."
+  ] },
   { v: 74, items: [
     "Android Auto: si pulsas «Iniciar ruta» (o eliges una emisora) con la app cerrada, la orden se guarda y se ejecuta en cuanto abras la app en el móvil."
   ] },

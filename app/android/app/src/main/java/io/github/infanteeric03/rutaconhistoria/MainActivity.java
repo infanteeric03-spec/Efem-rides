@@ -10,6 +10,10 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        /* Abierta desde el coche con el móvil bloqueado: se muestra sobre la pantalla de bloqueo para poder empezar la ruta. */
+        if (getIntent() != null && getIntent().getBooleanExtra("fromAuto", false)) {
+            if (Build.VERSION.SDK_INT >= 27) { setShowWhenLocked(true); setTurnScreenOn(true); }
+        }
         registerPlugin(SpeechDuckPlugin.class);
         registerPlugin(CarBluetoothPlugin.class);
         registerPlugin(CarAutoPlugin.class);
