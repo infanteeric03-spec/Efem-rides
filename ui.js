@@ -366,6 +366,7 @@
     inp.addEventListener("change", function () {
       A.setS(key, box ? inp.checked : inp.value);
       if (key === "theme") applyTheme();
+      if (key === "voice") A.testVoice();   // al elegir una voz suena una frase de prueba
       if (key === "dim") renderButtons();
       if (key === "ahorro" && run.on && !run.sim && S.ahorro !== "0") toast("Ahorro activado: con " + S.ahorro + " s entre posiciones, a 90 km/h comprueba cada " + Math.round(25 * +S.ahorro) + " m.");
       if (key === "wake" && !S.wake) toast("Sin esto, el móvil puede apagar la pantalla y parar el GPS.");

@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 71, items: [
+    "Al elegir una voz en Ajustes suena una frase de prueba, para oírla al momento."
+  ] },
   { v: 70, items: [
     "Corregido: la voz de la app ahora sí se calla cuando el navegador da un aviso, también andando."
   ] },
