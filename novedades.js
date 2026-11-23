@@ -1,5 +1,8 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 73, items: [
+    "Android Auto: el lugar que se ve en el coche ya sigue al de la tarjeta del móvil (antes se quedaba con el último dato hablado) y se refresca solo cada 10 segundos."
+  ] },
   { v: 72, items: [
     "Nuevo ajuste en Voz (app Android): «Cuando habla el navegador», para que la voz de la app se calle o baje el volumen, y cuánto baja (del 20 al 90 %)."
   ] },

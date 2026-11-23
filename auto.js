@@ -6,7 +6,13 @@
   if (!(CAP && CAP.isNativePlatform && CAP.isNativePlatform())) return;
   var P = CAP.registerPlugin("CarAuto");
   /* La sesión de medios solo se activa mientras suena la radio de la app: así los datos hablados no se llevan el control de medios del coche. */
-  var radioPlaying = false, here = null, idle = "Empieza el viaje en el móvil", tick = 0;
+  var radioPlaying = false, idle = "Empieza el viaje en el móvil", tick = 0;
+  /* El lugar actual sale siempre del estado de la app (el mismo que la tarjeta del móvil), no del último dato hablado: así no se queda desfasado. */
+  function hereName() {
+    if (!run.on) return null;
+    var p = run.here && A.byId[run.here];
+    return p ? p.n : "En ruta";
+  }
   function nextText() {
     if (!run.on) return null;
     return run.next ? "Próximo: " + run.next.p.n + " · " + A.C.fmtKm(run.next.d) : "Buscando el próximo lugar…";
@@ -21,10 +27,10 @@
   function compose() {
     var next = nextText();
     if (radioPlaying) {
-      var lines = []; if (here) lines.push("Ahora: " + here); if (next) lines.push(next);
+      var here = hereName(), lines = []; if (here && run.here) lines.push("Ahora: " + here); if (next) lines.push(next);
       return { title: lines.length ? lines[tick % lines.length] : "Ruta con Historia", text: station() };
     }
-    return { title: here || "Ruta con Historia", text: next || idle };
+    return { title: hereName() || "Ruta con Historia", text: next || idle };
   }
   var sent = "";
   function push(force) {
@@ -32,11 +38,15 @@
     if (!force && key === sent) return; sent = key;
     P.update({ title: c.title, text: c.text, active: radioPlaying, trip: !!(run.on && !run.sim), muted: !!run.mute }).catch(function () { });
   }
-  A.on("fact", function (e) { here = e.p.n; push(); });
+  A.on("fact", function () { push(); });
+  A.on("here", function () { push(); });
   A.on("fix", function () { push(); });
+  /* Red de seguridad: recalcula lo que se ve en el coche cada 10 s por si se perdió algún aviso (móvil bloqueado, JS frenado) y al volver a primer plano. */
+  setInterval(function () { push(); }, 10000);
+  document.addEventListener("visibilitychange", function () { push(true); });
   A.on("trip", function () { idle = "Viaje en marcha"; push(); });
   A.on("mute", function () { push(); });
-  A.on("stopped", function () { here = null; idle = "Viaje parado"; push(); });
+  A.on("stopped", function () { idle = "Viaje parado"; push(); });
   /* Cada 30 s alterna el sitio actual y el próximo mientras suena la radio. */
   setInterval(function () { if (radioPlaying && run.on) { tick++; push(); } }, 30000);
   /* Emisoras favoritas en la lista de la pantalla del coche. */
