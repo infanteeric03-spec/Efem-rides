@@ -1,5 +1,9 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 78, items: [
+    "Viaje a un nuevo destino: ahora eliges el destino (y el origen) entre los lugares de la app, escribiendo o desde una lista, sin buscarlo en internet.",
+    "Con la ruta preparada puedes revisar el mapa y pulsar «Validar e iniciar ruta» para empezar el viaje."
+  ] },
   { v: 77, items: [
     "Todos los desplegables de la app tienen ahora un aspecto propio, más claro y cómodo de tocar.",
     "Bluetooth del coche (app Android): ahora hay un interruptor y, al activarlo, eliges tu coche en una lista de dispositivos emparejados."

@@ -54,6 +54,43 @@
       }, function () { rej(new Error("nogps")); }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
     });
   }
+  /* ---------- Destino entre los lugares de la app ---------- */
+  var REGN = { AST: "Asturias", CAN: "Cantabria" };
+  function nrm(s) { return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim(); }
+  function appPlaces() { return L.filter(function (p) { return !p.src; }); }
+  function placeByName(t) {
+    var k = nrm(t); if (!k) return null;
+    var hit = appPlaces().filter(function (p) { return nrm(p.n) === k; });
+    return hit.length === 1 ? hit[0] : null;
+  }
+  function destOf(p) { return { lat: p.lat, lon: p.lon, name: p.n, full: p.n + ", " + (REGN[p.reg] || "España"), own: true }; }
+  function geocodeDest(t) { var p = placeByName(t); return p ? Promise.resolve(destOf(p)) : geocode(t); }
+  function fillPick() {
+    var sel = $("pPick"); sel.textContent = "";
+    var o0 = document.createElement("option"); o0.value = ""; o0.textContent = "Elegir un lugar de la app…"; sel.appendChild(o0);
+    appPlaces().slice().sort(function (a, b) { return a.n.localeCompare(b.n, "es"); }).forEach(function (p) {
+      var o = document.createElement("option"); o.value = p.id; o.textContent = p.n + (REGN[p.reg] ? " · " + REGN[p.reg] : ""); sel.appendChild(o);
+    });
+  }
+  function hideSug() { $("pSug").hidden = true; $("pSug").textContent = ""; }
+  function chooseDest(p) { $("pTo").value = p.n; hideSug(); $("pPick").value = ""; }
+  function showSug() {
+    var k = nrm($("pTo").value), box = $("pSug");
+    if (k.length < 1) { hideSug(); return; }
+    var hits = appPlaces().filter(function (p) { return nrm(p.n).indexOf(k) >= 0; })
+      .sort(function (a, b) { return (nrm(a.n).indexOf(k) === 0 ? 0 : 1) - (nrm(b.n).indexOf(k) === 0 ? 0 : 1) || a.n.localeCompare(b.n, "es"); }).slice(0, 6);
+    if (!hits.length || (hits.length === 1 && nrm(hits[0].n) === k)) { hideSug(); return; }
+    box.textContent = "";
+    hits.forEach(function (p) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "prep-sug-item"; b.setAttribute("role", "option");
+      var n = document.createElement("span"); n.textContent = p.n; var r = document.createElement("small"); r.textContent = REGN[p.reg] || "";
+      b.appendChild(n); b.appendChild(r);
+      b.addEventListener("pointerdown", function (ev) { ev.preventDefault(); });   // no pierde el foco del campo antes de elegir
+      b.addEventListener("click", function () { chooseDest(p); });
+      box.appendChild(b);
+    });
+    box.hidden = false;
+  }
   function routeBetween(a, b) {
     return getJSON(OSRM + a.lon + "," + a.lat + ";" + b.lon + "," + b.lat + "?overview=full&geometries=geojson&alternatives=false&steps=false", 20000).then(function (j) {
       if (!j || j.code !== "Ok" || !j.routes || !j.routes.length) throw new Error("noroute");
@@ -325,7 +362,7 @@
     function alive(x) { if (my !== job) throw new Error("cancel"); return x; }
     status("Buscando " + toText + "…");
     progress(0.02);
-    Promise.all([fromText ? geocode(fromText) : myPosition(), geocode(toText)]).then(alive).then(function (r) {
+    Promise.all([fromText ? geocodeDest(fromText) : myPosition(), geocodeDest(toText)]).then(alive).then(function (r) {
       origin = r[0]; dest = r[1];
       status("Calculando la ruta de " + origin.name + " a " + dest.name + "…");
       progress(0.06);
@@ -374,7 +411,7 @@
       status("");
       renderPrep();
       var ne = R.dayEfem ? R.dayEfem.items.length : 0;
-      A.emit("toast", "Viaje a " + dest.name + " preparado: " + places.length + " lugares" + (ne ? " y " + ne + (ne === 1 ? " efeméride" : " efemérides") + " del día" : "") + ".");
+      A.emit("toast", "Viaje a " + dest.name + " preparado" + (places.length ? ": " + places.length + " lugares nuevos" : "") + (ne ? " y " + ne + (ne === 1 ? " efeméride" : " efemérides") + " del día" : "") + ".");
       A.emit("trip");
     }).catch(function (e) {
       var msg = e && e.message;
@@ -463,11 +500,11 @@
   function status(t, kind) { var s = $("pStatus"); s.textContent = t || ""; s.className = "note" + (kind ? " " + kind : ""); s.hidden = !t; }
   function progress(f) { var b = $("pProg"); b.hidden = f == null; if (f != null) $("pBar").style.width = Math.round(f * 100) + "%"; }
   function renderPrep() {
-    var has = R && R.places && R.places.length;
+    var has = !!(R && R.pts && R.pts.length);
     $("pDone").hidden = !has;
     if (has) {
       var d = new Date(R.created);
-      $("pSum").textContent = R.from + " → " + R.to + " · " + C.fmtKm(R.km) + " · " + R.places.length + " lugares guardados" +
+      $("pSum").textContent = R.from + " → " + R.to + " · " + C.fmtKm(R.km) + " · " + (R.places.length ? R.places.length + " lugares nuevos guardados de Wikipedia" : "todos los lugares del camino ya son de la app") +
         (ROUTES.length > 1 ? " · " + ROUTES.length + " rutas guardadas" : "") +
         ". Preparado el " + d.toLocaleDateString("es-ES", { day: "numeric", month: "long" }) + ".";
     }
@@ -489,7 +526,7 @@
     if (A.Map && A.Map.refresh) A.Map.refresh();
     var mini = $("pMini");
     mini.hidden = !has;
-    if (has) mini.textContent = "Ruta preparada: " + R.from + " → " + R.to + " · " + R.places.length + (R.places.length === 1 ? " lugar" : " lugares");
+    if (has) mini.textContent = "Ruta preparada: " + R.from + " → " + R.to + (R.places.length ? " · " + R.places.length + (R.places.length === 1 ? " lugar nuevo" : " lugares nuevos") : "");
     var sel = $("s_sim"), opt = sel.querySelector('option[value="ruta"]');
     if (has && !opt) { opt = document.createElement("option"); opt.value = "ruta"; sel.insertBefore(opt, sel.firstChild); }
     if (opt) { if (has) opt.textContent = "Ruta preparada: " + R.from + " → " + R.to; else opt.remove(); }
@@ -504,6 +541,22 @@
     if (open) setTimeout(function () { $("pTo").focus(); }, 50);
   }
   $("pToggle").addEventListener("click", function () { setOpen($("pPanel").hidden); });
+  fillPick();
+  $("pTo").addEventListener("input", showSug);
+  $("pTo").addEventListener("blur", function () { setTimeout(hideSug, 150); });
+  $("pPick").addEventListener("change", function () {
+    var p = L.filter(function (q) { return q.id === $("pPick").value; })[0];
+    if (p) chooseDest(p);
+  });
+  /* Validar: la ruta ya está guardada y activa; esto la da por buena y empieza el viaje. */
+  $("pStartRoute").addEventListener("click", function () {
+    if (!R || run.on) return;
+    R.ok = true; persist();
+    A.emit("toast", "Ruta validada: " + R.from + " → " + R.to + ".");
+    setOpen(false);
+    var t = $("t-ruta"); if (t) t.click();
+    $("btnStart").click();
+  });
   $("pGo").addEventListener("click", function () { prepare($("pFrom").value.trim(), $("pTo").value.trim()); });
   $("pCancel").addEventListener("click", cancelPrep);
   $("pTo").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); $("pGo").click(); } });

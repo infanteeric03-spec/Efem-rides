@@ -159,7 +159,7 @@ console.log("\nNovedades");
   check(shown, "tras actualizar sale la lista de novedades", "no salió");
   await page.evaluate(() => [...document.querySelectorAll(".modal:not([hidden]) .btn")].pop().click());
   const saved = await page.evaluate(() => localStorage.getItem("rch.novSeen"));
-  check(saved && +saved >= 77, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
+  check(saved && +saved >= 78, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
   await ctx.close();
 }
 
@@ -185,6 +185,37 @@ console.log("\nDesplegables");
   await btn.click(); await page.keyboard.press("Escape");
   check(await page.evaluate(() => document.querySelector(".dd-pop").hidden), "Escape cierra la lista", "seguía abierta");
   check(!errs.length, "sin errores de JavaScript en los desplegables", errs.slice(0, 3).join(" | "));
+  await ctx.close();
+}
+
+/* ---------- Destino entre los lugares de la app ---------- */
+console.log("\nDestino de la lista");
+{
+  const { ctx, page, errs } = await mk();
+  const CORS = { "access-control-allow-origin": "*" };
+  await page.route((u) => /router\.project-osrm\.org/.test(u.href), (r) => r.fulfill({ status: 200, contentType: "application/json", headers: CORS, body: JSON.stringify({ code: "Ok", routes: [{ distance: 31000, duration: 2400, geometry: { coordinates: [[-5.85, 43.36], [-5.7, 43.4], [-5.6, 43.42], [-5.45, 43.4]] } }] }) }));
+  await page.route((u) => /wikipedia\.org/.test(u.href), (r) => r.fulfill({ status: 200, contentType: "application/json", headers: CORS, body: JSON.stringify({ query: { pages: [] } }) }));
+  await page.goto(BASE + "index.html"); await page.waitForTimeout(900);
+  await page.click("#t-lugares"); await page.click("#pToggle");
+  await page.fill("#pTo", "ovi"); await page.waitForTimeout(150);
+  const sug = await page.evaluate(() => [...document.querySelectorAll("#pSug .prep-sug-item")].map((x) => x.textContent));
+  check(sug.some((s) => /Oviedo/.test(s)), "al escribir salen los lugares de la app (" + sug.length + ")", "sin sugerencias: " + sug);
+  await page.locator("#pSug .prep-sug-item", { hasText: "Oviedo" }).first().click();
+  check((await page.inputValue("#pTo")) === "Oviedo", "elegir una sugerencia rellena el destino", "valor: " + (await page.inputValue("#pTo")));
+  const n = await page.evaluate(() => document.querySelectorAll("#pPick option").length);
+  check(n > 50, "la lista trae todos los lugares de la app (" + n + ")", "solo " + n);
+  await page.locator("#pPick").locator("xpath=../button").click();
+  await page.locator(".dd-pop .dd-opt", { hasText: "Llanes" }).first().click();
+  check((await page.inputValue("#pTo")) === "Llanes", "elegir de la lista rellena el destino", "valor: " + (await page.inputValue("#pTo")));
+  check(await page.evaluate(() => document.getElementById("pDone").hidden), "antes de preparar no se ofrece validar la ruta", "visible");
+  await page.fill("#pFrom", "Oviedo"); await page.click("#pGo");
+  await page.waitForFunction(() => !document.getElementById("pDone").hidden, null, { timeout: 15000 }).catch(() => {});
+  const done = await page.evaluate(() => ({ vis: !document.getElementById("pDone").hidden, sum: document.getElementById("pSum").textContent }));
+  check(done.vis && /Llanes/.test(done.sum), "con el destino de la app se prepara la ruta sin buscarlo en internet", JSON.stringify(done));
+  await page.click("#pStartRoute"); await page.waitForTimeout(600);
+  const on = await page.evaluate(() => ({ run: window.App.run.on, ok: JSON.parse(localStorage.getItem("rch.routes") || localStorage.getItem("rch.route") || "null") }));
+  check(on.run === true, "validar e iniciar ruta empieza el viaje", "el viaje no empezó");
+  check(!errs.length, "sin errores de JavaScript al elegir destino", errs.slice(0, 3).join(" | "));
   await ctx.close();
 }
 

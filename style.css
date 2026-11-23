@@ -695,3 +695,13 @@ ul.nov li { line-height: 1.4; }
 .dd-opt[aria-selected="true"] { color: var(--accent); font-weight: 600; }
 .dd-opt[aria-selected="true"]::after { content: "✓"; flex: none; }
 @media (prefers-reduced-motion: reduce) { .dd-btn::after { transition: none; } }
+
+/* Destino entre los lugares de la app */
+.prep-sug { grid-column: 2; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+.prep-sug[hidden] { display: none; }
+.prep-sug-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; padding: 8px 12px; background: none; border: 0; border-bottom: 1px solid var(--line); text-align: left; color: var(--fg); cursor: pointer; }
+.prep-sug-item:last-child { border-bottom: 0; }
+.prep-sug-item:hover, .prep-sug-item:focus-visible { background: var(--panel-2); }
+.prep-sug-item small { color: var(--muted); }
+.prep-fields .dd { display: flex; min-width: 0; }
+#pStartRoute { align-self: stretch; }
