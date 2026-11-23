@@ -1,5 +1,9 @@
 /* Novedades: se muestran una vez cuando la app se actualiza. Al publicar una versión, añade una entrada arriba. */
 window.NOVEDADES = [
+  { v: 77, items: [
+    "Todos los desplegables de la app tienen ahora un aspecto propio, más claro y cómodo de tocar.",
+    "Bluetooth del coche (app Android): ahora hay un interruptor y, al activarlo, eliges tu coche en una lista de dispositivos emparejados."
+  ] },
   { v: 76, items: [
     "Android Auto, con la app cerrada: cuenta atrás de 10 segundos en la pantalla del coche; si no contestas, se da por un «Sí» y empieza solo. «No» la cancela."
   ] },

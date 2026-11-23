@@ -159,7 +159,32 @@ console.log("\nNovedades");
   check(shown, "tras actualizar sale la lista de novedades", "no salió");
   await page.evaluate(() => [...document.querySelectorAll(".modal:not([hidden]) .btn")].pop().click());
   const saved = await page.evaluate(() => localStorage.getItem("rch.novSeen"));
-  check(saved && +saved >= 76, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
+  check(saved && +saved >= 77, "al cerrarla se recuerda la versión vista (" + saved + ")", "no se guardó");
+  await ctx.close();
+}
+
+/* ---------- Desplegables propios ---------- */
+console.log("\nDesplegables");
+{
+  const { ctx, page, errs } = await mk();
+  await page.addInitScript(() => localStorage.setItem("rch.novSeen", "999"));
+  await page.goto(BASE + "index.html"); await page.waitForTimeout(900);
+  await page.evaluate(() => document.getElementById('t-ajustes').click());
+  await page.waitForTimeout(300);
+  const n = await page.evaluate(() => [document.querySelectorAll("select").length, document.querySelectorAll(".dd-btn").length]);
+  check(n[0] > 0 && n[0] === n[1], "cada lista tiene su desplegable propio (" + n[1] + ")", "listas " + n[0] + ", desplegables " + n[1]);
+  const btn = page.locator("#s_theme").locator("xpath=../button");
+  await btn.scrollIntoViewIfNeeded(); await btn.click();
+  const opened = await page.evaluate(() => !document.querySelector(".dd-pop").hidden && document.querySelectorAll(".dd-pop .dd-opt").length);
+  check(opened >= 3, "al tocar se abre la lista con sus opciones (" + opened + ")", "no se abrió");
+  await page.locator(".dd-pop .dd-opt", { hasText: "Claro" }).click();
+  const st = await page.evaluate(() => ({ th: document.documentElement.getAttribute("data-theme"), v: document.getElementById("s_theme").value, txt: document.querySelector("#s_theme").parentElement.querySelector(".dd-txt").textContent, closed: document.querySelector(".dd-pop").hidden }));
+  check(st.th === "light" && st.v === "light" && st.txt === "Claro" && st.closed, "elegir una opción cambia el ajuste y cierra la lista", JSON.stringify(st));
+  const prog = await page.evaluate(() => { const s = document.getElementById("s_theme"); s.value = "dark"; return s.parentElement.querySelector(".dd-txt").textContent; });
+  check(prog === "Oscuro", "si la app cambia el valor por código, el botón lo refleja (" + prog + ")", "mostraba " + prog);
+  await btn.click(); await page.keyboard.press("Escape");
+  check(await page.evaluate(() => document.querySelector(".dd-pop").hidden), "Escape cierra la lista", "seguía abierta");
+  check(!errs.length, "sin errores de JavaScript en los desplegables", errs.slice(0, 3).join(" | "));
   await ctx.close();
 }
 

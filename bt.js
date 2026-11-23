@@ -11,46 +11,49 @@
   function save(v) { try { if (v) localStorage.setItem("rch.car", JSON.stringify(v)); else localStorage.removeItem("rch.car"); } catch (e) { } }
 
   var BT = CAP.registerPlugin("CarBluetooth");
-  var car = load(), stopTimer = null;
+  var car = load(), stopTimer = null, devices = [];
+  /* Interruptor: si no se ha tocado nunca y ya había un coche elegido, sigue activado. */
+  function loadOn() { try { var v = localStorage.getItem("rch.carOn"); return v == null ? !!car : v === "1"; } catch (e) { return !!car; } }
+  function saveOn(v) { try { localStorage.setItem("rch.carOn", v ? "1" : "0"); } catch (e) { } }
+  var on = loadOn();
+  function enabled() { return on && !!car; }
   $("carSec").hidden = false;
   var DEF = $("carTxt").textContent;
 
   function render() {
-    $("btnCar").textContent = car ? "Cambiar" : "Elegir";
-    $("carTxt").textContent = car ? "Coche: " + car.name + ". Empieza el viaje al conectarse y lo para al desconectarse." : DEF;
+    $("carOn").checked = on;
+    $("carPick").hidden = !on;
+    $("carTxt").textContent = !on ? DEF : car ? "Coche: " + car.name + ". Empieza el viaje al conectarse y lo para al desconectarse." : "Elige tu coche en la lista de abajo.";
   }
-  render();
 
-  /* ---------- Elegir el coche ---------- */
-  var modal = el("div", "modal"); modal.hidden = true; modal.setAttribute("role", "dialog"); modal.setAttribute("aria-modal", "true");
-  var sheet = el("div", "sheet"); modal.appendChild(sheet); document.body.appendChild(modal);
-  function close() { modal.hidden = true; document.body.classList.remove("modal-open"); }
-  modal.addEventListener("click", function (e) { if (e.target === modal) close(); });
-
-  function picker(list) {
-    sheet.textContent = "";
-    var head = el("div", "sheet-head"); head.appendChild(el("h2", null, "Elige tu coche"));
-    var x = el("button", "btn ghost small", "Cerrar"); x.type = "button"; x.addEventListener("click", close); head.appendChild(x);
-    sheet.appendChild(head);
-    sheet.appendChild(el("p", "note", list.length ? "Son los dispositivos Bluetooth emparejados con este móvil." : "No hay dispositivos emparejados. Empareja el coche en los ajustes de Bluetooth del móvil y vuelve aquí."));
-    list.forEach(function (d) {
-      var b = el("button", "btn ghost", d.name); b.type = "button";
-      b.addEventListener("click", function () { car = { address: d.address, name: d.name }; save(car); render(); close(); toast("Coche elegido: " + d.name + "."); });
-      sheet.appendChild(b);
-    });
-    if (car) {
-      var rm = el("button", "btn ghost", "Quitar el coche"); rm.type = "button";
-      rm.addEventListener("click", function () { car = null; save(null); render(); close(); toast("Ya no se usa el Bluetooth del coche."); });
-      sheet.appendChild(rm);
-    }
-    modal.hidden = false; document.body.classList.add("modal-open");
+  /* ---------- Lista de coches (dispositivos emparejados) ---------- */
+  function fillList() {
+    var sel = $("s_car"); sel.textContent = "";
+    var first = el("option", null, devices.length ? "Elige tu coche…" : "No hay dispositivos emparejados"); first.value = ""; sel.appendChild(first);
+    var known = false;
+    devices.forEach(function (d) { var o = el("option", null, d.name); o.value = d.address; sel.appendChild(o); if (car && d.address === car.address) known = true; });
+    if (car && !known) { var o2 = el("option", null, car.name + " (no emparejado)"); o2.value = car.address; sel.appendChild(o2); }
+    sel.value = car ? car.address : "";
   }
-  $("btnCar").addEventListener("click", function () {
-    BT.ask().then(function (r) {
-      if (!r.granted) { toast("Hace falta el permiso de Bluetooth para elegir el coche."); return; }
-      return BT.paired().then(function (res) { picker(res.devices || []); });
+  function loadDevices() {
+    return BT.ask().then(function (r) {
+      if (!r.granted) { toast("Hace falta el permiso de Bluetooth para elegir el coche."); on = false; saveOn(false); render(); return; }
+      return BT.paired().then(function (res) { devices = res.devices || []; fillList(); if (!devices.length) toast("No hay dispositivos emparejados. Empareja el coche en los ajustes de Bluetooth del móvil."); });
     }).catch(function () { toast("No he podido leer los dispositivos Bluetooth."); });
+  }
+  $("carOn").addEventListener("change", function () {
+    on = $("carOn").checked; saveOn(on); render();
+    if (on) loadDevices();
+    else { if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; } toast("Bluetooth del coche desactivado."); }
   });
+  $("s_car").addEventListener("change", function () {
+    var v = $("s_car").value, d = devices.filter(function (x) { return x.address === v; })[0];
+    if (!v) car = null; else if (d) car = { address: d.address, name: d.name };
+    save(car); render();
+    if (car) toast("Coche elegido: " + car.name + ".");
+  });
+  render(); fillList();
+  if (on) loadDevices();
 
   /* ---------- Empezar y parar ---------- */
   function begin() {
@@ -59,19 +62,19 @@
     toast("Viaje empezado: coche conectado.");
   }
   BT.addListener("connected", function (d) {
-    if (!car || d.address !== car.address) return;
+    if (!enabled() || d.address !== car.address) return;
     if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
     begin();
   });
   BT.addListener("disconnected", function (d) {
-    if (!car || d.address !== car.address || !run.on || run.sim) return;
+    if (!enabled() || d.address !== car.address || !run.on || run.sim) return;
     /* Margen de 20 s por si el Bluetooth se corta un momento. */
     if (stopTimer) clearTimeout(stopTimer);
     stopTimer = setTimeout(function () { stopTimer = null; if (run.on && !run.sim) A.stop(); }, 20000);
   });
   /* Al abrir la app con el coche ya conectado. */
   function atOpen() {
-    if (!car || run.on) return;
+    if (!enabled() || run.on) return;
     BT.isConnected({ address: car.address }).then(function (r) { if (r.connected) begin(); }).catch(function () { });
   }
   setTimeout(atOpen, 1500);

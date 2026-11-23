@@ -674,3 +674,24 @@ ul.nov li { line-height: 1.4; }
 .badge { display: inline-block; vertical-align: sub; margin-left: 3px; padding: 0; border: 0; background: none; font: 700 9px/1 var(--font-display); letter-spacing: .14em; color: var(--muted); position: relative; top: 2px; }
 .badge.app { color: var(--accent, #b9770e); }
 @media (max-width: 430px) { .top h1 { font-size: 18px; letter-spacing: .02em; } }
+
+/* Desplegables propios (dropdown.js): sustituyen a la lista del sistema */
+.dd { position: relative; display: inline-flex; min-width: 0; }
+.set .dd { flex: none; max-width: 55%; }
+.r-country .dd { flex: 1 1 auto; max-width: 70%; }
+.sheet .dd { display: flex; }
+.dd-native { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; clip: rect(0 0 0 0); }
+.dd-btn { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; padding: 0 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); color: var(--fg); cursor: pointer; }
+.r-country .dd-btn, .sheet .dd-btn { background: var(--panel); }
+.dd-txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.dd-btn::after { content: ""; flex: none; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .15s; }
+.dd-btn[aria-expanded="true"]::after { transform: rotate(-135deg) translateY(-2px); }
+.dd-btn:disabled { opacity: .5; }
+.dd-btn:focus-visible, .dd-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dd-pop { position: fixed; z-index: 9999; overflow-y: auto; overscroll-behavior: contain; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .35); padding: 4px; }
+.dd-pop[hidden] { display: none; }
+.dd-opt { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; padding: 8px 12px; border-radius: 8px; cursor: pointer; color: var(--fg); }
+.dd-opt:hover, .dd-opt:focus { background: var(--panel-2); outline: none; }
+.dd-opt[aria-selected="true"] { color: var(--accent); font-weight: 600; }
+.dd-opt[aria-selected="true"]::after { content: "✓"; flex: none; }
+@media (prefers-reduced-motion: reduce) { .dd-btn::after { transition: none; } }
